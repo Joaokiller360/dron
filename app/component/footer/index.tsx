@@ -2,25 +2,27 @@
 
 import { Instagram, Twitter, Facebook } from 'lucide-react';
 
-import { CopyText, SeparatorUp } from '@/app/utils';
+import { CopyText, SeparatorUp, Logo } from '@/app/utils';
 
 export default function Footer() {
   return (
     <>
-      <footer className="bg-honeydew-800 dark:bg-honeydew-900 text-white">
+      <footer className="text-white bg-honeydew-800 dark:bg-honeydew-900">
         <SeparatorUp colorsPrimary="bg-honeydew-900 dark:bg-honeydew-800" colorsSecundary="text-honeydew-800 dark:text-honeydew-900" />
-        <div className="mx-auto w-full max-w-7xl p-4 py-6 lg:py-8">
+        <div className="w-full p-4 py-6 mx-auto max-w-7xl lg:py-8">
           <div className="md:flex md:justify-between">
             <div className="mb-6 md:mb-0">
-              <a href="https://flowbite.com/" className="flex items-center">
-                <img src="https://flowbite.com/docs/images/logo.svg" className="h-7 me-3" alt="FlowBite Logo" />
-                <span className="text-heading self-center text-2xl font-semibold whitespace-nowrap">Flowbite</span>
-              </a>
+              <Logo
+                href='/'
+                name='jb.skylens'
+                style='h-7 me-3 rounded-full bg-white'
+                imgName='logo'
+              />
             </div>
             <div className="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
               <div>
-                <h2 className="mb-6 text-sm font-semibold text-heading uppercase">Recursos</h2>
-                <ul className="text-body font-medium">
+                <h2 className="mb-6 text-sm font-semibold uppercase text-heading">Recursos</h2>
+                <ul className="font-medium text-body">
                   <li className="mb-2">
                     <a href="/" className="hover:underline">Inicio</a>
                   </li>
@@ -39,8 +41,8 @@ export default function Footer() {
                 </ul>
               </div>
               <div>
-                <h2 className="mb-6 text-sm font-semibold text-heading uppercase">Legal</h2>
-                <ul className="text-body font-medium">
+                <h2 className="mb-6 text-sm font-semibold uppercase text-heading">Legal</h2>
+                <ul className="font-medium text-body">
                   <li className="mb-4">
                     <a href="#" className="hover:underline">Politica de Privacidad</a>
                   </li>
@@ -50,8 +52,8 @@ export default function Footer() {
                 </ul>
               </div>
               <div className='sm:pl-5'>
-                <h2 className="mb-6 text-sm font-semibold text-heading uppercase">Area de Contacto</h2>
-                <ul className="text-body font-medium">
+                <h2 className="mb-6 text-sm font-semibold uppercase text-heading">Area de Contacto</h2>
+                <ul className="font-medium text-body">
                   <li>
                     <a className='text-sm font-semibold text-heading'>Correo:</a><br />
                     <CopyText value='contacto@joaobarres.dev' toastText='Correo Copiado Correctamente' />
@@ -65,10 +67,10 @@ export default function Footer() {
             </div>
           </div>
           <hr className="my-6 border-default sm:mx-auto lg:my-8 text-white/80" />
-          <div className="sm:flex items-center sm:justify-between">
+          <div className="items-center sm:flex sm:justify-between">
             <span className="text-sm text-body sm:text-center">© 2026 <a href="https://joaobarres.dev/" className="hover:underline">JoaoBarres</a>. Todos los derechos reservados.
             </span>
-            <div className="flex pt-5 sm:pt-0 items-center">
+            <div className="flex items-center pt-5 sm:pt-0">
               <a href="https://www.facebook.com/share/1AagbyNSJV/?mibextid=wwXIfr" className="text-body hover:text-heading">
                 <Facebook />
                 <span className="sr-only">Facebook page</span>

@@ -2,6 +2,7 @@
 
 import { Video, Route, Factory, Helicopter, TvMinimalPlay } from 'lucide-react';
 import { usePathname } from "next/navigation";
+import { Logo } from '../logo';
 
 
 export default function Navbar() {
@@ -16,10 +17,14 @@ export default function Navbar() {
     <>
       <nav className="fixed top-0 z-20 w-full text-white dark:bg-honeydew-800 bg-honeydew-900 start-0 border-default">
         <div className="flex flex-wrap items-center justify-between p-4 mx-auto max-w-7xl backdrop-blur-sm">
-          <a href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
-            <img src="https://flowbite.com/docs/images/logo.svg" className="h-7" alt="Flowbite Logo" />
-            <span className="self-center text-xl font-semibold text-heading whitespace-nowrap">Flowbite</span>
-          </a>
+          <div className="flex items-center space-x-3 rtl:space-x-reverse">
+            <Logo
+              href='/'
+              name='jb.skylens'
+              style='h-7 me-3 rounded-full bg-white'
+              imgName='logo'
+            />
+          </div>
           <button data-collapse-toggle="navbar-dropdown" type="button" className="inline-flex items-center justify-center w-10 h-10 p-2 text-sm text-body rounded-base md:hidden hover:bg-neutral-secondary-soft hover:text-heading focus:outline-none focus:ring-2 focus:ring-neutral-tertiary" aria-controls="navbar-dropdown" aria-expanded="false">
             <span className="sr-only">Open main menu</span>
             <svg className="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M5 7h14M5 12h14M5 17h14" /></svg>
