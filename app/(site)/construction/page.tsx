@@ -1,6 +1,7 @@
-'use client'
 
-import { Button, Templets } from "@/app/utils"
+import { Button, createMetadata, Templets } from "@/app/utils"
+
+export const metadata = createMetadata('Error 405')
 
 export default function Construction() {
   return (

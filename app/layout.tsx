@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-import { Navbar } from '@/app/utils'
+import { Favicon, Navbar } from '@/app/utils'
 import { Footer } from '@/app/component';
 import FlowbiteInit from "./flowbait-init";
 
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     default: 'JB.SKYLENS - DRON',
     template: '%s - JB.SKYLENS - DRON',
   },
-  description: 'Sitio web para JB.SKYLENS - DRON',
+  description: 'Sitio web de JB.SKYLENS - DRON',
 }
 
 export default function RootLayout({
@@ -32,6 +32,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
+
+      < Favicon
+        href='logo-ico'
+      />
+
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

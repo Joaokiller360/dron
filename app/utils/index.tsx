@@ -9,7 +9,7 @@ import Maps from './maps'
 import { SectionCard, CardVideo, CardClient } from './cards'
 import { createMetadata } from './metadata'
 import Banner from './banner'
-import { Logo } from './logo'
+import { Favicon, Logo } from './logo'
 
 export {
   Navbar,
@@ -29,5 +29,6 @@ export {
   Banner,
   CardVideo,
   CardClient,
-  Logo
+  Logo,
+  Favicon
 }

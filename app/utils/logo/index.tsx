@@ -17,3 +17,17 @@ export function Logo({ href = '', name = '', style = '', imgName = '' }: logo) {
     </>
   )
 }
+
+interface favicon {
+  href?: string
+}
+
+export function Favicon({ href }: favicon) {
+  return (
+    <>
+      <head>
+        <link rel="icon" href={`https://res.cloudinary.com/dzlavqhid/image/upload/${href}.png`} />
+      </head>
+    </>
+  )
+}
