@@ -4,12 +4,13 @@ import { Video } from 'lucide-react'
 
 interface SectionCard {
   children: React.ReactNode
+  id?: string
 }
 
-export function SectionCard({ children }: SectionCard) {
+export function SectionCard({ children, id = '' }: SectionCard) {
   return (
     <>
-      <section className="p-5 bg-honeydew-900 dark:bg-honeydew-800 rounded-2xl sm:p-10">
+      <section id={id} className="p-5 bg-honeydew-900 dark:bg-honeydew-800 rounded-2xl sm:p-10">
         {children}
       </section>
     </>

@@ -16,7 +16,7 @@ export default function Footer() {
                 href='/'
                 name='jb.skylens'
                 style='h-7 me-3 rounded-full bg-white'
-                imgName='logo'
+                imgName='logo-p'
               />
             </div>
             <div className="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
@@ -32,9 +32,13 @@ export default function Footer() {
                   <li className="mb-2">
                     <a href="/services" className="hover:underline">Servicios</a>
                   </li>
+                  {/*
+                  
                   <li className="mb-2">
                     <a href="/clients" className="hover:underline">Clientes</a>
                   </li>
+                  
+                  */}
                   <li className="mb-2">
                     <a href="/portfolio" className="hover:underline">Portafolio</a>
                   </li>
@@ -44,10 +48,10 @@ export default function Footer() {
                 <h2 className="mb-6 text-sm font-semibold uppercase text-heading">Legal</h2>
                 <ul className="font-medium text-body">
                   <li className="mb-4">
-                    <a href="#" className="hover:underline">Politica de Privacidad</a>
+                    <a href="/construction" className="hover:underline">Politica de Privacidad</a>
                   </li>
                   <li>
-                    <a href="#" className="hover:underline">Terminos &amp; Condiciones</a>
+                    <a href="/construction" className="hover:underline">Terminos &amp; Condiciones</a>
                   </li>
                 </ul>
               </div>

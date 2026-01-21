@@ -4,6 +4,25 @@ import { Video, Route, Factory, Helicopter, TvMinimalPlay } from 'lucide-react';
 import { usePathname } from "next/navigation";
 import { Logo } from '../logo';
 
+interface route {
+  icon?: React.ReactNode
+  name?: string
+  href?: string
+}
+
+export function Routes({ icon, name = '', href = '' }: route) {
+  return (
+    <>
+      <li className="inline-flex items-center w-full p-2 rounded cursor-pointer hover:bg-neutral-tertiary-medium hover:text-heading hover:bg-honeydew-800 dark:hover:bg-honeydew-900">
+        <div className='flex items-center'>
+          {icon}
+          <a href={href} >{name}</a>
+        </div>
+      </li>
+    </>
+  )
+}
+
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -22,7 +41,7 @@ export default function Navbar() {
               href='/'
               name='jb.skylens'
               style='h-7 me-3 rounded-full bg-white'
-              imgName='logo'
+              imgName='logo-p'
             />
           </div>
           <button data-collapse-toggle="navbar-dropdown" type="button" className="inline-flex items-center justify-center w-10 h-10 p-2 text-sm text-body rounded-base md:hidden hover:bg-neutral-secondary-soft hover:text-heading focus:outline-none focus:ring-2 focus:ring-neutral-tertiary" aria-controls="navbar-dropdown" aria-expanded="false">
@@ -42,36 +61,31 @@ export default function Navbar() {
 
                 <div id="dropdownNavbar" className="z-10 hidden shadow-lg bg-honeydew-900 rounded-2xl w-72">
                   <ul className="p-2 text-sm font-medium text-body" aria-labelledby="dropdownNvbarButton">
-                    <li className="inline-flex items-center w-full p-2 rounded cursor-pointer hover:bg-neutral-tertiary-medium hover:text-heading hover:bg-honeydew-800 dark:hover:bg-honeydew-900">
-                      <div className='flex items-center'>
-                        <Video className='pr-2' />
-                        <a href="/" >Grabación de cine, series y peliculas</a>
-                      </div>
-                    </li>
-                    <li className="inline-flex items-center w-full p-2 rounded cursor-pointer hover:bg-neutral-tertiary-medium hover:text-heading hover:bg-honeydew-800 dark:hover:bg-honeydew-900">
-                      <div className='flex items-center'>
-                        <Route className='pr-2' />
-                        <a href="/" >Localización y reconocimiento</a>
-                      </div>
-                    </li>
-                    <li className="inline-flex items-center w-full p-2 rounded cursor-pointer hover:bg-neutral-tertiary-medium hover:text-heading hover:bg-honeydew-800 dark:hover:bg-honeydew-900">
-                      <div className='flex items-center'>
-                        <Factory className='pr-2' />
-                        <a href="/" >Industrial, Inspección y fotogrametria</a>
-                      </div>
-                    </li>
-                    <li className="inline-flex items-center w-full p-2 rounded cursor-pointer hover:bg-neutral-tertiary-medium hover:text-heading hover:bg-honeydew-800 dark:hover:bg-honeydew-900">
-                      <div className='flex items-center'>
-                        <Helicopter className='pr-2' />
-                        <a href="/" >Vuelo en ciudad</a>
-                      </div>
-                    </li>
-                    <li className="inline-flex items-center w-full p-2 rounded cursor-pointer hover:bg-neutral-tertiary-medium hover:text-heading hover:bg-honeydew-800 dark:hover:bg-honeydew-900">
-                      <div className='flex items-center'>
-                        <TvMinimalPlay className='pr-2' />
-                        <a href="/" >Eventos y retransmisiones</a>
-                      </div>
-                    </li>
+                    <Routes
+                      icon={<Video className='pr-2' />}
+                      name='Grabación de cine, series y peliculas'
+                      href='/construction'
+                    />
+                    <Routes
+                      icon={<Route className='pr-2' />}
+                      name='Localización y reconocimiento'
+                      href='/construction'
+                    />
+                    <Routes
+                      icon={<Factory className='pr-2' />}
+                      name='Industrial, Inspección y fotogrametria'
+                      href='/construction'
+                    />
+                    <Routes
+                      icon={<Helicopter className='pr-2' />}
+                      name='Vuelo en ciudad'
+                      href='/construction'
+                    />
+                    <Routes
+                      icon={<TvMinimalPlay className='pr-2' />}
+                      name='Eventos y retransmisiones'
+                      href='/construction'
+                    />
                   </ul>
                 </div>
               </li>

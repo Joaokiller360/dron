@@ -7,7 +7,7 @@ export const metadata = createMetadata('Portafolio')
 export default function Portfolio() {
   return (
     <>
-      <section className="pb-10 bg-honeydew-800 dark:bg-honeydew-900 pt-28">
+      <section className="pb-10 bg-honeydew-800 dark:bg-honeydew-900 pt-28" >
 
         <Banner
           label='Portfolio'
@@ -16,9 +16,9 @@ export default function Portfolio() {
         />
 
         <section className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-          <section className="space-y-6">
+          <section className="space-y-6" >
             {/* capsula uno */}
-            <SectionCard>
+            <SectionCard >
               <div>
                 <div className='flex justify-center font-mono text-3xl font-semibold text-center uppercase'>
                   <span>Eventos - Marina Ecovida</span>
