@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+# Bloquear carpetas internas o innecesarias
+Disallow: /api/
+Disallow: /_next/
+Disallow: /admin/
+Disallow: /dashboard/
+
+# Sitemap
+Sitemap: https://dron.joaobarres.dev/sitemap.xml
