@@ -29,7 +29,7 @@ export default function Portfolio() {
                     clients={[
                       {
                         client: 'Joao Barres',
-                        organizacion: 'Piloto'
+                        organizacion: 'Pailot'
                       }
                     ]}
                     content={[
@@ -41,6 +41,35 @@ export default function Portfolio() {
                       {
                         id: 1,
                         href: 'https://www.instagram.com/joao_barres',
+                        active: true,
+                        name: 'Instagram',
+                        icon: <Instagram size={24} strokeWidth={2} />
+                      }, {
+                        id: 2,
+                        href: 'https://api.whatsapp.com/message/SI7RZTHBYV3AK1?autoload=1&app_absent=0&utm_source=ig',
+                        active: false,
+                        name: 'Contacto',
+                        icon: <PhoneCall size={24} strokeWidth={2} />
+                      }
+                    ]}
+                  />
+
+                  <CardClient
+                    clients={[
+                      {
+                        client: 'Camara.Esme',
+                        organizacion: 'Filmaker'
+                      }
+                    ]}
+                    content={[
+                      {
+                        imgName: 'camaraEsme'
+                      }
+                    ]}
+                    buttons={[
+                      {
+                        id: 1,
+                        href: 'https://www.instagram.com/camara.esme',
                         active: true,
                         name: 'Instagram',
                         icon: <Instagram size={24} strokeWidth={2} />
