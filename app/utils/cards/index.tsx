@@ -177,7 +177,7 @@ export function CardClient({ buttons = [], content = [], clients = [], services 
                       loading="lazy"
                       src={`https://res.cloudinary.com/dzlavqhid/image/upload/${media?.imgName}.jpg`}
                       alt={d?.cliente?.client}
-                      className="object-cover w-full h-64 mb-5 transition-transform duration-500 group-hover:scale-105 rounded-2xl"
+                      className="object-cover w-full h-auto mb-5 transition-transform duration-500 group-hover:scale-105 rounded-2xl"
                     />
                   </>
                 ) : (

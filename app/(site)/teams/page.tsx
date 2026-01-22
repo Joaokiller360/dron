@@ -24,7 +24,7 @@ export default function Portfolio() {
                   <span>El crew dron</span>
                 </div>
                 <hr className="my-3 h-0.5 border-t-0 bg-white" />
-                <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                   <CardClient
                     clients={[
                       {
