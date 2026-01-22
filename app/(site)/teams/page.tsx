@@ -1,6 +1,7 @@
 
-import { createMetadata, Banner, SectionCard } from '@/app/utils'
+import { createMetadata, Banner, SectionCard, CardClient } from '@/app/utils'
 import { CallAction } from '@/app/component'
+import { Instagram, PhoneCall } from 'lucide-react'
 
 export const metadata = createMetadata('Equipo')
 
@@ -20,13 +21,38 @@ export default function Portfolio() {
             <SectionCard style='bg-honeydew-900 dark:bg-honeydew-800'>
               <div>
                 <div className='flex justify-center font-mono text-3xl font-semibold uppercase'>
-                  <span>El quipo de dron</span>
+                  <span>El crew dron</span>
                 </div>
                 <hr className="my-3 h-0.5 border-t-0 bg-white" />
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-                  <div>
-                    <img className="h-auto max-w-full rounded-xl" src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image.jpg" alt="" />
-                  </div>
+                  <CardClient
+                    clients={[
+                      {
+                        client: 'Joao Barres',
+                        organizacion: 'Piloto'
+                      }
+                    ]}
+                    content={[
+                      {
+                        imgName: 'pilot'
+                      }
+                    ]}
+                    buttons={[
+                      {
+                        id: 1,
+                        href: 'https://www.instagram.com/joao_barres',
+                        active: true,
+                        name: 'Instagram',
+                        icon: <Instagram size={24} strokeWidth={2} />
+                      }, {
+                        id: 2,
+                        href: 'https://api.whatsapp.com/message/SI7RZTHBYV3AK1?autoload=1&app_absent=0&utm_source=ig',
+                        active: false,
+                        name: 'Contacto',
+                        icon: <PhoneCall size={24} strokeWidth={2} />
+                      }
+                    ]}
+                  />
                 </div>
               </div>
             </SectionCard>

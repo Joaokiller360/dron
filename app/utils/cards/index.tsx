@@ -268,7 +268,7 @@ export function CardClient({ buttons = [], content = [], clients = [], services 
                       key={id}
                       text={name}
                       href={href}
-                      style="w-full max-w-xs cursor-pointer transition duration-500 bg-honeydew-900 hover:bg-white text-white hover:text-black dark:hover:text-white dark:bg-white dark:hover:bg-honeydew-800 dark:text-black"
+                      style="w-full max-w-xs cursor-pointer transition duration-500 bg-honeydew-800 hover:bg-white text-white hover:text-black dark:hover:text-white dark:bg-white dark:hover:bg-honeydew-900 dark:text-black"
                       icon={icon}
                     />
                   ))}
