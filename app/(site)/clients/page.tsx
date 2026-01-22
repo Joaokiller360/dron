@@ -19,17 +19,26 @@ export default function Clients() {
 
           <section className="space-y-6">
             {/* capsula uno */}
-            <SectionCard>
+            <SectionCard style='bg-honeydew-900 dark:bg-honeydew-800'>
               <div>
                 <div className='flex justify-center font-mono text-3xl font-semibold uppercase'>
                   <span>gran consumo</span>
                 </div>
                 <hr className="my-3 h-0.5 border-t-0 bg-white" />
-                <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+
                   <CardClient
-                    client='Marina Ecovida'
-                    imgName='marina'
-                    organizacion='Event Garden'
+                    clients={[
+                      {
+                        client: 'Marina Ecovida',
+                        organizacion: 'Event Garden'
+                      }
+                    ]}
+                    content={[
+                      {
+                        imgName: 'marina'
+                      }
+                    ]}
                     buttons={[
                       {
                         id: 1,
@@ -46,10 +55,19 @@ export default function Clients() {
                       }
                     ]}
                   />
+
                   <CardClient
-                    client='Vida Pura Beach'
-                    imgName='vida-pura'
-                    organizacion='Event Garden'
+                    clients={[
+                      {
+                        client: 'Vida Pura Beach',
+                        organizacion: 'Event Garden'
+                      }
+                    ]}
+                    content={[
+                      {
+                        imgName: 'vida-pura'
+                      }
+                    ]}
                     buttons={[
                       {
                         id: 1,
@@ -57,13 +75,28 @@ export default function Clients() {
                         active: true,
                         name: 'Instagram',
                         icon: <Instagram size={24} strokeWidth={2} />
+                      }, {
+                        id: 2,
+                        href: 'https://api.whatsapp.com/message/SI7RZTHBYV3AK1?autoload=1&app_absent=0&utm_source=ig',
+                        active: true,
+                        name: 'Contacto',
+                        icon: <PhoneCall size={24} strokeWidth={2} />
                       }
                     ]}
                   />
+
                   <CardClient
-                    client='Rumbeke Music Entertainment'
-                    imgName='rumbeke'
-                    organizacion='Event Garden'
+                    clients={[
+                      {
+                        client: 'Rumbeke Music Entertainment',
+                        organizacion: 'Event Garden'
+                      }
+                    ]}
+                    content={[
+                      {
+                        imgName: 'rumbeke'
+                      }
+                    ]}
                     buttons={[
                       {
                         id: 1,
@@ -74,22 +107,31 @@ export default function Clients() {
                       }
                     ]}
                   />
+
                 </div>
               </div>
 
             </SectionCard>
             {/* capsula dos */}
-            <SectionCard>
+            <SectionCard style='bg-honeydew-900 dark:bg-honeydew-800'>
               <div>
                 <div className='flex justify-center font-mono text-3xl font-semibold uppercase'>
                   <span>documentales</span>
                 </div>
                 <hr className="my-3 h-0.5 border-t-0 bg-white" />
-                <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   <CardClient
-                    client='Fundación Corazones Descalzos'
-                    imgName='corazones-descalzos'
-                    organizacion='Fundación'
+                    clients={[
+                      {
+                        client: 'Fundación Corazones Descalzos',
+                        organizacion: 'Fundación'
+                      }
+                    ]}
+                    content={[
+                      {
+                        imgName: 'corazones-descalzos'
+                      }
+                    ]}
                     buttons={[
                       {
                         id: 1,
@@ -104,17 +146,25 @@ export default function Clients() {
               </div>
             </SectionCard>
             {/* capsula tres */}
-            <SectionCard>
+            <SectionCard style='bg-honeydew-900 dark:bg-honeydew-800'>
               <div>
                 <div className='flex justify-center font-mono text-3xl font-semibold uppercase'>
                   <span>Gubernamental</span>
                 </div>
                 <hr className="my-3 h-0.5 border-t-0 bg-white" />
-                <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-                  <CardClient
-                    client='Prefectura de Esmeraldas'
-                    imgName='prefectura-esmeraldas'
-                    organizacion='Gubernamental'
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <CardClient
+                    clients={[
+                      {
+                        client: 'Prefectura de Esmeraldas',
+                        organizacion: 'Gubernamental'
+                      }
+                    ]}
+                    content={[
+                      {
+                        imgName: 'prefectura-esmeraldas'
+                      }
+                    ]}
                     buttons={[
                       {
                         id: 1,

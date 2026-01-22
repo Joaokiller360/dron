@@ -18,7 +18,7 @@ export default function Portfolio() {
         <section className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
           <section className="space-y-6" >
             {/* capsula uno */}
-            <SectionCard >
+            <SectionCard style="bg-honeydew-900 dark:bg-honeydew-800">
               <div>
                 <div className='flex justify-center font-mono text-3xl font-semibold text-center uppercase'>
                   <span>Eventos - Marina Ecovida</span>
@@ -68,7 +68,7 @@ export default function Portfolio() {
             </SectionCard>
 
             {/* capsula dos */}
-            <SectionCard>
+            <SectionCard style="bg-honeydew-900 dark:bg-honeydew-800">
               <div>
                 <div className='flex justify-center font-mono text-3xl font-semibold text-center uppercase'>
                   <span>Eventos Varios</span>
@@ -116,7 +116,7 @@ export default function Portfolio() {
             </SectionCard>
 
             {/* capsula tres */}
-            <SectionCard>
+            <SectionCard style="bg-honeydew-900 dark:bg-honeydew-800">
               <div>
                 <div className='flex justify-center font-mono text-3xl font-semibold text-center uppercase'>
                   <span>Documentales</span>
@@ -138,7 +138,7 @@ export default function Portfolio() {
             </SectionCard>
 
             {/* capsula cuatro */}
-            <SectionCard>
+            <SectionCard style="bg-honeydew-900 dark:bg-honeydew-800">
               <div>
                 <div className='flex justify-center font-mono text-3xl font-semibold text-center uppercase'>
                   <span>Gubernamental</span>
