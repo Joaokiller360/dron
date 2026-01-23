@@ -1,7 +1,13 @@
 
 import { Button, createMetadata, Templets } from "./utils"
 
-export const metadata = createMetadata('Error 404')
+export const metadata = createMetadata({
+  title: 'Página no encontrada',
+  description:
+    'Esta sección de JB.SKYLENS se encuentra actualmente en construcción. Pronto tendremos nuevas soluciones con drones.',
+  index: false, // 👈 importante para SEO
+})
+
 
 export default function NotFound() {
   return (
