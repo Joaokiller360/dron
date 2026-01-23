@@ -31,7 +31,7 @@ interface CardVideo {
 export function CardVideo({ title = '', organizacion = '', nameButton = '', href = '', videoname = '', imgName = '', present = '' }: CardVideo) {
   return (
     <>
-      <div className="flex flex-col h-full p-6 rounded-xl bg-honeydew-800 dark:bg-honeydew-900">
+      <div className="flex flex-col h-full p-6 rounded-xl bg-honeydew-800 dark:bg-honeydew-900" id={title}>
 
         {/* Imagen o Video */}
         <div className="relative overflow-hidden rounded-lg">
