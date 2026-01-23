@@ -3,7 +3,18 @@ import { createMetadata, Banner, SectionCard, CardClient } from '@/app/utils'
 import { CallAction } from '@/app/component'
 import { Instagram, PhoneCall } from 'lucide-react'
 
-export const metadata = createMetadata('Equipo')
+export const metadata = createMetadata({
+  title: 'Nuestro equipo',
+  description:
+    'Conoce al equipo de JB.SKYLENS, especialistas en operación de drones, inspecciones técnicas y producción audiovisual aérea.',
+  keywords: [
+    'equipo JB.SKYLENS',
+    'operadores de drones Ecuador',
+    'pilotos de drones certificados',
+  ],
+  canonical: 'https://dron.joaobarres.dev/teams',
+})
+
 
 export default function Portfolio() {
   return (

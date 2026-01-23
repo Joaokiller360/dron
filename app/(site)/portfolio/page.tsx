@@ -2,7 +2,19 @@
 import { CallAction } from '@/app/component'
 import { Banner, SectionCard, createMetadata, CardVideo } from '@/app/utils'
 
-export const metadata = createMetadata('Portafolio')
+export const metadata = createMetadata({
+  title: 'Portafolio',
+  description:
+    'Explora el portafolio de JB.SKYLENS con proyectos reales de fotografía aérea, video con drones, eventos e inspecciones en Ecuador.',
+  keywords: [
+    'portafolio drones',
+    'trabajos con drones Ecuador',
+    'fotografía aérea Ecuador',
+    'video aéreo',
+    'JB.SKYLENS',
+  ],
+  canonical: 'https://dron.joaobarres.dev/portfolio',
+})
 
 export default function Portfolio() {
   return (

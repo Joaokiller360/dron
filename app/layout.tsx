@@ -20,7 +20,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: {
     default: 'JB.SKYLENS - DRON',
-    template: '%s - JB.SKYLENS - DRON',
+    template: '%s | JB.SKYLENS - DRON',
   },
   description: 'Sitio web de JB.SKYLENS - DRON',
 }

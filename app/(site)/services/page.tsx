@@ -1,5 +1,20 @@
-import { Banner, CardClient, SectionCard } from "@/app/utils";
+import { Banner, CardClient, createMetadata, SectionCard } from "@/app/utils";
 import { FileSearchCorner } from 'lucide-react'
+
+export const metadata = createMetadata({
+  title: 'Servicios con drones',
+  description:
+    'Servicios con drones en Ecuador: inspecciones técnicas, fotografía aérea, video profesional, eventos y soluciones industriales.',
+  keywords: [
+    'servicios con drones',
+    'inspección con drones',
+    'fotografía aérea profesional',
+    'video con drones Ecuador',
+    'JB.SKYLENS',
+  ],
+  canonical: 'https://dron.joaobarres.dev/services',
+})
+
 
 export default function Services() {
   return (

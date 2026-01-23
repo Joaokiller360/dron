@@ -1,10 +1,22 @@
-import { LegalPage } from "@/app/utils";
+import { LegalPage, createMetadata } from "@/app/utils";
 
+export const metadata = createMetadata({
+  title: 'Términos y Condiciones',
+  description:
+    'Consulta los términos y condiciones de JB.SKYLENS, empresa especializada en servicios profesionales con drones en Ecuador.',
+  keywords: [
+    'JB.SKYLENS',
+    'drones Ecuador',
+    'términos y condiciones',
+    'servicios con drones',
+    'Joao Barres',
+  ],
+  canonical: 'https://dron.joaobarres.dev/legal/terms-and-conditions',
+})
 
 export default function TermsAndConditions() {
   return (
     <section className="pb-10 bg-honeydew-900 dark:bg-honeydew-800 pt-28" >
-
 
       <LegalPage
         title="Términos & Condiciones"
@@ -88,36 +100,9 @@ export default function TermsAndConditions() {
             text: [
               'Nos reservamos el derecho de modificar estos términos en cualquier momento. Los cambios entrarán en vigor inmediatamente después de su publicación en el sitio web.'
             ],
-          },
-          {
-            heading: '',
-            text: [
-              ''
-            ],
-          },
-          {
-            heading: '',
-            text: [
-              ''
-            ],
-          },
-          {
-            heading: '',
-            text: [
-              ''
-            ],
-          },
-          {
-            heading: '',
-            text: [
-              ''
-            ],
           }
         ]}
       />
-
-
-
 
     </section>
   )

@@ -3,7 +3,18 @@ import { CallAction } from '@/app/component'
 import { Banner, SectionCard, createMetadata, CardClient } from '@/app/utils'
 import { PhoneCall, Instagram } from 'lucide-react'
 
-export const metadata = createMetadata('Clientes')
+export const metadata = createMetadata({
+  title: 'Clientes',
+  description:
+    'Empresas y personas que han confiado en JB.SKYLENS para servicios profesionales con drones en Ecuador.',
+  keywords: [
+    'clientes JB.SKYLENS',
+    'empresas drones Ecuador',
+    'servicios profesionales con drones',
+  ],
+  canonical: 'https://dron.joaobarres.dev/clients',
+})
+
 
 export default function Clients() {
 

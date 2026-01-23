@@ -1,5 +1,5 @@
 
-import { Button } from '@/app/utils'
+import { Button, createMetadata } from '@/app/utils'
 import { Video } from 'lucide-react'
 
 interface SectionCard {
