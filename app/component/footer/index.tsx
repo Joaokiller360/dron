@@ -51,7 +51,7 @@ export default function Footer() {
                     <a href="/construction" className="hover:underline">Politica de Privacidad</a>
                   </li>
                   <li>
-                    <a href="/construction" className="hover:underline">Terminos &amp; Condiciones</a>
+                    <a href="/legal/terms-and-conditions" className="hover:underline">Terminos &amp; Condiciones</a>
                   </li>
                 </ul>
               </div>

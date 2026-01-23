@@ -10,6 +10,8 @@ import { SectionCard, CardVideo, CardClient } from './cards'
 import { createMetadata } from './metadata'
 import Banner from './banner'
 import { Favicon, Logo } from './logo'
+import LegalPage from './legalProps'
+import { highlightText } from './highlightText'
 
 export {
   Navbar,
@@ -30,5 +32,7 @@ export {
   CardVideo,
   CardClient,
   Logo,
-  Favicon
+  Favicon,
+  LegalPage,
+  highlightText
 }

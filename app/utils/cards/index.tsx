@@ -37,7 +37,7 @@ export function CardVideo({ title = '', organizacion = '', nameButton = '', href
         <div className="relative overflow-hidden rounded-lg">
           {videoname ? (
             <video
-              className="object-cover w-full h-56 rounded-lg"
+              className="object-cover w-full h-64 rounded-lg"
               autoPlay
               muted
               loop

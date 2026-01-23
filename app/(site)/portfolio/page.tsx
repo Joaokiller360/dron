@@ -107,8 +107,17 @@ export default function Portfolio() {
                       title='Rumbeke Carnaval 2025'
                       organizacion='Rumbeke Music Entertainment'
                       nameButton=' Reals'
-                      imgName='rumbeke'
+                      videoname='rumbeke-2025'
                       href='https://www.instagram.com/reel/C-jf6zPxlXs/?igsh=cGYxZnFhc2t3ODB1'
+                    />
+                  </div>
+                  <div>
+                    <CardVideo
+                      title='ALOHA FEST 2025'
+                      organizacion='ALOHA FEST'
+                      nameButton=' Reals'
+                      videoname='aloha-feste-2025'
+                      href='https://www.instagram.com/reel/DG4qghKOlPh/?utm_source=ig_web_copy_link'
                     />
                   </div>
                 </div>
@@ -152,6 +161,15 @@ export default function Portfolio() {
                       nameButton=' Reals'
                       videoname='provincializacion-esmeralda'
                       href='https://www.instagram.com/reel/DS8appVjfKH/?igsh=MTl4dWV6OHZ2c3o0Zg=='
+                    />
+                  </div>
+                  <div>
+                    <CardVideo
+                      title='Elvis Crespo'
+                      organizacion='Alcaldia De Esmeraldas'
+                      nameButton=' Reals'
+                      videoname='elvis-crespo'
+                      href='https://www.instagram.com/reel/DNA-zXrx9i8/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=='
                     />
                   </div>
                 </div>
