@@ -5,13 +5,42 @@ export const metadata = createMetadata({
   title: 'Servicios con drones',
   description:
     'Servicios con drones en Ecuador: inspecciones técnicas, fotografía aérea, video profesional, eventos y soluciones industriales.',
-  keywords: [
-    'servicios con drones',
-    'inspección con drones',
-    'fotografía aérea profesional',
-    'video con drones Ecuador',
-    'JB.SKYLENS',
-  ],
+    keywords: [
+      'servicios con drones esmeraldas',
+      'servicios de drones profesionales',
+      'drones para inspección técnica',
+      'drones para filmación profesional',
+      'drones para fotografía aérea',
+      'drones para levantamientos topográficos',
+      'drones para vigilancia aérea',
+      'drones para seguridad industrial',
+      'drones para infraestructuras',
+    
+      'inspección de puentes con drones',
+      'inspección de techos con drones',
+      'inspección industrial con drones',
+      'drones para puertos',
+      'drones para barcos',
+      'drones para operaciones portuarias',
+    
+      'drones para publicidad',
+      'drones para marketing',
+      'producción audiovisual con drones',
+      'video corporativo con drones',
+      'contenido publicitario aéreo',
+    
+      'servicios de drones en ecuador',
+      'empresa de drones ecuador',
+      'drones profesionales ecuador',
+      'operador de drones certificado',
+      'drones con permisos legales',
+    
+      'JB.SKYLENS servicios',
+      'servicios JB SKYLENS',
+      'drones para empresas',
+      'servicios técnicos con drones',
+      'servicios audiovisuales aéreos',
+    ],
   canonical: 'https://dron.joaobarres.dev/services',
 })
 

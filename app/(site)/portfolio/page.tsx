@@ -6,13 +6,38 @@ export const metadata = createMetadata({
   title: 'Portafolio',
   description:
     'Explora el portafolio de JB.SKYLENS con proyectos reales de fotografía aérea, video con drones, eventos e inspecciones en Ecuador.',
-  keywords: [
-    'portafolio drones',
-    'trabajos con drones Ecuador',
-    'fotografía aérea Ecuador',
-    'video aéreo',
-    'JB.SKYLENS',
-  ],
+    keywords: [
+      'portafolio drones esmeraldas',
+      'trabajos con drones esmeraldas',
+      'proyectos con drones ecuador',
+      'ejemplos de filmación con drones',
+      'fotografía aérea profesional',
+      'video aéreo profesional',
+      'producción audiovisual con drones',
+    
+      'videos con drones para eventos',
+      'filmación aérea de eventos',
+      'videos corporativos con drones',
+      'videos publicitarios con drones',
+      'fotografía aérea inmobiliaria',
+    
+      'drones para conciertos',
+      'drones para festivales',
+      'drones para eventos sociales',
+      'drones para eventos empresariales',
+    
+      'inspecciones con drones realizadas',
+      'levantamientos con drones realizados',
+      'trabajos técnicos con drones',
+    
+      'portafolio JB.SKYLENS',
+      'proyectos JB SKYLENS',
+      'trabajos de Joao Barres',
+      'empresa audiovisual con drones',
+      'contenido aéreo profesional',
+      'drones profesionales en acción',
+    ]
+    ,
   canonical: 'https://dron.joaobarres.dev/portfolio',
 })
 

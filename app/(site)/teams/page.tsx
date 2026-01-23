@@ -7,11 +7,37 @@ export const metadata = createMetadata({
   title: 'Nuestro equipo',
   description:
     'Conoce al equipo de JB.SKYLENS, especialistas en operación de drones, inspecciones técnicas y producción audiovisual aérea.',
-  keywords: [
-    'equipo JB.SKYLENS',
-    'operadores de drones Ecuador',
-    'pilotos de drones certificados',
-  ],
+    keywords: [
+      'equipo JB.SKYLENS',
+      'equipo de drones profesionales',
+      'operadores de drones certificados',
+      'pilotos de drones ecuador',
+      'especialistas en drones',
+    
+      'equipo audiovisual con drones',
+      'productores audiovisuales aéreos',
+      'técnicos en drones',
+      'expertos en filmación aérea',
+    
+      'empresa de drones en esmeraldas',
+      'empresa de drones en ecuador',
+      'equipo técnico de drones',
+    
+      'operador de drones profesional',
+      'piloto de drones con experiencia',
+      'equipo de inspección con drones',
+    
+      'equipo para seguridad industrial',
+      'equipo para inspecciones técnicas',
+      'equipo para producción audiovisual',
+    
+      'Joao Barres',
+      'fundador JB.SKYLENS',
+      'equipo JB SKYLENS drones',
+      'profesionales en drones',
+      'empresa audiovisual profesional',
+    ]
+    ,
   canonical: 'https://dron.joaobarres.dev/teams',
 })
 

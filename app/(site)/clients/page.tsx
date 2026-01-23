@@ -7,11 +7,35 @@ export const metadata = createMetadata({
   title: 'Clientes',
   description:
     'Empresas y personas que han confiado en JB.SKYLENS para servicios profesionales con drones en Ecuador.',
-  keywords: [
-    'clientes JB.SKYLENS',
-    'empresas drones Ecuador',
-    'servicios profesionales con drones',
-  ],
+    keywords: [
+      'clientes JB.SKYLENS',
+      'empresas que usan drones',
+      'clientes de servicios con drones',
+      'empresas atendidas con drones',
+    
+      'drones para empresas ecuador',
+      'servicios de drones empresariales',
+      'drones para industria',
+      'drones para puertos',
+      'drones para eventos empresariales',
+    
+      'clientes de filmación aérea',
+      'clientes de fotografía aérea',
+      'clientes de producción audiovisual',
+    
+      'empresas de esmeraldas con drones',
+      'clientes corporativos con drones',
+    
+      'confianza en servicios con drones',
+      'casos de éxito con drones',
+      'proyectos empresariales con drones',
+    
+      'clientes JB SKYLENS drones',
+      'empresas que confían en JB.SKYLENS',
+      'servicios profesionales con drones',
+      'empresa de drones confiable',
+    ]
+    ,
   canonical: 'https://dron.joaobarres.dev/clients',
 })
 
