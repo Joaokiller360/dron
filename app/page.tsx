@@ -1,4 +1,3 @@
-'use client'
 
 import { Inicio, Logos, About, WhatDeDo, WhyChooseUs, Galery } from '@/app/component'
 import { createMetadata } from '@/app/utils'
