@@ -26,7 +26,7 @@ export function Favicon({ href }: favicon) {
   return (
     <>
       <head>
-        <link rel="icon" href={`https://res.cloudinary.com/dzlavqhid/image/upload/${href}.ico`} />
+        <link rel="icon" href={`https://res.cloudinary.com/dzlavqhid/image/upload/${href}.ico` || '/ico/logo.ico'} />
       </head>
     </>
   )

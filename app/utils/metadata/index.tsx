@@ -6,6 +6,7 @@ interface Meta {
   keywords?: string[]
   canonical?: string
   index?: boolean
+  href?: string
 }
 
 export const createMetadata = ({
@@ -14,6 +15,7 @@ export const createMetadata = ({
   keywords = [],
   canonical,
   index = true,
+  href = ''
 }: Meta): Metadata => {
   return {
     title,
@@ -21,12 +23,17 @@ export const createMetadata = ({
     keywords,
     alternates: canonical
       ? {
-          canonical,
-        }
+        canonical,
+      }
       : undefined,
     robots: {
       index,
       follow: true,
     },
+    icons: {
+      icon: href
+        ? `https://res.cloudinary.com/dzlavqhid/image/upload/${href}.ico`
+        : '/ico/logo.ico',
+    }
   }
 }
