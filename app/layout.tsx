@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-import { Favicon, Navbar } from '@/app/utils'
+import { Favicon, Logo, Navbar } from '@/app/utils'
 import { Footer } from '@/app/component';
 import FlowbiteInit from "./flowbait-init";
 
@@ -16,6 +16,9 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+
+const logo = <Logo />
 
 export const metadata: Metadata = {
   title: {
