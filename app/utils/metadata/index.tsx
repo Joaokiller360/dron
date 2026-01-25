@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 
 interface Meta {
-  title: string
+  title?: string
   description?: string
   keywords?: string[]
   canonical?: string
@@ -11,29 +11,25 @@ interface Meta {
 
 export const createMetadata = ({
   title,
-  description = '',
-  keywords = [],
+  description,
+  keywords,
   canonical,
   index = true,
-  href = ''
-}: Meta): Metadata => {
-  return {
-    title,
-    description,
-    keywords,
-    alternates: canonical
-      ? {
-        canonical,
-      }
-      : undefined,
-    robots: {
-      index,
-      follow: true,
-    },
+  href,
+}: Meta): Metadata => ({
+  ...(title && { title }),
+  ...(description && { description }),
+  ...(keywords && { keywords }),
+  ...(canonical && {
+    alternates: { canonical },
+  }),
+  robots: {
+    index,
+    follow: index,
+  },
+  ...(href && {
     icons: {
-      icon: href
-        ? `https://res.cloudinary.com/dzlavqhid/image/upload/${href}.ico`
-        : '/ico/logo.ico',
-    }
-  }
-}
+      icon: `https://res.cloudinary.com/dzlavqhid/image/upload/${href}.ico`,
+    },
+  }),
+})
