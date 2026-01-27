@@ -351,3 +351,60 @@ Componente guardado
     </>
   )
 }
+
+import { Banner } from '@/app/utils'
+import { Film, MapPin, Factory, Building2, Earth } from 'lucide-react';
+
+interface d {
+  imagen?: string
+  title?: string
+  label?: string
+  content: a[]
+}
+
+interface a {
+  icon?: React.ReactNode
+  label?: string
+  hreft?: string
+}
+
+export function BannerCard({ imagen, title, label, content }: d) {
+
+  return (
+    <>
+      <header className="relative pb-10 bg-honeydew-900 dark:bg-honeydew-800/40 pt-28" >
+
+        {/* Imagen de fondo */}
+        <img
+          src={`https://res.cloudinary.com/dzlavqhid/image/upload/${imagen}.webp`}
+          alt={imagen}
+          className="absolute inset-0 object-cover object-center w-full h-full -z-10"
+        />
+
+        <Banner
+          label={label}
+          title={title}
+        />
+        <div className="flex justify-center">
+          <div className="grid gap-4 justify-items-center grid-cols-2 sm:grid-cols-4 lg:grid-cols-[repeat(auto-fit,minmax(7rem,1fr))] max-w-6xl">
+
+            {content.map((card, index) => (
+              <a
+                key={index}
+                href={`/services/${card.hreft}`}
+                className="flex flex-col items-center justify-center w-32 p-4 text-xs text-center text-white h-30 bg-honeydew-900/90 rounded-2xl"
+              >
+                {card.icon}
+                <span className="leading-tight uppercase">
+                  {card.label}
+                </span>
+              </a>
+            ))}
+
+          </div>
+        </div>
+
+      </header>
+    </>
+  )
+}

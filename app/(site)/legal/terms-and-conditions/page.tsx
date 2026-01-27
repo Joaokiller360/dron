@@ -1,7 +1,7 @@
 import { LegalPage, createMetadata } from "@/app/utils";
 
 export const metadata = createMetadata({
-  title: 'Términos y Condiciones',
+  title: 'Términos y Condiciones | JB.SKYLENS',
   description:
     'Consulta los términos y condiciones de JB.SKYLENS, empresa especializada en servicios profesionales con drones en Ecuador.',
   keywords: [

@@ -6,7 +6,7 @@ import { CopyText } from './email'
 import { ToastSuccess } from './toast'
 import { SeparatorUp, SeparatorBelow } from './separador'
 import Maps from './maps'
-import { SectionCard, CardVideo, CardClient } from './cards'
+import { SectionCard, CardVideo, CardClient, BannerCard } from './cards'
 import { createMetadata } from './metadata'
 import Banner from './banner'
 import { Favicon, Logo } from './logo'
@@ -34,5 +34,6 @@ export {
   Logo,
   Favicon,
   LegalPage,
-  highlightText
+  highlightText,
+  BannerCard
 }

@@ -3,7 +3,7 @@ import { Inicio, Logos, About, WhatDeDo, WhyChooseUs, Galery } from '@/app/compo
 import { createMetadata } from '@/app/utils'
 
 export const metadata = createMetadata({
-  title: 'Servicios profesionales con drones en Ecuador',
+  title: 'JB.SKYLENS',
   description:
     'JB.SKYLENS ofrece servicios profesionales con drones en Ecuador: inspecciones, fotografía aérea, video, eventos y soluciones técnicas con drones.',
     keywords: [

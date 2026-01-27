@@ -17,7 +17,7 @@ export const createMetadata = ({
   index = true,
   href,
 }: Meta): Metadata => ({
-  ...(title && { title }),
+  ...(`${title} | JB.SKYLENS - DRON` && { title }),
   ...(description && { description }),
   ...(keywords && { keywords }),
   ...(canonical && {

@@ -4,7 +4,7 @@ import { Banner, SectionCard, createMetadata, CardClient } from '@/app/utils'
 import { PhoneCall, Instagram } from 'lucide-react'
 
 export const metadata = createMetadata({
-  title: 'Clientes',
+  title: 'Clientes | JB.SKYLENS',
   description:
     'Empresas y personas que han confiado en JB.SKYLENS para servicios profesionales con drones en Ecuador.',
     keywords: [

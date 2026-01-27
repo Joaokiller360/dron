@@ -4,7 +4,7 @@ import { CallAction } from '@/app/component'
 import { Instagram, PhoneCall } from 'lucide-react'
 
 export const metadata = createMetadata({
-  title: 'Nuestro equipo',
+  title: 'Nuestro equipo | JB.SKYLENS',
   description:
     'Conoce al equipo de JB.SKYLENS, especialistas en operación de drones, inspecciones técnicas y producción audiovisual aérea.',
     keywords: [

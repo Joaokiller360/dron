@@ -4,7 +4,7 @@ import { From } from "@/app/hooks"
 import { About } from '@/app/component'
 
 export const metadata = createMetadata({
-  title: 'Contacto',
+  title: 'Contacto | JB.SKYLENS',
   description:
     'Contáctanos para servicios profesionales con drones en Ecuador. Cotizaciones para inspecciones, eventos, fotografía y video aéreo.',
   keywords: [

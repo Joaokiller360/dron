@@ -3,7 +3,7 @@ import { CallAction } from '@/app/component'
 import { Banner, SectionCard, createMetadata, CardVideo } from '@/app/utils'
 
 export const metadata = createMetadata({
-  title: 'Portafolio',
+  title: 'Portafolio | JB.SKYLENS',
   description:
     'Explora el portafolio de JB.SKYLENS con proyectos reales de fotografía aérea, video con drones, eventos e inspecciones en Ecuador.',
     keywords: [

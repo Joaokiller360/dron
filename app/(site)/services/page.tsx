@@ -2,7 +2,7 @@ import { Banner, CardClient, createMetadata, SectionCard } from "@/app/utils";
 import { FileSearchCorner } from 'lucide-react'
 
 export const metadata = createMetadata({
-  title: 'Servicios con drones',
+  title: 'Servicios con drones | JB.SKYLENS',
   description:
     'Servicios con drones en Ecuador: inspecciones técnicas, fotografía aérea, video profesional, eventos y soluciones industriales.',
   keywords: [
@@ -231,7 +231,7 @@ export default function Services() {
                   buttons={[
                     {
                       id: 1,
-                      href: `${link}`,
+                      href: `${link}insdustrial-inspection-and-photogrammetry`,
                       active: true,
                       name: 'Ver Más',
                       icon: <FileSearchCorner size={24} strokeWidth={2} />
@@ -254,7 +254,7 @@ export default function Services() {
                   buttons={[
                     {
                       id: 1,
-                      href: `${link}`,
+                      href: `${link}location-scouting-and-recon`,
                       active: true,
                       name: 'Ver Más',
                       icon: <FileSearchCorner size={24} strokeWidth={2} />
