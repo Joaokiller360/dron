@@ -1,60 +1,43 @@
 
-import { BannerCard } from '@/app/utils'
-import { Film, MapPin, Factory, Building2, Earth } from 'lucide-react';
-
-const listServices = [
-  {
-    icon: <Film size={38} className="mb-2" />,
-    label: 'drones para cine y publicidad',
-    hreft: 'events-and-live-broadcasting'
-  },{
-    icon: <Factory size={38} className="mb-2" />,
-    label: 'drones industriales',
-    hreft: 'insdustrial-inspection-and-photogrammetry'
-  },{
-    icon: <Building2 size={38} className="mb-2" />,
-    label: 'drones para vuelo en ciudad',
-    hreft: 'urban-flight-operations'
-  },{
-    icon: <Earth size={38} className="mb-2" />,
-    label: 'drones para eventos y retransmisiones',
-    hreft: 'film-and-tv-production'
-  },{
-    icon: <MapPin size={38} className="mb-2" />,
-    label: 'drones de localizacion',
-    hreft: 'location-scouting-and-recon'
-  }
-]
+import { PageServices } from '@/app/utils'
 
 export default function urbanFlightOperations() {
   return (
     <>
 
-      <BannerCard
-        imagen='evento-retransmisiones'
-        label='Servicios'
-        title='industrial, inspección y fotogrametría'
-        content={listServices}
+      <PageServices
+        D={[
+          {
+            imagen: 'grabacion-cine',
+            label: 'Servicios',
+            title: 'grabación de cine, series y peliculas',
+          }
+        ]}
+        keyword={
+          [
+            'Permiten capturar tomas aéreas impresionantes:',
+            'Adaptables a cualquier idea:',
+            '',
+          ]
+        }
+        Content={[
+          {
+            label: 'Servicios',
+            subTitle: 'especialistas líderes en cinematografía aérea',
+            text: [
+              'Somos expertos en brindar un servicio profesional para publicidad y ficción; estamos especializados en de drones para cine y drones para comerciales, llevamos tus proyectos audiovisuales a nuevas alturas.',
+              'El uso de drones para cine y publicidad presenta muchas ventajas competitivas:'
+            ],
+            list: [
+              {
+                text: ['Permiten capturar tomas aéreas impresionantes:', 'desde tomas panorámicas hasta seguimientos rápidos, los drones aportan una dimensión visual única a tu proyecto.']
+              }, {
+                text: ['Adaptables a cualquier idea:', 'no importa si estás filmando un anuncio publicitario o una escena clave de una película, nuestros drones se adaptan a tus necesidades. Son perfectos para todo, desde mostrar paisajes hasta capturar la acción más intensa.']
+              }
+            ]
+          }
+        ]}
       />
-
-      <main className='p-10 bg-honeydew-800/90'>
-
-        <section className='bg-black md:px-14 :px-20'>
-          <div>
-            <span className='font-bold uppercase'>
-              <span>-</span> Servicios
-            </span>
-
-            <div>
-              <span className='uppercase'>
-                las mejores ímagenes de tu evento
-              </span>
-            </div>
-          </div>
-
-        </section>
-
-      </main>
 
     </>
   )

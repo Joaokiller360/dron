@@ -1,9 +1,8 @@
 
-import { Banner, createMetadata, BannerCard } from '@/app/utils'
-import { Film, MapPin, Factory, Building2, Earth } from 'lucide-react';
+import { createMetadata, PageServices } from '@/app/utils'
 
 export const metadata = createMetadata({
-  title: 'Eventos y retransmisiones | JB.SKYLENS',
+  title: 'Vuelos en ciudad | JB.SKYLENS',
   description:
     'Empresas y personas que han confiado en JB.SKYLENS para servicios profesionales con drones en Ecuador.',
   keywords: [
@@ -38,59 +37,42 @@ export const metadata = createMetadata({
   canonical: 'https://dron.joaobarres.dev/clients',
 })
 
-const listServices = [
-  {
-    icon: <Film size={38} className="mb-2" />,
-    label: 'drones para cine y publicidad',
-    hreft: 'events-and-live-broadcasting'
-  },{
-    icon: <Factory size={38} className="mb-2" />,
-    label: 'drones industriales',
-    hreft: 'insdustrial-inspection-and-photogrammetry'
-  },{
-    icon: <Building2 size={38} className="mb-2" />,
-    label: 'drones para vuelo en ciudad',
-    hreft: 'urban-flight-operations'
-  },{
-    icon: <Earth size={38} className="mb-2" />,
-    label: 'drones para eventos y retransmisiones',
-    hreft: 'film-and-tv-production'
-  },{
-    icon: <MapPin size={38} className="mb-2" />,
-    label: 'drones de localizacion',
-    hreft: 'location-scouting-and-recon'
-  }
-]
-
 export default function urbanFlightOperations() {
   return (
     <>
 
-      <BannerCard
-        imagen='evento-retransmisiones'
-        label='Servicios'
-        title='vuelos en ciudad'
-        content={listServices}
+      <PageServices
+        D={[
+          {
+            imagen: 'vuelo-ciudad',
+            label: 'Servicios',
+            title: 'vuelos en ciudad',
+          }
+        ]}
+        keyword={
+          [
+            'Permiten capturar tomas aéreas impresionantes:',
+            'Adaptables a cualquier idea:'
+          ]
+        }
+        Content={[
+          {
+            label: 'Servicios',
+            subTitle: 'especialistas líderes en cinematografía aérea',
+            text: [
+              'Los drones para uso en ciudad son útiles para diversas tareas, como la captura de imágenes aéreas para producciones audiovisuales, inspecciones de infraestructuras o servicios de emergencia.',
+              'Los drones para uso en ciudad son útiles para diversas tareas, como la captura de imágenes aéreas para producciones audiovisuales, inspecciones de infraestructuras o servicios de emergencia.'
+            ],
+            list: [
+              {
+                text: ['Permiten capturar tomas aéreas impresionantes:','desde tomas panorámicas hasta seguimientos rápidos, los drones aportan una dimensión visual única a tu proyecto.']
+              },{
+                text: ['Adaptables a cualquier idea:', 'no importa si estás filmando un anuncio publicitario o una escena clave de una película, nuestros drones se adaptan a tus necesidades. Son perfectos para todo, desde mostrar paisajes hasta capturar la acción más intensa.']
+              }
+            ]
+          }
+        ]}
       />
-
-      <main className='p-10 bg-honeydew-800/90'>
-
-        <section className='bg-black md:px-14 :px-20'>
-          <div>
-            <span className='font-bold uppercase'>
-              <span>-</span> Servicios
-            </span>
-
-            <div>
-              <span className='uppercase'>
-                las mejores ímagenes de tu evento
-              </span>
-            </div>
-          </div>
-
-        </section>
-
-      </main>
 
     </>
   )

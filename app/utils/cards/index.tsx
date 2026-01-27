@@ -352,43 +352,90 @@ Componente guardado
   )
 }
 
-import { Banner } from '@/app/utils'
-import { Film, MapPin, Factory, Building2, Earth } from 'lucide-react';
+import { Banner, highlightText } from '@/app/utils'
+import { Film, MapPin, Factory, Building2, Earth, CheckCircle } from 'lucide-react';
+import React from 'react'
 
 interface d {
   imagen?: string
   title?: string
   label?: string
-  content: a[]
 }
 
-interface a {
-  icon?: React.ReactNode
+interface content {
   label?: string
-  hreft?: string
+  subTitle?: string
+  text?: string[]
+  list: List[]
 }
 
-export function BannerCard({ imagen, title, label, content }: d) {
+interface List {
+  text?: string[]
+}
+
+interface galery {
+  imagen?: string
+  video?: string
+}
+
+interface page {
+  D: d[]
+  Content: content[]
+  keyword?: string[]
+}
+
+const listServices = [
+  {
+    icon: <Film size={38} className="mb-2" />,
+    label: 'drones para cine y publicidad',
+    hreft: 'film-and-tv-production'
+  }, {
+    icon: <Factory size={38} className="mb-2" />,
+    label: 'drones industriales',
+    hreft: 'insdustrial-inspection-and-photogrammetry'
+  }, {
+    icon: <Building2 size={38} className="mb-2" />,
+    label: 'drones para vuelo en ciudad',
+    hreft: 'urban-flight-operations'
+  }, {
+    icon: <Earth size={38} className="mb-2" />,
+    label: 'drones para eventos y retransmisiones',
+    hreft: 'events-and-live-broadcasting'
+  }, {
+    icon: <MapPin size={38} className="mb-2" />,
+    label: 'drones de localizacion',
+    hreft: 'location-scouting-and-recon'
+  }
+]
+
+export function PageServices({
+  D,
+  Content,
+  keyword = [],
+}: page) {
+
+  const banner = D[0]
+  // const section = Content[0]
 
   return (
     <>
-      <header className="relative pb-10 bg-honeydew-900 dark:bg-honeydew-800/40 pt-28" >
+      <header className="relative pb-16 pt-44 bg-honeydew-900/40" >
 
         {/* Imagen de fondo */}
         <img
-          src={`https://res.cloudinary.com/dzlavqhid/image/upload/${imagen}.webp`}
-          alt={imagen}
+          src={`https://res.cloudinary.com/dzlavqhid/image/upload/${banner.imagen}.webp`}
+          alt={banner.imagen}
           className="absolute inset-0 object-cover object-center w-full h-full -z-10"
         />
 
         <Banner
-          label={label}
-          title={title}
+          label={banner.label}
+          title={banner.title}
         />
         <div className="flex justify-center">
           <div className="grid gap-4 justify-items-center grid-cols-2 sm:grid-cols-4 lg:grid-cols-[repeat(auto-fit,minmax(7rem,1fr))] max-w-6xl">
 
-            {content.map((card, index) => (
+            {listServices.map((card, index) => (
               <a
                 key={index}
                 href={`/services/${card.hreft}`}
@@ -405,6 +452,94 @@ export function BannerCard({ imagen, title, label, content }: d) {
         </div>
 
       </header>
+
+      <main className='p-10 text-black bg-honeydew-800/90'>
+
+        <section className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <div className="p-5 bg-white rounded-2xl sm:p-10">
+
+            {Content.map((section, index) => (
+              <React.Fragment key={index}>
+                <div className="font-mono">
+                  <span className="text-xl font-bold uppercase text-honeydew-800">
+                    <span className="pr-1">-</span>
+                    {section.label || 'Services'}
+                  </span>
+
+                  <div className="pt-2">
+                    <span className="text-3xl font-bold uppercase">
+                      {section.subTitle}
+                    </span>
+                  </div>
+                </div>
+
+                <div className='text-xl text-justify'>
+
+                  {section.text && (
+                    <div>
+                      {section.text.map((paragraph, i) => (
+                        <span key={i} className="block pt-2">
+                          {highlightText(paragraph, keyword)}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  <ul className="pt-4 space-y-3">
+                    {section.list.map((item, j) => (
+                      <li key={j} className="flex items-start gap-3">
+                        <span className="flex items-center justify-center w-5 h-5 mt-1">
+                          <CheckCircle className="w-4 h-4 text-honeydew-800" />
+                        </span>
+                        <span>
+                          {item.text && highlightText(item.text.join(' '), keyword)}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+
+                </div>
+              </React.Fragment>
+            ))}
+
+          </div>
+        </section>
+
+      </main>
     </>
   )
 }
+
+
+{/*
+            
+            <div className="font-mono">
+
+              <span className='text-xl font-bold uppercase text-honeydew-800'>
+                <span className='pr-1'>-</span>`{section.label || 'Services'}`
+              </span>
+
+              <div className='pt-2'>
+                <span className='text-3xl font-bold uppercase'>
+                  {section.subTitle}
+                </span>
+              </div>
+
+            </div>
+
+            <div>
+
+              <div>
+                <span className='pt-5'>
+                  {section.text}
+                </span>
+              </div>
+
+              <div>
+                <span>
+                  lista
+                </span>
+              </div>
+
+            </div>
+            */}
