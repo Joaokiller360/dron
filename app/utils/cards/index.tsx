@@ -453,7 +453,7 @@ export function PageServices({
 
       </header>
 
-      <main className='p-10 text-black bg-honeydew-800/90'>
+      <main className='p-10 text-black bg-honeydew-900 dark:bg-honeydew-800'>
 
         <section className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
           <div className="p-5 bg-white rounded-2xl sm:p-10">
