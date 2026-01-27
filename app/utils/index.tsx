@@ -12,6 +12,7 @@ import Banner from './banner'
 import { Favicon, Logo } from './logo'
 import LegalPage from './legalProps'
 import { highlightText } from './highlightText'
+import { ScrollBottonEffect, ScrollRevealEffect } from './animation'
 
 export {
   Navbar,
@@ -35,5 +36,7 @@ export {
   Favicon,
   LegalPage,
   highlightText,
-  PageServices
+  PageServices,
+  ScrollRevealEffect,
+  ScrollBottonEffect
 }

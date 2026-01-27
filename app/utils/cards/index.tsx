@@ -1,5 +1,5 @@
 
-import { Button, createMetadata } from '@/app/utils'
+import { Button } from '@/app/utils'
 import { Video } from 'lucide-react'
 
 interface SectionCard {
@@ -26,73 +26,76 @@ interface CardVideo {
   href?: string
   videoname?: string
   imgName?: string
+  index: number
 }
 
-export function CardVideo({ title = '', organizacion = '', nameButton = '', href = '', videoname = '', imgName = '', present = '' }: CardVideo) {
+export function CardVideo({ index = 0, title = '', organizacion = '', nameButton = '', href = '', videoname = '', imgName = '', present = '' }: CardVideo) {
   return (
     <>
-      <div className="flex flex-col h-full p-6 rounded-xl bg-honeydew-800 dark:bg-honeydew-900" id={title}>
+      <ScrollRevealEffect index={index} key={title}>
+        <div className="flex flex-col h-full p-6 rounded-xl bg-honeydew-800 dark:bg-honeydew-900" id={title}>
 
-        {/* Imagen o Video */}
-        <div className="relative overflow-hidden rounded-lg">
-          {videoname ? (
-            <video
-              className="object-cover w-full h-64 rounded-lg"
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="metadata"
-            >
-              <source src={`https://res.cloudinary.com/dzlavqhid/video/upload/${videoname}.mp4`} type="video/mp4" />
-              {videoname}
-            </video>
-          ) : (
-            imgName && (
-              <img
-                loading="lazy"
-                src={`https://res.cloudinary.com/dzlavqhid/image/upload/${imgName}.jpg`}
-                alt={imgName}
-                className="object-cover w-full h-64 transition-transform duration-500 group-hover:scale-105"
-              />
-            )
-          )}
-        </div>
-
-
-        {/* Contenido */}
-        <div className="flex flex-col flex-1 text-white">
-          <div className='grid items-center'>
-            <h5 className="mt-6 mb-2 text-2xl font-semibold tracking-tight text-center line-clamp-2">
-              {title}
-            </h5>
-
-            {/* Organizacion o Present */}
-            {present ? (
-              <p className="mb-4 text-xl text-center line-clamp-3">
-                Presenta: <span className='underline underline-offset-4'>{present}</span>
-              </p>
+          {/* Imagen o Video */}
+          <div className="relative overflow-hidden rounded-lg">
+            {videoname ? (
+              <video
+                className="object-cover w-full h-64 rounded-lg"
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+              >
+                <source src={`https://res.cloudinary.com/dzlavqhid/video/upload/${videoname}.mp4`} type="video/mp4" />
+                {videoname}
+              </video>
             ) : (
-              organizacion && (
-                <p className="mb-4 text-xl text-center line-clamp-3">
-                  Organizacion: <span className='underline underline-offset-4'>{organizacion}</span>
-                </p>
+              imgName && (
+                <img
+                  loading="lazy"
+                  src={`https://res.cloudinary.com/dzlavqhid/image/upload/${imgName}.jpg`}
+                  alt={imgName}
+                  className="object-cover w-full h-64 transition-transform duration-500 group-hover:scale-105"
+                />
               )
             )}
           </div>
 
-          {/* Botón siempre abajo */}
-          <div className="mt-auto">
-            <Button
-              href={href}
-              text={`Ver ${nameButton}`}
-              style="cursor-pointer transition duration-500 bg-honeydew-900 hover:bg-white text-white hover:text-black dark:hover:text-white dark:bg-white dark:hover:bg-honeydew-800 dark:text-black"
-              icon={<Video size={24} strokeWidth={2} />}
-            />
-          </div>
-        </div>
 
-      </div>
+          {/* Contenido */}
+          <div className="flex flex-col flex-1 text-white">
+            <div className='grid items-center'>
+              <h5 className="mt-6 mb-2 text-2xl font-semibold tracking-tight text-center line-clamp-2">
+                {title}
+              </h5>
+
+              {/* Organizacion o Present */}
+              {present ? (
+                <p className="mb-4 text-xl text-center line-clamp-3">
+                  Presenta: <span className='underline underline-offset-4'>{present}</span>
+                </p>
+              ) : (
+                organizacion && (
+                  <p className="mb-4 text-xl text-center line-clamp-3">
+                    Organizacion: <span className='underline underline-offset-4'>{organizacion}</span>
+                  </p>
+                )
+              )}
+            </div>
+
+            {/* Botón siempre abajo */}
+            <div className="mt-auto">
+              <Button
+                href={href}
+                text={`Ver ${nameButton}`}
+                style="cursor-pointer transition duration-500 bg-honeydew-900 hover:bg-white text-white hover:text-black dark:hover:text-white dark:bg-white dark:hover:bg-honeydew-800 dark:text-black"
+                icon={<Video size={24} strokeWidth={2} />}
+              />
+            </div>
+          </div>
+
+        </div>
+      </ScrollRevealEffect>
 
     </>
   )
@@ -117,6 +120,7 @@ interface CardClient {
   content?: Content[];
   clients?: Client[];
   services?: Services[];
+  index: number
 }
 
 interface Client {
@@ -146,7 +150,7 @@ interface Buttons {
   icon?: React.ReactNode
 }
 
-export function CardClient({ buttons = [], content = [], clients = [], services = [] }: CardClient) {
+export function CardClient({ index = 0, buttons = [], content = [], clients = [], services = [] }: CardClient) {
 
   const activeButtons = buttons.filter(
     ({ active, href }) => active && href
@@ -352,7 +356,7 @@ Componente guardado
   )
 }
 
-import { Banner, highlightText } from '@/app/utils'
+import { Banner, highlightText, ScrollRevealEffect } from '@/app/utils'
 import { Film, MapPin, Factory, Building2, Earth, CheckCircle } from 'lucide-react';
 import React from 'react'
 
@@ -382,6 +386,7 @@ interface page {
   D: d[]
   Content: content[]
   keyword?: string[]
+  index: number
 }
 
 const listServices = [
@@ -412,6 +417,7 @@ export function PageServices({
   D,
   Content,
   keyword = [],
+  index = 0
 }: page) {
 
   const banner = D[0]
@@ -436,17 +442,19 @@ export function PageServices({
           <div className="grid gap-4 justify-items-center grid-cols-2 sm:grid-cols-4 lg:grid-cols-[repeat(auto-fit,minmax(7rem,1fr))] max-w-6xl">
 
             {listServices.map((card, index) => (
-              <a
-                key={index}
-                href={`/services/${card.hreft}`}
-                className="flex flex-col items-center justify-center w-32 p-4 text-xs text-center text-white h-30 bg-honeydew-900/90 rounded-2xl"
-              >
-                {card.icon}
-                <span className="leading-tight uppercase">
-                  {card.label}
-                </span>
-              </a>
+              <ScrollRevealEffect index={index} key={card.label}>
+                <a
+                  href={`/services/${card.hreft}`}
+                  className="flex flex-col items-center justify-center w-32 p-4 text-xs text-center text-white h-30 bg-honeydew-900/90 rounded-2xl"
+                >
+                  {card.icon}
+                  <span className="leading-tight uppercase">
+                    {card.label}
+                  </span>
+                </a>
+              </ScrollRevealEffect>
             ))}
+
 
           </div>
         </div>

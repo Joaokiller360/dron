@@ -1,4 +1,4 @@
-import { Banner, CardClient, createMetadata, SectionCard } from "@/app/utils";
+import { Banner, CardClient, createMetadata, ScrollRevealEffect, SectionCard } from "@/app/utils";
 import { FileSearchCorner } from 'lucide-react'
 
 export const metadata = createMetadata({
@@ -152,16 +152,132 @@ export const metadata = createMetadata({
   canonical: 'https://dron.joaobarres.dev/services',
 })
 
+const link = '/services/'
+
+const clients = [
+  {
+    services: [
+      {
+        title: 'Grabación de cine, series y peliculas',
+        description:
+          'Producción audiovisual aérea con calidad cinematográfica, ideal para escenas dinámicas, tomas creativas y narrativas de alto impacto visual'
+      }
+    ],
+    content: [
+      {
+        imgName: 'grabacion-cine'
+      }
+    ],
+    buttons: [
+      {
+        id: 1,
+        href: `${link}`,
+        active: true,
+        name: 'Ver Más',
+        icon: <FileSearchCorner size={24} strokeWidth={2} />
+      }
+    ]
+  },
+  {
+    services: [
+      {
+        title: 'Localización y reconocimiento',
+        description: 'Análisis visual del terreno para planificación, evaluación de zonas y toma de decisiones antes de iniciar un proyecto o producción'
+      }
+    ],
+    content: [
+      {
+        imgName: 'localizacion-reconocimiento'
+      }
+    ],
+    buttons: [
+      {
+        id: 1,
+        href: `${link}`,
+        active: true,
+        name: 'Ver Más',
+        icon: <FileSearchCorner size={24} strokeWidth={2} />
+      }
+    ]
+  },
+  {
+    services: [
+      {
+        title: 'Industrial, inspección y fotogrametría',
+        description: 'Captura aérea técnica para inspección de infraestructuras, levantamientos fotogramétricos y monitoreo industrial con alta precisión'
+      }
+    ],
+    content: [
+      {
+        imgName: 'industria-inspeccion'
+      }
+    ],
+    buttons: [
+      {
+        id: 1,
+        href: `${link}insdustrial-inspection-and-photogrammetry`,
+        active: true,
+        name: 'Ver Más',
+        icon: <FileSearchCorner size={24} strokeWidth={2} />
+      }
+    ]
+  },
+  {
+    services: [
+      {
+        title: 'Vuelo en ciudad',
+        description: 'Operaciones con dron en entornos urbanos, cumpliendo normativas y garantizando seguridad para proyectos comerciales y audiovisuales'
+      }
+    ],
+    content: [
+      {
+        imgName: 'vuelo-ciudad'
+      }
+    ],
+    buttons: [
+      {
+        id: 1,
+        href: `${link}location-scouting-and-recon`,
+        active: true,
+        name: 'Ver Más',
+        icon: <FileSearchCorner size={24} strokeWidth={2} />
+      }
+    ]
+  },
+  {
+    services: [
+      {
+        title: 'Eventos y retransmisiones',
+        description: 'Cobertura aérea en tiempo real o grabada para eventos, shows y actividades especiales, brindando una perspectiva única y envolvente'
+      }
+    ],
+    content: [
+      {
+        imgName: 'evento-retransmisiones'
+      }
+    ],
+    buttons: [
+      {
+        id: 1,
+        href: `${link}urban-flight-operations`,
+        active: true,
+        name: 'Ver Más',
+        icon: <FileSearchCorner size={24} strokeWidth={2} />
+      }
+    ]
+  }
+]
+
+
 
 export default function Services() {
-
-  const link = '/services/'
 
   return (
     <>
       <section className="pb-10 bg-honeydew-900 dark:bg-honeydew-800 pt-28" >
         <Banner
           title='explora nuestros servicios'
+          label='Servicios'
         />
 
         <section className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -170,120 +286,16 @@ export default function Services() {
             <SectionCard style="bg-honeydew-800 dark:bg-honeydew-900">
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 
-                <CardClient
-                  services={[
-                    {
-                      title: 'Grabación de cine, series y peliculas',
-                      description: 'Producción audiovisual aérea con calidad cinematográfica, ideal para escenas dinámicas, tomas creativas y narrativas de alto impacto visual'
-                    }
-                  ]}
-                  content={[
-                    {
-                      imgName: 'grabacion-cine'
-                    }
-                  ]}
-                  buttons={[
-                    {
-                      id: 1,
-                      href: `${link}`,
-                      active: true,
-                      name: 'Ver Más',
-                      icon: <FileSearchCorner size={24} strokeWidth={2} />
-                    }
-                  ]}
-                />
-
-                <CardClient
-                  services={[
-                    {
-                      title: 'Localización y reconocimiento',
-                      description: 'Análisis visual del terreno para planificación, evaluación de zonas y toma de decisiones antes de iniciar un proyecto o producción'
-                    }
-                  ]}
-                  content={[
-                    {
-                      imgName: 'localizacion-reconocimiento'
-                    }
-                  ]}
-                  buttons={[
-                    {
-                      id: 1,
-                      href: `${link}`,
-                      active: true,
-                      name: 'Ver Más',
-                      icon: <FileSearchCorner size={24} strokeWidth={2} />
-                    }
-                  ]}
-                />
-
-                <CardClient
-                  services={[
-                    {
-                      title: 'Industrial, inspección y fotogrametría',
-                      description: 'Captura aérea técnica para inspección de infraestructuras, levantamientos fotogramétricos y monitoreo industrial con alta precisión'
-                    }
-                  ]}
-                  content={[
-                    {
-                      imgName: 'industria-inspeccion'
-                    }
-                  ]}
-                  buttons={[
-                    {
-                      id: 1,
-                      href: `${link}insdustrial-inspection-and-photogrammetry`,
-                      active: true,
-                      name: 'Ver Más',
-                      icon: <FileSearchCorner size={24} strokeWidth={2} />
-                    }
-                  ]}
-                />
-
-                <CardClient
-                  services={[
-                    {
-                      title: 'Vuelo en ciudad',
-                      description: 'Operaciones con dron en entornos urbanos, cumpliendo normativas y garantizando seguridad para proyectos comerciales y audiovisuales'
-                    }
-                  ]}
-                  content={[
-                    {
-                      imgName: 'vuelo-ciudad'
-                    }
-                  ]}
-                  buttons={[
-                    {
-                      id: 1,
-                      href: `${link}location-scouting-and-recon`,
-                      active: true,
-                      name: 'Ver Más',
-                      icon: <FileSearchCorner size={24} strokeWidth={2} />
-                    }
-                  ]}
-                />
-
-                <CardClient
-                  services={[
-                    {
-                      title: 'Eventos y retransmisiones',
-                      description: 'Cobertura aérea en tiempo real o grabada para eventos, shows y actividades especiales, brindando una perspectiva única y envolvente'
-                    }
-                  ]}
-                  content={[
-                    {
-                      imgName: 'evento-retransmisiones'
-                    }
-                  ]}
-                  buttons={[
-                    {
-                      id: 1,
-                      href: `${link}urban-flight-operations`,
-                      active: true,
-                      name: 'Ver Más',
-                      icon: <FileSearchCorner size={24} strokeWidth={2} />
-                    }
-                  ]}
-                />
+                {clients.map((client, index) => (
+                  <ScrollRevealEffect key={index} index={index}>
+                    <CardClient
+                      index={index}
+                      services={client.services}
+                      content={client.content}
+                      buttons={client.buttons}
+                    />
+                  </ScrollRevealEffect>
+                ))}
 
               </div>
 

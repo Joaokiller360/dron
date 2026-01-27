@@ -6,40 +6,138 @@ export const metadata = createMetadata({
   title: 'Portafolio | JB.SKYLENS',
   description:
     'Explora el portafolio de JB.SKYLENS con proyectos reales de fotografía aérea, video con drones, eventos e inspecciones en Ecuador.',
-    keywords: [
-      'portafolio drones esmeraldas',
-      'trabajos con drones esmeraldas',
-      'proyectos con drones ecuador',
-      'ejemplos de filmación con drones',
-      'fotografía aérea profesional',
-      'video aéreo profesional',
-      'producción audiovisual con drones',
-    
-      'videos con drones para eventos',
-      'filmación aérea de eventos',
-      'videos corporativos con drones',
-      'videos publicitarios con drones',
-      'fotografía aérea inmobiliaria',
-    
-      'drones para conciertos',
-      'drones para festivales',
-      'drones para eventos sociales',
-      'drones para eventos empresariales',
-    
-      'inspecciones con drones realizadas',
-      'levantamientos con drones realizados',
-      'trabajos técnicos con drones',
-    
-      'portafolio JB.SKYLENS',
-      'proyectos JB SKYLENS',
-      'trabajos de Joao Barres',
-      'empresa audiovisual con drones',
-      'contenido aéreo profesional',
-      'drones profesionales en acción',
-    ]
-    ,
+  keywords: [
+    'portafolio drones esmeraldas',
+    'trabajos con drones esmeraldas',
+    'proyectos con drones ecuador',
+    'ejemplos de filmación con drones',
+    'fotografía aérea profesional',
+    'video aéreo profesional',
+    'producción audiovisual con drones',
+
+    'videos con drones para eventos',
+    'filmación aérea de eventos',
+    'videos corporativos con drones',
+    'videos publicitarios con drones',
+    'fotografía aérea inmobiliaria',
+
+    'drones para conciertos',
+    'drones para festivales',
+    'drones para eventos sociales',
+    'drones para eventos empresariales',
+
+    'inspecciones con drones realizadas',
+    'levantamientos con drones realizados',
+    'trabajos técnicos con drones',
+
+    'portafolio JB.SKYLENS',
+    'proyectos JB SKYLENS',
+    'trabajos de Joao Barres',
+    'empresa audiovisual con drones',
+    'contenido aéreo profesional',
+    'drones profesionales en acción',
+  ]
+  ,
   canonical: 'https://dron.joaobarres.dev/portfolio',
 })
+
+const marinaEcovida = [
+  {
+    title: 'Marina Sounset - Session Vol. 4',
+    present: 'Jaun Fernando Velazco',
+    nameButton: 'Reels',
+    href: 'https://www.instagram.com/reel/DS7quC9DdTr/?igsh=MTZpMHI1cHlzZmxwNw==',
+    videoname: 'juan-fernando'
+  },
+  {
+    title: 'Halloween - CONCERT PARTY',
+    present: 'Magic Juan',
+    nameButton: 'Reels',
+    videoname: 'magic-juan',
+    href: 'https://www.instagram.com/reel/DQnVl9ijDO-/?igsh=MTVucHQ2M3B6aGQyMw=='
+  },
+  {
+    title: 'Marina Sounset - Session Vol. 3',
+    present: 'Verde 70',
+    nameButton: 'Reels',
+    videoname: 'verde-70',
+    href: 'https://www.instagram.com/reel/DNMlByMx6FD/?igsh=dDNsMDI5eXhhcnpt'
+  },
+  {
+    title: 'Marina Sounset - Session Vol. 2',
+    present: 'Tercer Mundo + AU-D',
+    nameButton: 'Reels',
+    videoname: 'tercerMundo-auD',
+    imgName: 'marina',
+    href: 'https://www.instagram.com/reel/DJ0QWdJJl2V/?igsh=MXBtZ2Rod3I5NDAzaw=='
+  }
+]
+
+const eventoVarios = [
+  {
+    title: 'Green AND White',
+    organizacion: 'Vida Pura Beach',
+    nameButton: 'Reals',
+    imgName: 'vida-pura',
+    href: 'https://www.instagram.com/reel/DMWlNidNaUA/?igsh=ZXZiN2dwaWIybWQ0',
+  },
+  {
+    title: 'Paolo Plaza',
+    organizacion: 'Vida Pura Beach',
+    nameButton: 'Reals',
+    imgName: 'vida-pura',
+    href: 'https://www.instagram.com/reel/DB97gJdPqBT/?igsh=MWcxcmRmeWE2dTEwYQ==',
+  },
+  {
+    title: 'Rumbeke 2025',
+    organizacion: 'Rumbeke Music Entertainment',
+    nameButton: ' Reals',
+    imgName: 'rumbeke',
+    href: 'https://www.instagram.com/reel/DNcNE8zN1O9/?igsh=ODl2YmV4Y2wwYXNk',
+  },
+  {
+    title: 'Rumbeke Carnaval 2025',
+    organizacion: 'Rumbeke Music Entertainment',
+    nameButton: 'Reals',
+    videoname: 'rumbeke-2025',
+    href: 'https://www.instagram.com/reel/C-jf6zPxlXs/?igsh=cGYxZnFhc2t3ODB1',
+  },
+  {
+    title: 'ALOHA FEST 2025',
+    organizacion: 'ALOHA FEST',
+    nameButton: 'Reals',
+    videoname: 'aloha-feste-2025',
+    href: 'https://www.instagram.com/reel/DG4qghKOlPh/?utm_source=ig_web_copy_link',
+  }
+]
+
+const documentals = [
+  {
+    title: 'Corazones Descalzos',
+    organizacion: 'Fundación Corazones Descalzos',
+    nameButton: 'Reals',
+    videoname: 'corazones-descalzos',
+    imgName: 'corazones-descalzos',
+    href: 'https://www.instagram.com/reel/DS8appVjfKH/?igsh=MTl4dWV6OHZ2c3o0Zg==',
+  }
+]
+
+const gubernamental = [
+  {
+    title: 'Prefectura de Esmeraldas',
+    organizacion: 'Gobierno',
+    nameButton: 'Reals',
+    videoname: 'provincializacion-esmeralda',
+    href: 'https://www.instagram.com/reel/DS8appVjfKH/?igsh=MTl4dWV6OHZ2c3o0Zg==',
+  },
+  {
+    title: 'Elvis Crespo',
+    organizacion: 'Alcaldia De Esmeraldas',
+    nameButton: 'Reals',
+    videoname: 'elvis-crespo',
+    href: 'https://www.instagram.com/reel/DNA-zXrx9i8/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=='
+  }
+]
 
 export default function Portfolio() {
   return (
@@ -62,35 +160,14 @@ export default function Portfolio() {
                 </div>
                 <hr className="my-3 h-0.5 border-t-0 bg-white" />
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  <CardVideo
-                    title='Marina Sounset - Session Vol. 4'
-                    present='Jaun Fernando Velazco'
-                    nameButton=' Reals'
-                    href='https://www.instagram.com/reel/DS7quC9DdTr/?igsh=MTZpMHI1cHlzZmxwNw=='
-                    videoname='juan-fernando'
-                  />
-                  <CardVideo
-                    title='Halloween - CONCERT PARTY'
-                    present='Magic Juan'
-                    nameButton=' Reals'
-                    videoname='magic-juan'
-                    href='https://www.instagram.com/reel/DQnVl9ijDO-/?igsh=MTVucHQ2M3B6aGQyMw=='
-                  />
-                  <CardVideo
-                    title='Marina Sounset - Session Vol. 3'
-                    present='Verde 70'
-                    nameButton=' Reals'
-                    videoname='verde-70'
-                    href='https://www.instagram.com/reel/DNMlByMx6FD/?igsh=dDNsMDI5eXhhcnpt'
-                  />
-                  <CardVideo
-                    title='Marina Sounset - Session Vol. 2'
-                    present='Tercer Mundo + AU-D'
-                    nameButton=' Reals'
-                    videoname='tercerMundo-auD'
-                    imgName='marina'
-                    href='https://www.instagram.com/reel/DJ0QWdJJl2V/?igsh=MXBtZ2Rod3I5NDAzaw=='
-                  />
+                  {marinaEcovida.map((video, index) => (
+                    <CardVideo
+                      key={video.title}
+                      index={index}
+                      {...video}
+                    />
+                  ))}
+
                 </div>
               </div>
 
@@ -104,41 +181,13 @@ export default function Portfolio() {
                 </div>
                 <hr className="my-3 h-0.5 border-t-0 bg-white" />
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  <CardVideo
-                    title='Green AND White'
-                    organizacion='Vida Pura Beach'
-                    nameButton=' Reals'
-                    imgName='vida-pura'
-                    href='https://www.instagram.com/reel/DMWlNidNaUA/?igsh=ZXZiN2dwaWIybWQ0'
-                  />
-                  <CardVideo
-                    title='Paolo Plaza'
-                    organizacion='Vida Pura Beach'
-                    nameButton=' Reals'
-                    imgName='vida-pura'
-                    href='https://www.instagram.com/reel/DB97gJdPqBT/?igsh=MWcxcmRmeWE2dTEwYQ=='
-                  />
-                  <CardVideo
-                    title='Rumbeke 2025'
-                    organizacion='Rumbeke Music Entertainment'
-                    nameButton=' Reals'
-                    imgName='rumbeke'
-                    href='https://www.instagram.com/reel/DNcNE8zN1O9/?igsh=ODl2YmV4Y2wwYXNk'
-                  />
-                  <CardVideo
-                    title='Rumbeke Carnaval 2025'
-                    organizacion='Rumbeke Music Entertainment'
-                    nameButton=' Reals'
-                    videoname='rumbeke-2025'
-                    href='https://www.instagram.com/reel/C-jf6zPxlXs/?igsh=cGYxZnFhc2t3ODB1'
-                  />
-                  <CardVideo
-                    title='ALOHA FEST 2025'
-                    organizacion='ALOHA FEST'
-                    nameButton=' Reals'
-                    videoname='aloha-feste-2025'
-                    href='https://www.instagram.com/reel/DG4qghKOlPh/?utm_source=ig_web_copy_link'
-                  />
+                  {eventoVarios.map((video, index) => (
+                    <CardVideo
+                      key={video.title}
+                      index={index}
+                      {...video}
+                    />
+                  ))}
                 </div>
               </div>
             </SectionCard>
@@ -151,14 +200,13 @@ export default function Portfolio() {
                 </div>
                 <hr className="my-3 h-0.5 border-t-0 bg-white" />
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  <CardVideo
-                    title='Corazones Descalzos'
-                    organizacion='Fundación Corazones Descalzos'
-                    nameButton=' Reals'
-                    videoname='corazones-descalzos'
-                    imgName='corazones-descalzos'
-                    href='https://www.instagram.com/reel/DS8appVjfKH/?igsh=MTl4dWV6OHZ2c3o0Zg=='
-                  />
+                  {documentals.map((video, index) => (
+                    <CardVideo
+                      key={video.title}
+                      index={index}
+                      {...video}
+                    />
+                  ))}
                 </div>
               </div>
             </SectionCard>
@@ -171,20 +219,15 @@ export default function Portfolio() {
                 </div>
                 <hr className="my-3 h-0.5 border-t-0 bg-white" />
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  <CardVideo
-                    title='Prefectura de Esmeraldas'
-                    organizacion='Gobierno'
-                    nameButton=' Reals'
-                    videoname='provincializacion-esmeralda'
-                    href='https://www.instagram.com/reel/DS8appVjfKH/?igsh=MTl4dWV6OHZ2c3o0Zg=='
-                  />
-                  <CardVideo
-                    title='Elvis Crespo'
-                    organizacion='Alcaldia De Esmeraldas'
-                    nameButton=' Reals'
-                    videoname='elvis-crespo'
-                    href='https://www.instagram.com/reel/DNA-zXrx9i8/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=='
-                  />
+
+                  {gubernamental.map((video, index) => (
+                    <CardVideo
+                      key={video.title}
+                      index={index}
+                      {...video}
+                    />
+                  ))}
+
                 </div>
               </div>
             </SectionCard>
