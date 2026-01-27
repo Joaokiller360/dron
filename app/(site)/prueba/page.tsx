@@ -14,6 +14,7 @@ export default function Prueba() {
             {/* capsula uno */}
             <SectionCard style="bg-honeydew-800 dark:bg-honeydew-900">
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {/*
                 <CardClient
                   clients={[
                     {
@@ -65,6 +66,7 @@ export default function Prueba() {
                     }
                   ]}
                 />
+                */}
               </div>
 
             </SectionCard>
