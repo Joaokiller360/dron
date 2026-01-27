@@ -1,43 +1,171 @@
 
 import { CallAction } from '@/app/component'
-import { Banner, SectionCard, createMetadata, CardClient } from '@/app/utils'
+import { Banner, SectionCard, createMetadata, CardClient, ScrollRevealEffect } from '@/app/utils'
 import { PhoneCall, Instagram } from 'lucide-react'
 
 export const metadata = createMetadata({
   title: 'Clientes | JB.SKYLENS',
   description:
     'Empresas y personas que han confiado en JB.SKYLENS para servicios profesionales con drones en Ecuador.',
-    keywords: [
-      'clientes JB.SKYLENS',
-      'empresas que usan drones',
-      'clientes de servicios con drones',
-      'empresas atendidas con drones',
-    
-      'drones para empresas ecuador',
-      'servicios de drones empresariales',
-      'drones para industria',
-      'drones para puertos',
-      'drones para eventos empresariales',
-    
-      'clientes de filmación aérea',
-      'clientes de fotografía aérea',
-      'clientes de producción audiovisual',
-    
-      'empresas de esmeraldas con drones',
-      'clientes corporativos con drones',
-    
-      'confianza en servicios con drones',
-      'casos de éxito con drones',
-      'proyectos empresariales con drones',
-    
-      'clientes JB SKYLENS drones',
-      'empresas que confían en JB.SKYLENS',
-      'servicios profesionales con drones',
-      'empresa de drones confiable',
-    ]
-    ,
+  keywords: [
+    'clientes JB.SKYLENS',
+    'empresas que usan drones',
+    'clientes de servicios con drones',
+    'empresas atendidas con drones',
+
+    'drones para empresas ecuador',
+    'servicios de drones empresariales',
+    'drones para industria',
+    'drones para puertos',
+    'drones para eventos empresariales',
+
+    'clientes de filmación aérea',
+    'clientes de fotografía aérea',
+    'clientes de producción audiovisual',
+
+    'empresas de esmeraldas con drones',
+    'clientes corporativos con drones',
+
+    'confianza en servicios con drones',
+    'casos de éxito con drones',
+    'proyectos empresariales con drones',
+
+    'clientes JB SKYLENS drones',
+    'empresas que confían en JB.SKYLENS',
+    'servicios profesionales con drones',
+    'empresa de drones confiable',
+  ]
+  ,
   canonical: 'https://dron.joaobarres.dev/clients',
 })
+
+const documentals = [
+  {
+    clients: [
+      {
+        client: 'Fundación Corazones Descalzos',
+        organizacion: 'Fundación',
+      }
+    ],
+    content: [
+      {
+        imgName: 'corazones-descalzos'
+      }
+    ],
+    buttons: [
+      {
+        id: 1,
+        href: 'https://www.instagram.com/corazones.descalzos',
+        active: true,
+        name: 'Instagram',
+        icon: <Instagram size={24} strokeWidth={2} />
+      }
+    ]
+  }
+
+]
+
+const gubernamental = [
+  {
+    clients: [
+      {
+        client: 'Prefectura de Esmeraldas',
+        organizacion: 'Gubernamental'
+      }
+    ],
+    content: [
+      {
+        imgName: 'prefectura-esmeraldas'
+      }
+    ],
+    buttons: [
+      {
+        id: 1,
+        href: 'https://www.instagram.com/esmeraldasprefectura',
+        active: true,
+        name: 'Instagram',
+        icon: <Instagram size={24} strokeWidth={2} />
+      }
+    ]
+  }
+
+]
+
+const grandConsomer = [
+  {
+    clients: [
+      {
+        client: 'Marina Ecovida',
+        organizacion: 'Event Garden'
+      }
+    ],
+    content: [
+      {
+        imgName: 'marina'
+      }
+    ],
+    buttons: [
+      {
+        id: 1,
+        href: 'https://www.instagram.com/marinaecovida',
+        active: true,
+        name: 'Instagram',
+        icon: <Instagram size={24} strokeWidth={2} />
+      }, {
+        id: 2,
+        href: 'https://api.whatsapp.com/message/SI7RZTHBYV3AK1?autoload=1&app_absent=0&utm_source=ig',
+        active: true,
+        name: 'Contacto',
+        icon: <PhoneCall size={24} strokeWidth={2} />
+      }
+    ]
+  },
+  {
+    clients: [
+      {
+        client: 'Vida Pura Beach',
+        organizacion: 'Event Garden'
+      }
+    ],
+    content: [
+      {
+        imgName: 'vida-pura'
+      }
+    ],
+    buttons: [
+      {
+        id: 1,
+        href: 'https://www.instagram.com/marinaecovida',
+        active: true,
+        name: 'Instagram',
+        icon: <Instagram size={24} strokeWidth={2} />
+      }
+    ]
+  },
+  {
+    clients: [
+      {
+        client: 'Rumbeke Music Entertainment',
+        organizacion: 'Event Garden'
+      }
+    ],
+    content: [
+      {
+        imgName: 'rumbeke'
+      }
+    ],
+    buttons: [
+      {
+        id: 1,
+        href: 'https://www.instagram.com/rumbekemusicentertainment',
+        active: true,
+        name: 'Instagram',
+        icon: <Instagram size={24} strokeWidth={2} />
+      }
+    ]
+  }
+
+]
 
 
 export default function Clients() {
@@ -62,86 +190,16 @@ export default function Clients() {
                 <hr className="my-3 h-0.5 border-t-0 bg-white" />
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 
-                  <CardClient
-                    clients={[
-                      {
-                        client: 'Marina Ecovida',
-                        organizacion: 'Event Garden'
-                      }
-                    ]}
-                    content={[
-                      {
-                        imgName: 'marina'
-                      }
-                    ]}
-                    buttons={[
-                      {
-                        id: 1,
-                        href: 'https://www.instagram.com/marinaecovida',
-                        active: true,
-                        name: 'Instagram',
-                        icon: <Instagram size={24} strokeWidth={2} />
-                      }, {
-                        id: 2,
-                        href: 'https://api.whatsapp.com/message/SI7RZTHBYV3AK1?autoload=1&app_absent=0&utm_source=ig',
-                        active: true,
-                        name: 'Contacto',
-                        icon: <PhoneCall size={24} strokeWidth={2} />
-                      }
-                    ]}
-                  />
-
-                  <CardClient
-                    clients={[
-                      {
-                        client: 'Vida Pura Beach',
-                        organizacion: 'Event Garden'
-                      }
-                    ]}
-                    content={[
-                      {
-                        imgName: 'vida-pura'
-                      }
-                    ]}
-                    buttons={[
-                      {
-                        id: 1,
-                        href: 'https://www.instagram.com/marinaecovida',
-                        active: true,
-                        name: 'Instagram',
-                        icon: <Instagram size={24} strokeWidth={2} />
-                      }, {
-                        id: 2,
-                        href: 'https://api.whatsapp.com/message/SI7RZTHBYV3AK1?autoload=1&app_absent=0&utm_source=ig',
-                        active: true,
-                        name: 'Contacto',
-                        icon: <PhoneCall size={24} strokeWidth={2} />
-                      }
-                    ]}
-                  />
-
-                  <CardClient
-                    clients={[
-                      {
-                        client: 'Rumbeke Music Entertainment',
-                        organizacion: 'Event Garden'
-                      }
-                    ]}
-                    content={[
-                      {
-                        imgName: 'rumbeke'
-                      }
-                    ]}
-                    buttons={[
-                      {
-                        id: 1,
-                        href: 'https://www.instagram.com/rumbekemusicentertainment',
-                        active: true,
-                        name: 'Instagram',
-                        icon: <Instagram size={24} strokeWidth={2} />
-                      }
-                    ]}
-                  />
+                  {grandConsomer.map((item, index) => (
+                    <ScrollRevealEffect key={index} index={index}>
+                      <CardClient
+                        index={index}
+                        clients={item.clients}
+                        content={item.content}
+                        buttons={item.buttons}
+                      />
+                    </ScrollRevealEffect>
+                  ))}
 
                 </div>
               </div>
@@ -155,28 +213,18 @@ export default function Clients() {
                 </div>
                 <hr className="my-3 h-0.5 border-t-0 bg-white" />
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  <CardClient
-                    clients={[
-                      {
-                        client: 'Fundación Corazones Descalzos',
-                        organizacion: 'Fundación'
-                      }
-                    ]}
-                    content={[
-                      {
-                        imgName: 'corazones-descalzos'
-                      }
-                    ]}
-                    buttons={[
-                      {
-                        id: 1,
-                        href: 'https://www.instagram.com/corazones.descalzos',
-                        active: true,
-                        name: 'Instagram',
-                        icon: <Instagram size={24} strokeWidth={2} />
-                      }
-                    ]}
-                  />
+
+                  {documentals.map((item, index) => (
+                    <ScrollRevealEffect key={index} index={index}>
+                      <CardClient
+                        index={index}
+                        clients={item.clients}
+                        content={item.content}
+                        buttons={item.buttons}
+                      />
+                    </ScrollRevealEffect>
+                  ))}
+
                 </div>
               </div>
             </SectionCard>
@@ -188,28 +236,18 @@ export default function Clients() {
                 </div>
                 <hr className="my-3 h-0.5 border-t-0 bg-white" />
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <CardClient
-                    clients={[
-                      {
-                        client: 'Prefectura de Esmeraldas',
-                        organizacion: 'Gubernamental'
-                      }
-                    ]}
-                    content={[
-                      {
-                        imgName: 'prefectura-esmeraldas'
-                      }
-                    ]}
-                    buttons={[
-                      {
-                        id: 1,
-                        href: 'https://www.instagram.com/esmeraldasprefectura',
-                        active: true,
-                        name: 'Instagram',
-                        icon: <Instagram size={24} strokeWidth={2} />
-                      }
-                    ]}
-                  />
+
+                  {gubernamental.map((item, index) => (
+                    <ScrollRevealEffect key={index} index={index}>
+                      <CardClient
+                        index={index}
+                        clients={item.clients}
+                        content={item.content}
+                        buttons={item.buttons}
+                      />
+                    </ScrollRevealEffect>
+                  ))}
+
                 </div>
               </div>
             </SectionCard>
