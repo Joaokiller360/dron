@@ -1,6 +1,6 @@
 
 import { CallAction } from '@/app/component'
-import { Banner, SectionCard, createMetadata, CardVideo } from '@/app/utils'
+import { Banner, SectionCard, createMetadata, CardVideo, ScrollBottonEffect } from '@/app/utils'
 
 export const metadata = createMetadata({
   title: 'Portafolio | JB.SKYLENS',
@@ -155,10 +155,14 @@ export default function Portfolio() {
             {/* capsula uno */}
             <SectionCard style="bg-honeydew-900 dark:bg-honeydew-800">
               <div>
-                <div className='flex justify-center font-mono text-3xl font-semibold text-center uppercase'>
-                  <span>Eventos - Marina Ecovida</span>
-                </div>
-                <hr className="my-3 h-0.5 border-t-0 bg-white" />
+
+                <ScrollBottonEffect>
+                  <div className='flex justify-center font-mono text-3xl font-semibold uppercase'>
+                    <span>Eventos - Marina Ecovida</span>
+                  </div>
+                  <hr className="my-3 h-0.5 border-t-0 bg-white" />
+                </ScrollBottonEffect>
+
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {marinaEcovida.map((video, index) => (
                     <CardVideo
@@ -176,10 +180,12 @@ export default function Portfolio() {
             {/* capsula dos */}
             <SectionCard style="bg-honeydew-900 dark:bg-honeydew-800">
               <div>
-                <div className='flex justify-center font-mono text-3xl font-semibold text-center uppercase'>
-                  <span>Eventos Varios</span>
-                </div>
-                <hr className="my-3 h-0.5 border-t-0 bg-white" />
+                <ScrollBottonEffect>
+                  <div className='flex justify-center font-mono text-3xl font-semibold uppercase'>
+                    <span>Eventos - Varios</span>
+                  </div>
+                  <hr className="my-3 h-0.5 border-t-0 bg-white" />
+                </ScrollBottonEffect>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {eventoVarios.map((video, index) => (
                     <CardVideo
@@ -195,10 +201,12 @@ export default function Portfolio() {
             {/* capsula tres */}
             <SectionCard style="bg-honeydew-900 dark:bg-honeydew-800">
               <div>
-                <div className='flex justify-center font-mono text-3xl font-semibold text-center uppercase'>
-                  <span>Documentales</span>
-                </div>
-                <hr className="my-3 h-0.5 border-t-0 bg-white" />
+                <ScrollBottonEffect>
+                  <div className='flex justify-center font-mono text-3xl font-semibold uppercase'>
+                    <span>Documentales</span>
+                  </div>
+                  <hr className="my-3 h-0.5 border-t-0 bg-white" />
+                </ScrollBottonEffect>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {documentals.map((video, index) => (
                     <CardVideo
@@ -214,10 +222,12 @@ export default function Portfolio() {
             {/* capsula cuatro */}
             <SectionCard style="bg-honeydew-900 dark:bg-honeydew-800">
               <div>
-                <div className='flex justify-center font-mono text-3xl font-semibold text-center uppercase'>
-                  <span>Gubernamental</span>
-                </div>
-                <hr className="my-3 h-0.5 border-t-0 bg-white" />
+                <ScrollBottonEffect>
+                  <div className='flex justify-center font-mono text-3xl font-semibold uppercase'>
+                    <span>Gubernamental</span>
+                  </div>
+                  <hr className="my-3 h-0.5 border-t-0 bg-white" />
+                </ScrollBottonEffect>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 
                   {gubernamental.map((video, index) => (

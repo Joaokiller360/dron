@@ -39,7 +39,7 @@ export const ScrollBottonEffect = ({ children }: { children: ReactNode }) => {
       style={{
         opacity: isInview ? 1 : 0,
         transform: isInview ? 'translateY(0)' : 'translateY(100px)',
-        transition: 'all 0.6s cubic-bezier( 0.17, 0.55, 0.55, 1 ) 0.2s'
+        transition: 'all 0.5s cubic-bezier( 0.17, 0.55, 0.55, 1 ) 0.2s'
       }}
       ref={ref}
     >
