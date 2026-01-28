@@ -88,8 +88,7 @@ export default function Portfolio() {
                         name: 'Contacto',
                         icon: <PhoneCall size={24} strokeWidth={2} />
                       }
-                    ]}
-                  />
+                    ]} index={0}                  />
 
                   <CardClient
                     clients={[
@@ -117,8 +116,7 @@ export default function Portfolio() {
                         name: 'Contacto',
                         icon: <PhoneCall size={24} strokeWidth={2} />
                       }
-                    ]}
-                  />
+                    ]} index={0}                  />
                 </div>
               </div>
             </SectionCard>
