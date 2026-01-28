@@ -49,8 +49,7 @@ export default function urbanFlightOperations() {
             title: 'industrial, inspección y fotogrametría',
           }
         ]}
-        Content={[]}
-      />
+        Content={[]} index={0}      />
 
     </>
   )

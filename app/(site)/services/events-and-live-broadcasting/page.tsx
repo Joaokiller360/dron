@@ -13,8 +13,7 @@ export default function urbanFlightOperations() {
             title: 'Eventos y retransmisiones',
           }
         ]}
-        Content={[]}
-      />
+        Content={[]} index={0}      />
 
     </>
   )

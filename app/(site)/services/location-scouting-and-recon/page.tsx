@@ -49,8 +49,7 @@ export default function urbanFlightOperations() {
             title: 'localización y reconocimiento',
           }
         ]}
-        Content={[]}
-      />
+        Content={[]} index={0}      />
 
     </>
   )

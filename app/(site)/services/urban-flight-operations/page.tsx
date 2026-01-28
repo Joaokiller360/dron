@@ -49,12 +49,10 @@ export default function urbanFlightOperations() {
             title: 'vuelos en ciudad',
           }
         ]}
-        keyword={
-          [
-            'Permiten capturar tomas aéreas impresionantes:',
-            'Adaptables a cualquier idea:'
-          ]
-        }
+        keyword={[
+          'Permiten capturar tomas aéreas impresionantes:',
+          'Adaptables a cualquier idea:'
+        ]}
         Content={[
           {
             label: 'Servicios',
@@ -65,14 +63,13 @@ export default function urbanFlightOperations() {
             ],
             list: [
               {
-                text: ['Permiten capturar tomas aéreas impresionantes:','desde tomas panorámicas hasta seguimientos rápidos, los drones aportan una dimensión visual única a tu proyecto.']
-              },{
+                text: ['Permiten capturar tomas aéreas impresionantes:', 'desde tomas panorámicas hasta seguimientos rápidos, los drones aportan una dimensión visual única a tu proyecto.']
+              }, {
                 text: ['Adaptables a cualquier idea:', 'no importa si estás filmando un anuncio publicitario o una escena clave de una película, nuestros drones se adaptan a tus necesidades. Son perfectos para todo, desde mostrar paisajes hasta capturar la acción más intensa.']
               }
             ]
           }
-        ]}
-      />
+        ]} index={0}      />
 
     </>
   )
