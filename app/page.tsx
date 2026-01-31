@@ -1,6 +1,6 @@
 
 import { Inicio, Logos, About, WhatDeDo, WhyChooseUs, Galery } from '@/app/component'
-import { createMetadata } from '@/app/utils'
+import { createMetadata, } from '@/app/utils'
 
 export const metadata = createMetadata({
   title: 'JB.SKYLENS',

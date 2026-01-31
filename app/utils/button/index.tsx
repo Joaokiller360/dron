@@ -29,6 +29,7 @@ interface ButtonProps {
   icon?: React.ReactNode;
   style?: string;
   id?: string;
+  target?: string
 }
 
 export function Button({
@@ -37,13 +38,14 @@ export function Button({
   text = '',
   icon = null,
   style = '',
+  target
 }: ButtonProps) {
   const classes = `inline-flex items-center gap-2 px-4 py-2 rounded-xl transition-all ${style}`;
 
   return (
     <div className="flex justify-center">
       {href ? (
-        <a href={href} id={id} className={classes}>
+        <a target={target} href={href} id={id} className={classes}>
           <span>{text}</span>
           {icon}
         </a>

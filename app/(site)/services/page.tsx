@@ -268,8 +268,6 @@ const clients = [
   }
 ]
 
-
-
 export default function Services() {
 
   return (

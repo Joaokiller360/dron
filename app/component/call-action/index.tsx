@@ -1,4 +1,4 @@
-import { Button, SeparatorUp } from '@/app/utils'
+import { Button, SeparatorUp, ScrollBottonEffect } from '@/app/utils'
 
 interface CallActionProps {
   text?: string
@@ -20,7 +20,7 @@ export default function CallAction({
   buttonColor = '',
   textColor = '',
   background = '',
-  buttonhref ='',
+  buttonhref = '',
   buttonText = ''
 }: CallActionProps) {
   return (
@@ -33,25 +33,27 @@ export default function CallAction({
       <section
         className={`mx-auto flex justify-center px-4 py-16 ${style}`}
       >
-        <div
-          className={`${background} w-full max-w-5xl rounded-2xl p-6 sm:p-12 grid grid-cols-1 lg:grid-cols-2 gap-6 items-center`}
-        >
-          {/* Texto */}
-          <div className={`${textColor} text-center`}>
-            <span className="block font-semibold leading-snug">
-              {text}
-            </span>
-          </div>
+        <ScrollBottonEffect>
+          <div
+            className={`${background} w-full max-w-5xl rounded-2xl p-6 sm:p-12 grid grid-cols-1 lg:grid-cols-2 gap-6 items-center`}
+          >
+            {/* Texto */}
+            <div className={`${textColor} text-center`}>
+              <span className="block font-semibold leading-snug">
+                {text}
+              </span>
+            </div>
 
-          {/* Botón */}
-          <div className="flex justify-center">
-            <Button
-              href={buttonhref}
-              text={buttonText}
-              style={buttonColor}
-            />
+            {/* Botón */}
+            <div className="flex justify-center">
+              <Button
+                href={buttonhref}
+                text={buttonText}
+                style={buttonColor}
+              />
+            </div>
           </div>
-        </div>
+        </ScrollBottonEffect>
       </section>
     </>
   )

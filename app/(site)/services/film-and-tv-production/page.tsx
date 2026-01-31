@@ -16,7 +16,8 @@ export default function urbanFlightOperations() {
         keyword={[
           'Permiten capturar tomas aéreas impresionantes:',
           'Adaptables a cualquier idea:',
-          'Ahorro de tiempo y dinero: ',
+          'Ahorro de tiempo y dinero:',
+          'Calidad de imagen superior'
         ]}
         Content={[
           {
@@ -33,10 +34,26 @@ export default function urbanFlightOperations() {
                 text: ['Adaptables a cualquier idea:', 'no importa si estás filmando un anuncio publicitario o una escena clave de una película, nuestros drones se adaptan a tus necesidades. Son perfectos para todo, desde mostrar paisajes hasta capturar la acción más intensa.']
               }, {
                 text: ['Ahorro de tiempo y dinero:', 'los drones ofrecen una manera más económica y rápida de obtener las tomas perfectas, sin comprometer la calidad. Además, nuestro servicio está especializado en  conseguir las tomas perfectas en el menor tiempo posible, multiplicando el ahorro al disminuir los costes operativos en set: eficiencia y calidad premium, ¡es lo que ofrecemos!']
+              }, {
+                text: ['Calidad de imagen superior:', 'nuestros drones están equipados con tecnología de cámara y estabilización de última generación, asegurando que cada toma sea nítida y de alta calidad.']
               }
-            ]
+            ],
           }
-        ]} index={0}      />
+        ]}
+        galery={[
+          {
+            video: 'juan-fernando',
+            label: 'juan-fernando',
+            ref: 'juanfervelasco'
+          },
+          {
+            video: 'corazones-descalzos',
+            label: 'corazones-descalzos',
+            ref: 'fundacionph3'
+          }
+        ]}
+        index={0}
+      />
 
     </>
   )

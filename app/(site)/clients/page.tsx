@@ -55,7 +55,7 @@ const documentals = [
     buttons: [
       {
         id: 1,
-        href: 'https://www.instagram.com/corazones.descalzos',
+        href: 'https://www.instagram.com/fundacionph3',
         active: true,
         name: 'Instagram',
         icon: <Instagram size={24} strokeWidth={2} />

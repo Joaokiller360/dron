@@ -117,7 +117,6 @@ const documentals = [
     organizacion: 'Fundación Corazones Descalzos',
     nameButton: 'Reals',
     videoname: 'corazones-descalzos',
-    imgName: 'corazones-descalzos',
     href: 'https://www.instagram.com/reel/DS8appVjfKH/?igsh=MTl4dWV6OHZ2c3o0Zg==',
   }
 ]

@@ -4,11 +4,12 @@ import { motion, useInView } from 'framer-motion'
 import { ReactNode, useRef } from 'react'
 
 interface Props {
-  children: ReactNode
+  children: React.ReactNode
   index?: number
+  className?: string
 }
 
-export const ScrollRevealEffect = ({ children, index = 0 }: Props) => {
+export const ScrollRevealEffect = ({ children, index = 0, className = '', }: Props) => {
   const ref = useRef(null)
   const isInView = useInView(ref)
 
@@ -17,6 +18,7 @@ export const ScrollRevealEffect = ({ children, index = 0 }: Props) => {
       ref={ref}
       initial={{ opacity: 0, y: 100 }}
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 100 }}
+      className={className}
       transition={{
         duration: 0.6,
         ease: [0.17, 0.55, 0.55, 1],

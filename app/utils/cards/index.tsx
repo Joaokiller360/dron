@@ -1,5 +1,5 @@
 
-import { Button } from '@/app/utils'
+import { Button, ScrollBottonEffect } from '@/app/utils'
 import { Video } from 'lucide-react'
 
 interface SectionCard {
@@ -86,6 +86,7 @@ export function CardVideo({ index = 0, title = '', organizacion = '', nameButton
             {/* Botón siempre abajo */}
             <div className="mt-auto">
               <Button
+                target='_blank'
                 href={href}
                 text={`Ver ${nameButton}`}
                 style="cursor-pointer transition duration-500 bg-honeydew-900 hover:bg-white text-white hover:text-black dark:hover:text-white dark:bg-white dark:hover:bg-honeydew-800 dark:text-black"
@@ -212,6 +213,7 @@ export function CardClient({ index = 0, buttons = [], content = [], clients = []
               <div className={`grid gap-2 px-6 mt-4 md:mt-6 ${activeButtons.length === 1 ? 'flex items-center justify-center' : 'grid-cols-2'} `} >
                 {activeButtons.map(({ id, href, name, icon }) => (
                   <Button
+                    target='_blank'
                     key={id}
                     text={name}
                     href={href}
@@ -269,6 +271,7 @@ export function CardClient({ index = 0, buttons = [], content = [], clients = []
                 <div className={`grid gap-2 px-6 mt-4 md:mt-6 ${activeButtons.length === 1 ? 'flex items-center justify-center' : 'grid-cols-2'} `} >
                   {activeButtons.map(({ id, href, name, icon }) => (
                     <Button
+                      target='_blank'
                       key={id}
                       text={name}
                       href={href}
@@ -357,8 +360,9 @@ Componente guardado
 }
 
 import { Banner, highlightText, ScrollRevealEffect } from '@/app/utils'
-import { Film, MapPin, Factory, Building2, Earth, CheckCircle } from 'lucide-react';
+import { Film, MapPin, Factory, Building2, Earth, CheckCircle, Paperclip } from 'lucide-react';
 import React from 'react'
+import Link from 'next/link'
 
 interface d {
   imagen?: string
@@ -377,9 +381,11 @@ interface List {
   text?: string[]
 }
 
-interface galery {
+interface Galery {
   imagen?: string
   video?: string
+  label?: string
+  ref?: string
 }
 
 interface page {
@@ -387,6 +393,7 @@ interface page {
   Content: content[]
   keyword?: string[]
   index: number
+  galery?: Galery[]
 }
 
 const listServices = [
@@ -417,7 +424,8 @@ export function PageServices({
   D,
   Content,
   keyword = [],
-  index = 0
+  index = 0,
+  galery
 }: page) {
 
   const banner = D[0]
@@ -461,51 +469,114 @@ export function PageServices({
 
       </header>
 
-      <main className='p-10 text-black bg-honeydew-900 dark:bg-honeydew-800'>
+      <main className='py-5 text-black sm:p-10 bg-honeydew-900 dark:bg-honeydew-800'>
 
         <section className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-          <div className="p-5 bg-white rounded-2xl sm:p-10">
+          <div className="p-5 bg-gray-200 rounded-2xl sm:p-10">
 
             {Content.map((section, index) => (
               <React.Fragment key={index}>
                 <div className="font-mono">
-                  <span className="text-xl font-bold uppercase text-honeydew-800">
-                    <span className="pr-1">-</span>
-                    {section.label || 'Services'}
+                  {/*Label*/}
+                  <span className="text-sm font-bold uppercase sm:text-xl text-honeydew-800">
+                    <ScrollBottonEffect>
+                      <span className="pr-1">-</span>
+                      {section.label || 'Services'}
+                    </ScrollBottonEffect>
                   </span>
 
+                  {/*Subtitle*/}
                   <div className="pt-2">
-                    <span className="text-3xl font-bold uppercase">
-                      {section.subTitle}
+                    <span className="text-xl font-bold text-justify uppercase lg:text-3xl sm:text-2xl">
+                      <ScrollBottonEffect>
+                        {section.subTitle}
+                      </ScrollBottonEffect>
                     </span>
                   </div>
                 </div>
 
                 <div className='text-xl text-justify'>
-
+                  {/*Text*/}
                   {section.text && (
                     <div>
                       {section.text.map((paragraph, i) => (
-                        <span key={i} className="block pt-2">
-                          {highlightText(paragraph, keyword)}
-                        </span>
+                        <ScrollRevealEffect key={i} index={i}>
+                          <span className="block pt-2">
+                            {highlightText(paragraph, keyword)}
+                          </span>
+                        </ScrollRevealEffect>
                       ))}
                     </div>
                   )}
 
+                  {/*List*/}
                   <ul className="pt-4 space-y-3">
                     {section.list.map((item, j) => (
-                      <li key={j} className="flex items-start gap-3">
-                        <span className="flex items-center justify-center w-5 h-5 mt-1">
-                          <CheckCircle className="w-4 h-4 text-honeydew-800" />
-                        </span>
-                        <span>
-                          {item.text && highlightText(item.text.join(' '), keyword)}
-                        </span>
-                      </li>
+                      <ScrollRevealEffect key={j} index={j}>
+                        <li className="flex items-start gap-3">
+                          <span className="flex items-center justify-center w-5 h-5 mt-1">
+                            <CheckCircle className="w-4 h-4 text-honeydew-800" />
+                          </span>
+                          <span>
+                            {item.text && highlightText(item.text.join(' '), keyword)}
+                          </span>
+                        </li>
+                      </ScrollRevealEffect>
                     ))}
                   </ul>
 
+                  <div className="flex justify-center pt-2 xl:p-4 sm:pt-0">
+                    <div className="grid w-full h-auto grid-rows-1 gap-4 xs:grid-cols-1 sm:grid-cols-2">
+                      {Array.isArray(galery) &&
+                        galery.map((g, l) => (
+                          <div key={l} className="h-auto rounded-2xl">
+                            {g.video && (
+                              <video
+                                className="object-cover w-full h-96 rounded-2xl"
+                                autoPlay
+                                muted
+                                loop
+                                playsInline
+                                preload="metadata"
+                              >
+                                <source
+                                  src={`https://res.cloudinary.com/dzlavqhid/video/upload/${g.video}.mp4`}
+                                  type="video/mp4"
+                                />
+                              </video>
+                            )}
+
+                            {g.ref && (
+                              <div className="flex items-center justify-center gap-2 pt-1">
+                                <Paperclip className="w-4 h-4" />
+                                <Link
+                                  href={`https://www.instagram.com/${g.ref}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-sm underline hover:opacity-80"
+                                >
+                                  {g.label}
+                                </Link>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+
+
+                    </div>
+                  </div>
+
+                  <div className='text-white bg-black'>
+                    <div>hola</div>
+                    <div>
+                      <Button
+                        style='bg-white text-black cursor-pointer'
+                        href='#'
+                        target='_self'
+                        text='hola'
+                      />
+                    </div>
+                  </div>
                 </div>
               </React.Fragment>
             ))}
@@ -513,7 +584,7 @@ export function PageServices({
           </div>
         </section>
 
-      </main>
+      </main >
     </>
   )
 }
