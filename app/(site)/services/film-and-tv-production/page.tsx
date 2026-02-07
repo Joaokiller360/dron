@@ -17,8 +17,14 @@ export default function urbanFlightOperations() {
           'Permiten capturar tomas aéreas impresionantes:',
           'Adaptables a cualquier idea:',
           'Ahorro de tiempo y dinero:',
-          'Calidad de imagen superior'
+          'Calidad de imagen superior',
+          'Portfolio',
+          'Ecuador'
         ]}
+        keywordLink={{
+          Portfolio: '/portfolio',
+          Ecuador: '/locations/ecuador'
+        }}
         Content={[
           {
             label: 'Servicios',
@@ -50,6 +56,21 @@ export default function urbanFlightOperations() {
             video: 'corazones-descalzos',
             label: 'corazones-descalzos',
             ref: 'fundacionph3'
+          }
+        ]}
+        P={[
+          {
+            text: 'En nuestro Portfolio podrás ver las obras en las que hemos prestado nuestros servicios de especialistas; tanto en eventos y publicidad.',
+            buttons: [
+              {
+                label: 'Ver Portfolio',
+                href: '/portfolio'
+              },
+              {
+                label: 'Ver servicios',
+                href: '/services'
+              }
+            ]
           }
         ]}
         index={0}

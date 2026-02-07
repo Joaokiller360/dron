@@ -2,6 +2,7 @@
 
 import { Templets, Button, ScrollBottonEffect } from "@/app/utils";
 import { Clapperboard, Handshake } from "lucide-react";
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 const banner = {
   ubication: {
@@ -87,6 +88,21 @@ export default function Inicio() {
             </nav>
 
           </section>
+
+          <div className="flex items-center justify-center w-full">
+            <div className="w-[85vw] sm:w-[70vw] md:w-[28rem] lg:w-[32rem] xl:w-[36rem] ">
+              <div className="relative w-full aspect-[16/9]">
+                <DotLottieReact
+                  src="/animation/dron_animate.json"
+                  loop
+                  autoplay
+                  className="absolute inset-0 w-full h-full"
+                />
+              </div>
+            </div>
+          </div>
+
+
         </ScrollBottonEffect>
       </header>
 

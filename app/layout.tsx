@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
+
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-import { createMetadata, Favicon, Navbar } from '@/app/utils'
+import { createMetadata, Navbar } from '@/app/utils'
 import { Footer } from '@/app/component';
 import FlowbiteInit from "./flowbait-init";
 
@@ -21,7 +21,6 @@ export const metadata = createMetadata({
   href: 'logo-ico',
 })
 
-
 export default function RootLayout({
   children,
 }: {
@@ -29,7 +28,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-
+      <meta name="google-site-verification" content={process.env.GOOGLE_VERIFICATION} />
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

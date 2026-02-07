@@ -359,7 +359,7 @@ Componente guardado
   )
 }
 
-import { Banner, highlightText, ScrollRevealEffect } from '@/app/utils'
+import { Banner, highlightText, ScrollRevealEffect, keywordLink } from '@/app/utils'
 import { Film, MapPin, Factory, Building2, Earth, CheckCircle, Paperclip } from 'lucide-react';
 import React from 'react'
 import Link from 'next/link'
@@ -377,6 +377,17 @@ interface content {
   list: List[]
 }
 
+interface ButtonItem {
+  label: string
+  href: string
+  target?: '_self' | '_blank'
+}
+
+interface p {
+  text?: string
+  buttons?: ButtonItem[]
+}
+
 interface List {
   text?: string[]
 }
@@ -392,8 +403,10 @@ interface page {
   D: d[]
   Content: content[]
   keyword?: string[]
+  keywordLink?: keywordLink
   index: number
   galery?: Galery[]
+  P?: p[]
 }
 
 const listServices = [
@@ -424,7 +437,9 @@ export function PageServices({
   D,
   Content,
   keyword = [],
+  keywordLink = {},
   index = 0,
+  P,
   galery
 }: page) {
 
@@ -510,7 +525,7 @@ export function PageServices({
                   )}
 
                   {/*List*/}
-                  <ul className="pt-4 space-y-3">
+                  <ul className="py-4 space-y-3">
                     {section.list.map((item, j) => (
                       <ScrollRevealEffect key={j} index={j}>
                         <li className="flex items-start gap-3">
@@ -566,16 +581,37 @@ export function PageServices({
                     </div>
                   </div>
 
-                  <div className='text-white bg-black'>
-                    <div>hola</div>
-                    <div>
-                      <Button
-                        style='bg-white text-black cursor-pointer'
-                        href='#'
-                        target='_self'
-                        text='hola'
-                      />
-                    </div>
+                  <div className='grid justify-center mt-3'>
+
+                    {Array.isArray(P) &&
+                      P.map((p, x) => (
+                        <ScrollRevealEffect key={x}>
+                          <div>
+                            <span>
+                              {p.text &&
+                                highlightText(
+                                  p.text,
+                                  keyword,
+                                  keywordLink
+                                )}
+                            </span>
+                          </div>
+                          {Array.isArray(p.buttons) && (
+                            <div className="grid grid-cols-2 gap-2 mt-2">
+                              {p.buttons.map((btn, i) => (
+                                <Button
+                                  key={i}
+                                  style="bg-white text-black cursor-pointer"
+                                  href={btn.href}
+                                  target={btn.target ?? '_self'}
+                                  text={btn.label}
+                                />
+                              ))}
+                            </div>
+                          )}
+                        </ScrollRevealEffect>
+                      ))}
+
                   </div>
                 </div>
               </React.Fragment>

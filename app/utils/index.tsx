@@ -11,7 +11,7 @@ import { createMetadata } from './metadata'
 import Banner from './banner'
 import { Favicon, Logo } from './logo'
 import LegalPage from './legalProps'
-import { highlightText } from './highlightText'
+import { highlightText, keywordLink } from './highlightText'
 import { ScrollBottonEffect, ScrollRevealEffect } from './animation'
 
 export {
@@ -40,3 +40,4 @@ export {
   ScrollRevealEffect,
   ScrollBottonEffect
 }
+export type { keywordLink }

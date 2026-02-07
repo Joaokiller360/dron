@@ -19,9 +19,9 @@ export default function Footer() {
                 imgName='logo-p'
               />
             </div>
-            <div className="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
+            <div className="grid grid-cols-2 gap-8 sm:gap-3 sm:grid-cols-3">
               <div>
-                <h2 className="mb-6 text-sm font-semibold uppercase text-heading">Recursos</h2>
+                <h2 className="w-auto mb-6 text-sm font-semibold uppercase text-heading">Recursos</h2>
                 <ul className="font-medium text-body">
                   <li className="mb-2">
                     <a href="/" className="hover:underline">Inicio</a>
@@ -55,7 +55,7 @@ export default function Footer() {
                   </li>
                 </ul>
               </div>
-              <div className='sm:pl-5'>
+              <div className='sm:pl-1'>
                 <h2 className="mb-6 text-sm font-semibold uppercase text-heading">Area de Contacto</h2>
                 <ul className="font-medium text-body">
                   <li>
