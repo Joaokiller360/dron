@@ -24,10 +24,11 @@ export default function From({ additionalClasses = '' }: LogoProps) {
     if (!form.current) return;
 
     try {
-      const serviceId = 'service_wa9tudy';
-      const templateId = 'template_t0aqlbj';
+      const serviceId = `${process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID}`;
+      const templateId = `${process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID}`;
+      const publicKey = `${process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY}`;
 
-      await emailjs.sendForm(serviceId, templateId, form.current);
+      await emailjs.sendForm(serviceId, templateId, form.current, publicKey);
 
       setToastText('¡Formulario enviado con éxito!');
       setToastVariant('success');
@@ -44,7 +45,7 @@ export default function From({ additionalClasses = '' }: LogoProps) {
     }, 2500);
   };
 
-  emailjs.init('0biM3Cjhn5bwlSsZR');
+  emailjs.init(`${process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY}`);
 
   return (
     <section className={`${additionalClasses} body-font relative`}>
