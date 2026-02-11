@@ -14,16 +14,12 @@ export default function urbanFlightOperations() {
           }
         ]}
         keyword={[
-          'Permiten capturar tomas aéreas impresionantes:',
-          'Adaptables a cualquier idea:',
-          'Ahorro de tiempo y dinero:',
-          'Calidad de imagen superior',
-          'Portfolio',
-          'Ecuador'
+          'DGAC-Ecuador-(RDAC 101)',
+          'Portfolio'
         ]}
         keywordLink={{
           Portfolio: '/portfolio',
-          Ecuador: '/locations/ecuador'
+          'DGAC-Ecuador-(RDAC 101)': 'https://www.aviacioncivil.gob.ec/'
         }}
         Content={[
           {
@@ -69,6 +65,25 @@ export default function urbanFlightOperations() {
               {
                 label: 'Ver servicios',
                 href: '/services'
+              }
+            ]
+          }
+        ]}
+        CalltoAction={[
+          {
+            callToAction: 'Nuestro compromiso con la seguridad y profesionalidad',
+            text: [
+              'En JB.SkyLens trabajamos bajo estrictos estándares de seguridad y cumpliendo la normativa oficial de la DGAC-Ecuador-(RDAC 101). Nuestro equipo de pilotos profesionales garantiza operaciones aéreas legales, seguras y eficientes en cada proyecto.',
+              'Gestionamos permisos, registros y requisitos obligatorios para que cada vuelo esté en regla, porque entendemos que en trabajos aéreos la seguridad, la responsabilidad y la legalidad no son opcionales, son parte del servicio.'
+            ],
+            buttons: [
+              {
+                label: 'Contactanos',
+                href: '/contact'
+              },
+              {
+                label: 'Ver Portfolio',
+                href: '/portfolio'
               }
             ]
           }

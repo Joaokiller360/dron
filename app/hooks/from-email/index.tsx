@@ -82,7 +82,7 @@ export default function From({ additionalClasses = '' }: LogoProps) {
             <p className='mb-5 leading-relaxed text-justify'>Ofrecemos soluciones integrales que garantizan un mantenimiento óptimo y seguro de embarcaciones.</p>
           </section>
 
-          <section className='px-2 bg-honeydew-800 rounded-2xl'>
+          <section className='p-2 bg-honeydew-800 rounded-2xl'>
             <fieldset className='relative mb-4'>
               <label htmlFor='name' className='text-sm font-bold leading-7'>Nombres y Apellidos</label>
               <input required placeholder='Joao A********' type='text' id='name' name='name' className='w-full px-3 py-2 rounded bg-honeydew-900' />

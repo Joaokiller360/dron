@@ -171,7 +171,7 @@ const clients = [
     buttons: [
       {
         id: 1,
-        href: `${link}`,
+        href: `${link}film-and-tv-production`,
         active: true,
         name: 'Ver Más',
         icon: <FileSearchCorner size={24} strokeWidth={2} />
@@ -193,7 +193,7 @@ const clients = [
     buttons: [
       {
         id: 1,
-        href: `${link}`,
+        href: `${link}location-scouting-and-recon`,
         active: true,
         name: 'Ver Más',
         icon: <FileSearchCorner size={24} strokeWidth={2} />
@@ -237,7 +237,7 @@ const clients = [
     buttons: [
       {
         id: 1,
-        href: `${link}location-scouting-and-recon`,
+        href: `${link}urban-flight-operations`,
         active: true,
         name: 'Ver Más',
         icon: <FileSearchCorner size={24} strokeWidth={2} />

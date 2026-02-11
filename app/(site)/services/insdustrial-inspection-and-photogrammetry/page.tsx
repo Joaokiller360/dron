@@ -50,42 +50,48 @@ export default function urbanFlightOperations() {
           }
         ]}
         keyword={[
-          'Permiten capturar tomas aéreas impresionantes:',
-          'Adaptables a cualquier idea:',
-          'Ahorro de tiempo y dinero:',
-          'Calidad de imagen superior'
+          'DGAC-Ecuador-(RDAC 101)',
         ]}
+        keywordLink={{
+          'DGAC-Ecuador-(RDAC 101)': 'https://www.aviacioncivil.gob.ec/'
+        }}
         Content={[
           {
             label: 'Servicios',
-            subTitle: 'especialistas líderes en cinematografía aérea',
+            subTitle: 'trabajos rpas con drones industriales',
             text: [
-              'Somos expertos en brindar un servicio profesional para publicidad y ficción; estamos especializados en de drones para cine y drones para comerciales, llevamos tus proyectos audiovisuales a nuevas alturas.',
-              'El uso de drones para cine y publicidad presenta muchas ventajas competitivas:'
-            ],
-            list: [
-              {
-                text: ['Permiten capturar tomas aéreas impresionantes:', 'desde tomas panorámicas hasta seguimientos rápidos, los drones aportan una dimensión visual única a tu proyecto.']
-              }, {
-                text: ['Adaptables a cualquier idea:', 'no importa si estás filmando un anuncio publicitario o una escena clave de una película, nuestros drones se adaptan a tus necesidades. Son perfectos para todo, desde mostrar paisajes hasta capturar la acción más intensa.']
-              }, {
-                text: ['Ahorro de tiempo y dinero:', 'los drones ofrecen una manera más económica y rápida de obtener las tomas perfectas, sin comprometer la calidad. Además, nuestro servicio está especializado en  conseguir las tomas perfectas en el menor tiempo posible, multiplicando el ahorro al disminuir los costes operativos en set: eficiencia y calidad premium, ¡es lo que ofrecemos!']
-              }, {
-                text: ['Calidad de imagen superior:', 'nuestros drones están equipados con tecnología de cámara y estabilización de última generación, asegurando que cada toma sea nítida y de alta calidad.']
-              }
+              'Los drones, también conocidos como vehículos aéreos no tripulados (UAVs), han revolucionado diversas aplicaciones industriales gracias a su flexibilidad, capacidad de acceso y eficiencia en costos.',
+              'JB.SKYLENS ofrece servicios con drones industriales para trabajos RPAS, más allá de los propios para la industria audiovisual. En nuestra cartera de servicios ofrecemos nuestra flota de drones para agricultura, inspección-monitoreo-mantenmineto de infraestructuras, mapeo-topografía-fotogrametría de alta precisión, seguimiento de obras & Real Estate, operaciones logísticas, así como vigilancia y seguridad.'
             ],
           }
         ]}
-        galery={[
+        P={[
           {
-            video: 'juan-fernando',
-            label: 'juan-fernando',
-            ref: 'juanfervelasco'
-          },
+            buttons: [
+              {
+                label: 'Enviar Solicitud',
+                href: '/contact'
+              },
+            ]
+          }
+        ]}
+        CalltoAction={[
           {
-            video: 'corazones-descalzos',
-            label: 'corazones-descalzos',
-            ref: 'fundacionph3'
+            callToAction: 'Nuestro compromiso con la seguridad y profesionalidad',
+            text: [
+              'En JB.SkyLens trabajamos bajo estrictos estándares de seguridad y cumpliendo la normativa oficial de la DGAC-Ecuador-(RDAC 101). Nuestro equipo de pilotos profesionales garantiza operaciones aéreas legales, seguras y eficientes en cada proyecto.',
+              'Gestionamos permisos, registros y requisitos obligatorios para que cada vuelo esté en regla, porque entendemos que en trabajos aéreos la seguridad, la responsabilidad y la legalidad no son opcionales, son parte del servicio.'
+            ],
+            buttons: [
+              {
+                label: 'Contactanos',
+                href: '/contact'
+              },
+              {
+                label: 'Ver Portfolio',
+                href: '/portfolio'
+              }
+            ]
           }
         ]}
         index={0}
