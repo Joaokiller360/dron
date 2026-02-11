@@ -26,9 +26,8 @@ export default function From({ additionalClasses = '' }: LogoProps) {
     try {
       const serviceId = `${process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID}`;
       const templateId = `${process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID}`;
-      const publicKey = `${process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY}`;
 
-      await emailjs.sendForm(serviceId, templateId, form.current, publicKey);
+      await emailjs.sendForm(serviceId, templateId, form.current);
 
       setToastText('¡Formulario enviado con éxito!');
       setToastVariant('success');
