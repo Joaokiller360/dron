@@ -1,4 +1,4 @@
-
+'use client'
 import { Button, ScrollBottonEffect } from '@/app/utils'
 import { Video } from 'lucide-react'
 
@@ -363,6 +363,7 @@ import { Banner, highlightText, ScrollRevealEffect, keywordLink } from '@/app/ut
 import { Film, MapPin, Factory, Building2, Earth, CheckCircle, Paperclip } from 'lucide-react';
 import React from 'react'
 import Link from 'next/link'
+import { DotLottieReact } from '@lottiefiles/dotlottie-react'
 
 interface d {
   imagen?: string
@@ -409,6 +410,8 @@ interface page {
   P?: p[]
   galeria?: galeria[]
   CalltoAction?: CalltoAction[]
+  Animations?: animation[]
+  Example?: example[]
 }
 
 interface galeria {
@@ -421,6 +424,17 @@ interface CalltoAction {
   callToAction?: string
   text?: string[]
   buttons?: ButtonItem[]
+}
+
+interface animation {
+  src?: string
+}
+
+interface example {
+  label?: string
+  subTitle?: string
+  text?: string[]
+
 }
 
 const listServices = [
@@ -460,7 +474,9 @@ export function PageServices({
   P,
   galery,
   galeria,
-  CalltoAction
+  CalltoAction,
+  Animations,
+  Example
 }: page) {
 
   const banner = D[0]
@@ -510,106 +526,123 @@ export function PageServices({
 
 
           {Content.map((section, index) => (
-            <div key={index} className="p-5 bg-gray-200 rounded-2xl sm:p-10">
-              <React.Fragment>
-                <div className="font-mono">
-                  {/*Label*/}
-                  <span className="text-sm font-bold uppercase sm:text-xl text-honeydew-800">
-                    <ScrollBottonEffect>
-                      <span className="pr-1">-</span>
-                      {section.label || 'Services'}
-                    </ScrollBottonEffect>
-                  </span>
-
-                  {/*Subtitle*/}
-                  <div className="pt-2">
-                    <span className="text-xl font-bold text-justify uppercase lg:text-3xl sm:text-2xl">
+            <ScrollRevealEffect key={index}>
+              <div key={index} className="p-5 bg-gray-200 rounded-2xl sm:p-10">
+                <React.Fragment>
+                  <div className="font-mono">
+                    {/*Label*/}
+                    <span className="text-sm font-bold uppercase sm:text-xl text-honeydew-800">
                       <ScrollBottonEffect>
-                        {section.subTitle}
+                        <span className="pr-1">-</span>
+                        {section.label || 'Services'}
                       </ScrollBottonEffect>
                     </span>
-                  </div>
-                </div>
 
-                <div className='text-xl text-justify'>
-                  {/*Text*/}
-                  {section.text && (
-                    <div>
-                      {section.text.map((paragraph, i) => (
-                        <ScrollRevealEffect key={i} index={i}>
-                          <span className="block pt-2">
-                            {highlightText(paragraph, keyword)}
-                          </span>
-                        </ScrollRevealEffect>
-                      ))}
+                    {/*Subtitle*/}
+                    <div className="pt-2">
+                      <span className="text-xl font-bold text-justify uppercase lg:text-3xl sm:text-2xl">
+                        <ScrollBottonEffect>
+                          {section.subTitle}
+                        </ScrollBottonEffect>
+                      </span>
                     </div>
-                  )}
+                  </div>
 
-                  {/*List*/}
-
-                  {section.list?.map((item, j) => (
-                    <ScrollRevealEffect key={j} index={j}>
-                      <ul className="py-4 space-y-3">
-                        <li className="flex items-start gap-3">
-                          <span className="flex items-center justify-center w-5 h-5 mt-1">
-                            <CheckCircle className="w-4 h-4 text-honeydew-800" />
-                          </span>
-                          <span>
-                            {item.text && highlightText(item.text.join(' '), keyword)}
-                          </span>
-                        </li>
-                      </ul>
-                    </ScrollRevealEffect>
-                  ))}
-
-                  {Array.isArray(galery) && (
-                    <ScrollRevealEffect>
-                      <div className="flex justify-center pt-2 xl:p-4 sm:pt-0">
-                        <div className="grid w-full h-auto gap-4 xs:grid-cols-1 sm:grid-cols-2">
-                          {galery.map((g, l) => (
-                            <div key={l} className="h-auto rounded-2xl">
-                              {g.video && (
-                                <video
-                                  className="object-cover w-full h-96 rounded-2xl"
-                                  autoPlay
-                                  muted
-                                  loop
-                                  playsInline
-                                  preload="metadata"
-                                >
-                                  <source
-                                    src={`https://res.cloudinary.com/dzlavqhid/video/upload/${g.video}.mp4`}
-                                    type="video/mp4"
-                                  />
-                                </video>
-                              )}
-
-                              {g.ref && (
-                                <div className="flex items-center justify-center gap-2 pt-1">
-                                  <Paperclip className="w-4 h-4" />
-                                  <Link
-                                    href={`https://www.instagram.com/${g.ref}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-sm underline hover:opacity-80"
-                                  >
-                                    {g.label}
-                                  </Link>
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
+                  <div className='text-justify sm:text-xl'>
+                    {/*Text*/}
+                    {section.text && (
+                      <div>
+                        {section.text.map((paragraph, i) => (
+                          <ScrollRevealEffect key={i} index={i}>
+                            <span className="block pt-2">
+                              {highlightText(paragraph, keyword, keywordLink)}
+                            </span>
+                          </ScrollRevealEffect>
+                        ))}
                       </div>
-                    </ScrollRevealEffect>
-                  )}
+                    )}
 
+                    {/*List*/}
 
-                  {Array.isArray(P) &&
-                    P.map((p, x) => (
-                      <ScrollRevealEffect key={x}>
-                        <div className='grid justify-center mt-3'>
-                          <div>
+                    {section.list?.map((item, j) => (
+                      <ScrollRevealEffect key={j} index={j}>
+                        <ul className="py-4 space-y-3">
+                          <li className="flex items-start gap-3">
+                            <span className="flex items-center justify-center w-5 h-5 mt-1">
+                              <CheckCircle className="w-4 h-4 text-honeydew-800" />
+                            </span>
+                            <span>
+                              {item.text && highlightText(item.text.join(' '), keyword)}
+                            </span>
+                          </li>
+                        </ul>
+                      </ScrollRevealEffect>
+                    ))}
+
+                    {Array.isArray(galery) && (
+                      <ScrollRevealEffect>
+                        <div className="flex justify-center pt-2 xl:p-4 sm:pt-0">
+                          <div className="grid w-full h-auto gap-4 xs:grid-cols-1 sm:grid-cols-2">
+                            {galery.map((g, l) => (
+                              <div key={l} className="h-auto rounded-2xl">
+                                {g.video && (
+                                  <video
+                                    className="object-cover w-full h-96 rounded-2xl"
+                                    autoPlay
+                                    muted
+                                    loop
+                                    playsInline
+                                    preload="metadata"
+                                  >
+                                    <source
+                                      src={`https://res.cloudinary.com/dzlavqhid/video/upload/${g.video}.mp4`}
+                                      type="video/mp4"
+                                    />
+                                  </video>
+                                )}
+
+                                {g.ref && (
+                                  <div className="flex items-center justify-center gap-2 pt-1">
+                                    <Paperclip className="w-4 h-4" />
+                                    <Link
+                                      href={`https://www.instagram.com/${g.ref}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-sm underline hover:opacity-80"
+                                    >
+                                      {g.label}
+                                    </Link>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </ScrollRevealEffect>
+                    )}
+
+                    {Animations?.map((a, i) => (
+                      <ScrollRevealEffect key={i} index={i}>
+                        <div className="flex items-center justify-center w-full">
+                          <div className="w-[85vw] sm:w-[70vw] md:w-[28rem] lg:w-[32rem] xl:w-[36rem] ">
+                            <div className="relative w-full aspect-[16/9]">
+                              <DotLottieReact
+                                src={`/animation/${a.src}.json`}
+                                loop
+                                autoplay
+                                className="absolute inset-0 w-full h-full"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </ScrollRevealEffect>
+
+                    ))}
+
+                    {Array.isArray(P) &&
+                      P.map((p, x) => (
+                        <ScrollRevealEffect key={x}>
+                          <div className='grid justify-center mt-3'>
                             <span>
                               {p.text &&
                                 highlightText(
@@ -618,75 +651,111 @@ export function PageServices({
                                   keywordLink
                                 )}
                             </span>
+                            {Array.isArray(p.buttons) && (
+                              <div className="flex flex-wrap justify-center gap-10 mt-2">
+                                {p.buttons.map((btn, i) => (
+                                  <Button
+                                    key={i}
+                                    style="cursor-pointer text-center border-2 border-honeydew-800 dark:border-honeydew-800 transition duration-500 bg-white text-black hover:bg-honeydew-700 hover:text-white dark:bg-honeydew-800 dark:hover:bg-white dark:hover:text-black dark:text-white"
+                                    href={btn.href}
+                                    target={btn.target ?? '_self'}
+                                    text={btn.label}
+                                  />
+                                ))}
+                              </div>
+                            )}
                           </div>
-                          {Array.isArray(p.buttons) && (
-                            <div className="flex flex-wrap justify-center gap-10 mt-2">
-                              {p.buttons.map((btn, i) => (
-                                <Button
-                                  key={i}
-                                  style="cursor-pointer text-center border-2 border-honeydew-800 dark:border-honeydew-800 transition duration-500 bg-white text-black hover:bg-honeydew-700 hover:text-white dark:bg-honeydew-800 dark:hover:bg-white dark:hover:text-black dark:text-white"
-                                  href={btn.href}
-                                  target={btn.target ?? '_self'}
-                                  text={btn.label}
-                                />
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </ScrollRevealEffect>
-                    ))}
-                </div>
-              </React.Fragment>
-            </div>
+                        </ScrollRevealEffect>
+                      ))}
+                  </div>
+                </React.Fragment>
+              </div>
+            </ScrollRevealEffect>
           ))}
 
           {galeria?.map((g, i) => (
-            <div className='p-5 mt-10 bg-gray-200 rounded-2xl sm:p-10'>
-              <div>
-                galeria
+            <ScrollRevealEffect key={i} index={i}>
+              <div className='p-5 mt-10 bg-gray-200 rounded-2xl sm:p-10'>
+                <div>
+                  galeria
+                </div>
               </div>
-            </div>
+            </ScrollRevealEffect>
           ))}
 
           {CalltoAction?.map((c, i) => (
-            <div className='p-5 mt-10 text-xl bg-gray-200 rounded-2xl sm:p-10' key={i}>
+            <ScrollRevealEffect key={i} index={i}>
+              <div className='p-5 mt-10 bg-gray-200 rounded-2xl sm:p-10'>
 
-              <ScrollBottonEffect>
-                <span className='font-bold'>{c.callToAction}</span>
-              </ScrollBottonEffect>
+                <ScrollBottonEffect>
+                  <span className='text-sm font-bold text-justify uppercase sm:text-xl'>{c.callToAction}</span>
+                </ScrollBottonEffect>
 
-              <div className='grid'>
-                {Array.isArray(c.text) && c.text.map((text, idx) => (
-                  <ScrollRevealEffect key={idx} index={idx}>
-                    <span className='mt-2'>
-                      {text &&
-                        highlightText(
-                          text,
-                          keyword,
-                          keywordLink
-                        )}
-                    </span>
-                  </ScrollRevealEffect>
-                ))}
-              </div>
-
-              {Array.isArray(c.buttons) && (
-                <div className="flex flex-wrap justify-center gap-10 mt-2">
-                  {c.buttons.map((btn, i) => (
-                    <ScrollRevealEffect key={i} index={i}>
-                      <Button
-                        key={i}
-                        style="cursor-pointer text-center border-2 border-honeydew-800 dark:border-honeydew-800 transition duration-500 bg-white text-black hover:bg-honeydew-700 hover:text-white dark:bg-honeydew-800 dark:hover:bg-white dark:hover:text-black dark:text-white"
-                        href={btn.href}
-                        target={btn.target ?? '_self'}
-                        text={btn.label}
-                      />
+                <div className='grid sm:text-xl'>
+                  {Array.isArray(c.text) && c.text.map((text, idx) => (
+                    <ScrollRevealEffect key={idx} index={idx}>
+                      <span className='mt-2'>
+                        {text &&
+                          highlightText(
+                            text,
+                            keyword,
+                            keywordLink
+                          )}
+                      </span>
                     </ScrollRevealEffect>
                   ))}
                 </div>
-              )}
 
-            </div>
+                {Array.isArray(c.buttons) && (
+                  <div className="flex flex-wrap justify-center gap-10 mt-2">
+                    {c.buttons.map((btn, i) => (
+                      <ScrollRevealEffect key={i} index={i}>
+                        <Button
+                          key={i}
+                          style="cursor-pointer text-center border-2 border-honeydew-800 dark:border-honeydew-800 transition duration-500 bg-white text-black hover:bg-honeydew-700 hover:text-white dark:bg-honeydew-800 dark:hover:bg-white dark:hover:text-black dark:text-white"
+                          href={btn.href}
+                          target={btn.target ?? '_self'}
+                          text={btn.label}
+                        />
+                      </ScrollRevealEffect>
+                    ))}
+                  </div>
+                )}
+
+              </div>
+            </ScrollRevealEffect>
+          ))}
+
+          {Example?.map((e, i) => (
+            <ScrollRevealEffect key={i} index={i}>
+              <div className='p-5 mt-10 bg-gray-200 rounded-2xl sm:p-10'>
+                <div className="font-mono">
+                  {/*Label*/}
+                  <span className="text-sm font-bold uppercase sm:text-xl text-honeydew-800">
+                    <ScrollBottonEffect>
+                      <span className="pr-1">-</span>
+                      {e.label || 'Example'}
+                    </ScrollBottonEffect>
+                  </span>
+
+                  {/*Subtitle*/}
+                  <div className="pt-2">
+                    <span className="text-xl font-bold text-justify uppercase lg:text-3xl sm:text-2xl">
+                      <ScrollBottonEffect>
+                        {e.subTitle || 'Ejemplo'}
+                      </ScrollBottonEffect>
+                    </span>
+                  </div>
+
+                  <ScrollBottonEffect>
+                    <div className='flex justify-center pt-3'>
+                      <img className="w-auto h-auto rounded-2xl " src={`https://res.cloudinary.com/dzlavqhid/image/upload/${banner.imagen}.webp`}
+                        alt={banner.imagen} />
+                    </div>
+                  </ScrollBottonEffect>
+                </div>
+              </div>
+            </ScrollRevealEffect>
           ))}
 
         </section>
@@ -695,37 +764,3 @@ export function PageServices({
     </>
   )
 }
-
-
-{/*
-            
-            <div className="font-mono">
-
-              <span className='text-xl font-bold uppercase text-honeydew-800'>
-                <span className='pr-1'>-</span>`{section.label || 'Services'}`
-              </span>
-
-              <div className='pt-2'>
-                <span className='text-3xl font-bold uppercase'>
-                  {section.subTitle}
-                </span>
-              </div>
-
-            </div>
-
-            <div>
-
-              <div>
-                <span className='pt-5'>
-                  {section.text}
-                </span>
-              </div>
-
-              <div>
-                <span>
-                  lista
-                </span>
-              </div>
-
-            </div>
-            */}

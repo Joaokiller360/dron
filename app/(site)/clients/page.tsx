@@ -87,6 +87,28 @@ const gubernamental = [
         icon: <Instagram size={24} strokeWidth={2} />
       }
     ]
+  },
+  {
+    clients: [
+      {
+        client: 'Alcaldía de Esmeraldas',
+        organizacion: 'Gubernamental'
+      }
+    ],
+    content: [
+      {
+        imgName: 'alcaldia-esmeraldas'
+      }
+    ],
+    buttons: [
+      {
+        id: 1,
+        href: 'https://www.instagram.com/',
+        active: true,
+        name: 'Instagram',
+        icon: <Instagram size={24} strokeWidth={2} />
+      }
+    ]
   }
 
 ]

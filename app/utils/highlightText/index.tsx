@@ -26,7 +26,7 @@ export function highlightText(
       <a
         key={index}
         href={href}
-        className="font-semibold underline text-honeydew-600"
+        className="font-semibold underline text-honeydew-700"
       >
         {part}
       </a>
