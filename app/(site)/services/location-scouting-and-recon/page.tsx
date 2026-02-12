@@ -65,6 +65,11 @@ export default function urbanFlightOperations() {
             ],
           }
         ]}
+        Animations={[
+          {
+            src: 'cityFlight', 
+          }
+        ]}
         CalltoAction={[
           {
             callToAction: 'Nuestro compromiso con la seguridad y profesionalidad',
