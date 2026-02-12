@@ -416,8 +416,10 @@ interface page {
 
 interface galeria {
   video?: string
+  urlImg?: string
   label?: string
-  ref?: string
+  href?: string
+  style?: string
 }
 
 interface CalltoAction {
@@ -434,7 +436,8 @@ interface example {
   label?: string
   subTitle?: string
   text?: string[]
-
+  buttons?: ButtonItem[]
+  Galeria?: galeria[]
 }
 
 const listServices = [
@@ -465,39 +468,56 @@ const listServices = [
   }
 ]
 
+export function Img({ urlImg = '', href = '', style = '' }: galeria) {
+  return (
+    <>
+      <a href={href} className={`${style} relative flex flex-col px-4 pt-40 pb-4 overflow-hidden font-black rounded-lg group grow cursor-pointer`}>
+        <img src={urlImg} alt={href} className="absolute inset-0 object-cover w-full h-full transition-transform duration-500 ease-in-out group-hover:scale-105" />
+        <div className="absolute inset-0 bg-linear-to-b from-gray-900/25 to-gray-900/5" />
+      </a>
+    </>
+  )
+}
+
+
+// Componente principal que renderiza la página de servicios
 export function PageServices({
-  D,
-  Content,
-  keyword = [],
-  keywordLink = {},
-  index = 0,
-  P,
-  galery,
-  galeria,
-  CalltoAction,
-  Animations,
-  Example
+  D, // Array de datos para el banner principal
+  Content, // Array de secciones de contenido principal
+  keyword = [], // Palabras clave para resaltar en el texto
+  keywordLink = {}, // Enlaces asociados a palabras clave
+  index = 0, // Índice de la página (no siempre usado)
+  P, // Secciones adicionales de párrafos y botones
+  galery, // Galería de videos o imágenes para la sección principal
+  galeria, // Galería secundaria (puede ser para ejemplos o extras)
+  CalltoAction, // Secciones de llamada a la acción
+  Animations, // Animaciones Lottie para mostrar
+  Example // Ejemplos de uso o casos destacados
 }: page) {
 
+  // Banner principal de la página
   const banner = D[0]
   // const section = Content[0]
 
   return (
     <>
+      {/* Encabezado con imagen de fondo y banner */}
       <header className="relative pb-16 pt-44 bg-honeydew-900/40" >
 
-        {/* Imagen de fondo */}
+        {/* Imagen de fondo del banner */}
         <img
           src={`https://res.cloudinary.com/dzlavqhid/image/upload/${banner.imagen}.webp`}
           alt={banner.imagen}
           className="absolute inset-0 object-cover object-center w-full h-full -z-10"
         />
 
+        {/* Componente Banner con título y etiqueta */}
         <Banner
           label={banner.label}
           title={banner.title}
         />
         <div className="flex justify-center">
+          {/* Tarjetas de servicios principales */}
           <div className="grid gap-4 justify-items-center grid-cols-2 sm:grid-cols-4 lg:grid-cols-[repeat(auto-fit,minmax(7rem,1fr))] max-w-6xl">
 
             {listServices.map((card, index) => (
@@ -514,23 +534,23 @@ export function PageServices({
               </ScrollRevealEffect>
             ))}
 
-
           </div>
         </div>
 
       </header>
 
+      {/* Contenido principal de la página */}
       <main className='py-5 text-black sm:p-10 bg-honeydew-900 dark:bg-honeydew-800'>
 
         <section className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
 
-
+          {/* Renderiza cada sección de contenido principal */}
           {Content.map((section, index) => (
             <ScrollRevealEffect key={index}>
               <div key={index} className="p-5 bg-gray-200 rounded-2xl sm:p-10">
                 <React.Fragment>
                   <div className="font-mono">
-                    {/*Label*/}
+                    {/* Etiqueta de la sección */}
                     <span className="text-sm font-bold uppercase sm:text-xl text-honeydew-800">
                       <ScrollBottonEffect>
                         <span className="pr-1">-</span>
@@ -538,7 +558,7 @@ export function PageServices({
                       </ScrollBottonEffect>
                     </span>
 
-                    {/*Subtitle*/}
+                    {/* Subtítulo de la sección */}
                     <div className="pt-2">
                       <span className="text-xl font-bold text-justify uppercase lg:text-3xl sm:text-2xl">
                         <ScrollBottonEffect>
@@ -549,7 +569,7 @@ export function PageServices({
                   </div>
 
                   <div className='text-justify sm:text-xl'>
-                    {/*Text*/}
+                    {/* Texto principal de la sección */}
                     {section.text && (
                       <div>
                         {section.text.map((paragraph, i) => (
@@ -562,8 +582,7 @@ export function PageServices({
                       </div>
                     )}
 
-                    {/*List*/}
-
+                    {/* Lista de elementos destacados de la sección */}
                     {section.list?.map((item, j) => (
                       <ScrollRevealEffect key={j} index={j}>
                         <ul className="py-4 space-y-3">
@@ -579,6 +598,7 @@ export function PageServices({
                       </ScrollRevealEffect>
                     ))}
 
+                    {/* Galería de videos o imágenes si existe */}
                     {Array.isArray(galery) && (
                       <ScrollRevealEffect>
                         <div className="flex justify-center pt-2 xl:p-4 sm:pt-0">
@@ -601,6 +621,7 @@ export function PageServices({
                                   </video>
                                 )}
 
+                                {/* Enlace a Instagram si existe referencia */}
                                 {g.ref && (
                                   <div className="flex items-center justify-center gap-2 pt-1">
                                     <Paperclip className="w-4 h-4" />
@@ -621,6 +642,7 @@ export function PageServices({
                       </ScrollRevealEffect>
                     )}
 
+                    {/* Animaciones Lottie si existen */}
                     {Animations?.map((a, i) => (
                       <ScrollRevealEffect key={i} index={i}>
                         <div className="flex items-center justify-center w-full">
@@ -639,6 +661,7 @@ export function PageServices({
 
                     ))}
 
+                    {/* Secciones adicionales de párrafos y botones */}
                     {Array.isArray(P) &&
                       P.map((p, x) => (
                         <ScrollRevealEffect key={x}>
@@ -673,6 +696,7 @@ export function PageServices({
             </ScrollRevealEffect>
           ))}
 
+          {/* Galería secundaria si existe */}
           {galeria?.map((g, i) => (
             <ScrollRevealEffect key={i} index={i}>
               <div className='p-5 mt-10 bg-gray-200 rounded-2xl sm:p-10'>
@@ -683,14 +707,17 @@ export function PageServices({
             </ScrollRevealEffect>
           ))}
 
+          {/* Secciones de llamada a la acción */}
           {CalltoAction?.map((c, i) => (
             <ScrollRevealEffect key={i} index={i}>
               <div className='p-5 mt-10 bg-gray-200 rounded-2xl sm:p-10'>
 
+                {/* Título de la llamada a la acción */}
                 <ScrollBottonEffect>
                   <span className='text-sm font-bold text-justify uppercase sm:text-xl'>{c.callToAction}</span>
                 </ScrollBottonEffect>
 
+                {/* Texto de la llamada a la acción */}
                 <div className='grid sm:text-xl'>
                   {Array.isArray(c.text) && c.text.map((text, idx) => (
                     <ScrollRevealEffect key={idx} index={idx}>
@@ -706,6 +733,7 @@ export function PageServices({
                   ))}
                 </div>
 
+                {/* Botones de la llamada a la acción */}
                 {Array.isArray(c.buttons) && (
                   <div className="flex flex-wrap justify-center gap-10 mt-2">
                     {c.buttons.map((btn, i) => (
@@ -726,11 +754,12 @@ export function PageServices({
             </ScrollRevealEffect>
           ))}
 
+          {/* Ejemplos de uso o casos destacados */}
           {Example?.map((e, i) => (
             <ScrollRevealEffect key={i} index={i}>
               <div className='p-5 mt-10 bg-gray-200 rounded-2xl sm:p-10'>
                 <div className="font-mono">
-                  {/*Label*/}
+                  {/* Etiqueta del ejemplo */}
                   <span className="text-sm font-bold uppercase sm:text-xl text-honeydew-800">
                     <ScrollBottonEffect>
                       <span className="pr-1">-</span>
@@ -738,7 +767,7 @@ export function PageServices({
                     </ScrollBottonEffect>
                   </span>
 
-                  {/*Subtitle*/}
+                  {/* Subtítulo del ejemplo */}
                   <div className="pt-2">
                     <span className="text-xl font-bold text-justify uppercase lg:text-3xl sm:text-2xl">
                       <ScrollBottonEffect>
@@ -747,12 +776,92 @@ export function PageServices({
                     </span>
                   </div>
 
-                  <ScrollBottonEffect>
-                    <div className='flex justify-center pt-3'>
-                      <img className="w-auto h-auto rounded-2xl " src={`https://res.cloudinary.com/dzlavqhid/image/upload/${banner.imagen}.webp`}
-                        alt={banner.imagen} />
+                  {/* Texto del ejemplo */}
+                  <div className="pt-2">
+                    <span className='font-sans text-xl text-justify'>
+                      {Array.isArray(e.text) && e.text.map((paragraph, idx) => (
+                        <ScrollRevealEffect key={idx} index={idx}>
+                          <span className="block pt-2">
+                            {highlightText(paragraph, keyword, keywordLink)}
+                          </span>
+                        </ScrollRevealEffect>
+                      ))}
+                    </span>
+                  </div>
+
+                  {/* Imagen del ejemplo */}
+                  {Array.isArray(e.Galeria) && (
+                    <ScrollRevealEffect>
+                      <div className="flex items-center justify-center w-full pt-5">
+                        <div className="w-[85vw] sm:w-[70vw] md:w-[28rem] lg:w-[32rem] xl:w-[36rem] ">
+                          <div className="relative w-full aspect-[16/9]">
+                            {e.Galeria.map((g, l) => (
+                              <div key={l} className="h-auto rounded-2xl">
+                                {g.video && (
+                                  <video
+                                    className="object-cover w-full h-96 rounded-2xl"
+                                    autoPlay
+                                    muted
+                                    loop
+                                    playsInline
+                                    preload="metadata"
+                                  >
+                                    <source
+                                      src={`https://res.cloudinary.com/dzlavqhid/video/upload/${g.video}.mp4`}
+                                      type="video/mp4"
+                                    />
+                                  </video>
+                                )}
+
+                                {g.urlImg && (
+                                  <div className="flex justify-center w-full">
+                                    <img
+                                      loading="lazy"
+                                      src={`https://res.cloudinary.com/dzlavqhid/image/upload/${g.urlImg}.jpg`}
+                                      alt={g.label}
+                                      className="object-cover h-96 rounded-2xl"
+                                    />
+                                  </div>
+                                )}
+
+
+                                {g.href && (
+                                  <div className="flex items-center justify-center gap-2 pt-5">
+                                    <Paperclip className="w-4 h-4" />
+                                    <Link
+                                      href={`https://www.instagram.com/reel/${g.href}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-sm underline hover:opacity-80"
+                                    >
+                                      {g.label}
+                                    </Link>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </ScrollRevealEffect>
+                  )}
+
+                  {/* Botones del ejemplo */}
+                  {Array.isArray(e.buttons) && (
+                    <div className="flex flex-wrap justify-center gap-10 mt-5">
+                      {e.buttons.map((btn, i) => (
+                        <ScrollRevealEffect key={i} index={i}>
+                          <Button
+                            key={i}
+                            style="cursor-pointer text-center border-2 border-honeydew-800 dark:border-honeydew-800 transition duration-500 bg-white text-black hover:bg-honeydew-700 hover:text-white dark:bg-honeydew-800 dark:hover:bg-white dark:hover:text-black dark:text-white"
+                            href={btn.href}
+                            target={btn.target ?? '_self'}
+                            text={btn.label}
+                          />
+                        </ScrollRevealEffect>
+                      ))}
                     </div>
-                  </ScrollBottonEffect>
+                  )}
                 </div>
               </div>
             </ScrollRevealEffect>
