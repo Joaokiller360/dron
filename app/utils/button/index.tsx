@@ -51,7 +51,7 @@ export function Button({
         </a>
       ) : (
         <>
-          <button id={id} className={classes}>
+          <button id={id} className={classes} >
             <span>{text}</span>
             {icon}
           </button>

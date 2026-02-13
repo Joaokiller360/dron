@@ -213,7 +213,6 @@ export function CardClient({ index = 0, buttons = [], content = [], clients = []
               <div className={`grid gap-2 px-6 mt-4 md:mt-6 ${activeButtons.length === 1 ? 'flex items-center justify-center' : 'grid-cols-2'} `} >
                 {activeButtons.map(({ id, href, name, icon }) => (
                   <Button
-                    target='_blank'
                     key={id}
                     text={name}
                     href={href}
@@ -265,7 +264,7 @@ export function CardClient({ index = 0, buttons = [], content = [], clients = []
 
                 {/* Nombre del Servicio */}
                 <span className="mb-0.5 text-2xl text-center font-semibold tracking-tight text-heading">{d.Services.title}</span>
-                <span className="p-4 text-xl leading-relaxed">{d.Services.description}</span>
+                <span className="p-4 text-xl leading-relaxed text-justify">{d.Services.description}</span>
 
                 {/* Boton */}
                 <div className={`grid gap-2 px-6 mt-4 md:mt-6 ${activeButtons.length === 1 ? 'flex items-center justify-center' : 'grid-cols-2'} `} >
@@ -360,7 +359,7 @@ Componente guardado
 }
 
 import { Banner, highlightText, ScrollRevealEffect, keywordLink } from '@/app/utils'
-import { Film, MapPin, Factory, Building2, Earth, CheckCircle, Paperclip } from 'lucide-react';
+import { Film, MapPin, Factory, Building2, Earth, CheckCircle, Paperclip, MapPinHouse } from 'lucide-react';
 import React from 'react'
 import Link from 'next/link'
 import { DotLottieReact } from '@lottiefiles/dotlottie-react'
@@ -465,6 +464,11 @@ const listServices = [
     icon: <Earth size={38} className="mb-2" />,
     label: 'drones para eventos y retransmisiones',
     hreft: 'events-and-live-broadcasting'
+  },
+  {
+    icon: <MapPinHouse size={38} className="mb-2" />,
+    label: 'drones para inmobiliaria',
+    hreft: 'real-estate'
   }
 ]
 
@@ -792,14 +796,24 @@ export function PageServices({
                   {/* Imagen del ejemplo */}
                   {Array.isArray(e.Galeria) && (
                     <ScrollRevealEffect>
-                      <div className="flex items-center justify-center w-full pt-5">
-                        <div className="w-[85vw] sm:w-[70vw] md:w-[28rem] lg:w-[32rem] xl:w-[36rem] ">
-                          <div className="relative w-full aspect-[16/9]">
+                      <div className="flex justify-center w-full pt-5">
+                        <div className="w-[96vw] sm:w-[90vw] md:w-[52rem] lg:w-[64rem] xl:w-[75rem]">
+
+
+                          <div
+                            className={`
+        grid gap-3
+        ${e.Galeria.length === 1
+                                ? "grid-cols-1 justify-items-center"
+                                : "grid-cols-1 sm:grid-cols-2"}
+      `}
+                          >
                             {e.Galeria.map((g, l) => (
-                              <div key={l} className="h-auto rounded-2xl">
+                              <div key={l} className="w-full max-w-[900px]">
+
                                 {g.video && (
                                   <video
-                                    className="object-cover w-full h-96 rounded-2xl"
+                                    className="object-cover w-full rounded-2xl aspect-video"
                                     autoPlay
                                     muted
                                     loop
@@ -814,19 +828,16 @@ export function PageServices({
                                 )}
 
                                 {g.urlImg && (
-                                  <div className="flex justify-center w-full">
-                                    <img
-                                      loading="lazy"
-                                      src={`https://res.cloudinary.com/dzlavqhid/image/upload/${g.urlImg}.jpg`}
-                                      alt={g.label}
-                                      className="object-cover h-96 rounded-2xl"
-                                    />
-                                  </div>
+                                  <img
+                                    loading="lazy"
+                                    src={`https://res.cloudinary.com/dzlavqhid/image/upload/${g.urlImg}.jpg`}
+                                    alt={g.label}
+                                    className="object-cover w-full rounded-2xl aspect-video"
+                                  />
                                 )}
 
-
                                 {g.href && (
-                                  <div className="flex items-center justify-center gap-2 pt-5">
+                                  <div className="flex items-center justify-center gap-2 pt-3">
                                     <Paperclip className="w-4 h-4" />
                                     <Link
                                       href={`https://www.instagram.com/reel/${g.href}`}
@@ -838,11 +849,15 @@ export function PageServices({
                                     </Link>
                                   </div>
                                 )}
+
                               </div>
                             ))}
                           </div>
+
                         </div>
                       </div>
+
+
                     </ScrollRevealEffect>
                   )}
 

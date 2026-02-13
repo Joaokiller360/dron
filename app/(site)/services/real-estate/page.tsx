@@ -1,20 +1,23 @@
 
 import { PageServices } from '@/app/utils'
 
-export default function urbanFlightOperations() {
+export default function realState() {
   return (
     <>
 
       <PageServices
         D={[
           {
-            imagen: 'evento-retransmisiones',
+            imagen: 'drones-inmobiliaria',
             label: 'Servicios',
-            title: 'Eventos y retransmisiones',
+            title: 'drones para inmobiliaria',
           }
         ]}
         keyword={[
           'DGAC-Ecuador-(RDAC 101)',
+          'sector inmobiliario',
+          'única',
+          'recorridos virtuales y videos'
         ]}
         keywordLink={{
           'DGAC-Ecuador-(RDAC 101)': 'https://www.aviacioncivil.gob.ec/'
@@ -22,10 +25,10 @@ export default function urbanFlightOperations() {
         Content={[
           {
             label: 'Servicios',
-            subTitle: 'las mejores imágenes de tu evento',
+            subTitle: 'imagenes aéreas para inmobiliaria',
             text: [
-              'Los drones para uso en ciudad son útiles para diversas tareas, como la captura de imágenes aéreas para producciones audiovisuales, inspecciones de infraestructuras o servicios de emergencia.',
-              'Sin embargo, es necesario obtener un permiso especial de la DGAC-Ecuador-(RDAC 101) para operar en lo que se conoce como CTR (Control de Tráfico Aéreo) debido a que en estas áreas hay una mayor densidad de tráfico aéreo y se deben seguir protocolos de seguridad específicos.',
+              'Los drones son herramientas valiosas en el sector inmobiliario, ya que permiten capturar imágenes aéreas impresionantes de propiedades y sus alrededores. Estas imágenes proporcionan una perspectiva única que puede atraer a potenciales compradores al mostrar la ubicación, el tamaño y las características de la propiedad de manera más efectiva que las fotografías tradicionales desde el suelo.',
+              'Además, los drones pueden ser utilizados para crear recorridos virtuales y videos promocionales que destacan las mejores cualidades de una propiedad, facilitando la comercialización y venta de inmuebles.',
               'Es importante contar con operadores profesionales autorizados y con experiencia para garantizar la seguridad de los vuelos y el cumplimiento de la normativa aérea en estas áreas.'
             ],
           }
@@ -51,8 +54,8 @@ export default function urbanFlightOperations() {
             subTitle: 'ejemplo de aplicación',
             Galeria: [
               {
-                label: 'retransmisión en directo',
-                video: 'provincializacion-esmeralda',
+                label: 'example-realState',
+                video: 'example-realState',
               }
             ]
           }

@@ -259,6 +259,28 @@ const clients = [
     buttons: [
       {
         id: 1,
+        href: `${link}events-and-live-broadcasting`,
+        active: true,
+        name: 'Ver Más',
+        icon: <FileSearchCorner size={24} strokeWidth={2} />
+      }
+    ]
+  },
+  {
+    services: [
+      {
+        title: 'Drones para inmobiliaria',
+        description: 'Captura aérea de propiedades para el sector inmobiliario, mostrando ubicaciones, características y detalles de manera atractiva para potenciales compradores'
+      }
+    ],
+    content: [
+      {
+        imgName: 'drones-inmobiliaria'
+      }
+    ],
+    buttons: [
+      {
+        id: 1,
         href: `${link}urban-flight-operations`,
         active: true,
         name: 'Ver Más',

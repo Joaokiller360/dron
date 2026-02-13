@@ -1,7 +1,7 @@
 'use client'
 
 import { Templets, Button, ScrollBottonEffect } from "@/app/utils";
-import { Clapperboard, Handshake } from "lucide-react";
+import { Clapperboard, Handshake, Drone } from "lucide-react";
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 const banner = {
@@ -31,6 +31,13 @@ const banner = {
         'cursor-pointer text-center transition duration-500 bg-white text-black hover:bg-honeydew-500 hover:text-white dark:bg-honeydew-500 dark:hover:bg-white dark:hover:text-black dark:text-white',
       icon: Handshake,
     },
+    {
+      href: '/services',
+      text: 'Ver servicios',
+      style:
+        'cursor-pointer transition duration-500 bg-honeydew-500 hover:bg-white text-white hover:text-black dark:hover:text-white dark:bg-white dark:hover:bg-honeydew-500 dark:text-black',
+      icon: Drone,
+    }
   ],
 };
 
