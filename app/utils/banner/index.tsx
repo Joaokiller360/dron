@@ -26,9 +26,9 @@ export default function Banner({ label = '', title = '', description = '' }: Ban
               </ScrollBottonEffect>
 
               <ScrollBottonEffect>
-                <span className="my-5 font-mono text-4xl font-bold uppercase gradient-text">
+                <h1 className="my-5 font-mono text-4xl font-bold uppercase gradient-text">
                   {title}
-                </span>
+                </h1>
               </ScrollBottonEffect>
               <ScrollBottonEffect>
                 <span className="mx-10 font-mono text-sm font-light lg:text-lg gradient-text">

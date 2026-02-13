@@ -1,5 +1,37 @@
 
-import { PageServices } from '@/app/utils'
+import { createMetadata, PageServices } from '@/app/utils'
+
+export const metadata = createMetadata({
+  title: 'Real State | JB.SKYLENS',
+  description:
+    'Servicios profesionales de drones para bienes raíces en Ecuador. Fotografías, videos aéreos y tomas cinematográficas para inmobiliarias, constructoras y proyectos inmobiliarios.',
+  keywords: [
+    'drones para bienes raíces',
+    'real estate con drones',
+    'fotografía aérea inmobiliaria',
+    'video aéreo para propiedades',
+
+    'drones para inmobiliarias ecuador',
+    'servicios de drones para constructoras',
+    'drones para proyectos inmobiliarios',
+    'filmación aérea de propiedades',
+
+    'marketing inmobiliario con drones',
+    'contenido audiovisual inmobiliario',
+    'tomas aéreas de casas y edificios',
+
+    'servicios de drones en esmeraldas',
+    'producción audiovisual inmobiliaria',
+    'fotografía profesional de propiedades',
+
+    'JB.SKYLENS real estate',
+    'drones profesionales para ventas de casas',
+    'promoción inmobiliaria con drones',
+    'empresa de drones para inmobiliarias'
+  ]
+  ,
+  canonical: 'https://dron.joaobarres.dev/services/real-estate',
+})
 
 export default function realState() {
   return (

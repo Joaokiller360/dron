@@ -4,37 +4,34 @@ import { createMetadata, PageServices } from '@/app/utils'
 export const metadata = createMetadata({
   title: 'Vuelos en ciudad | JB.SKYLENS',
   description:
-    'Empresas y personas que han confiado en JB.SKYLENS para servicios profesionales con drones en Ecuador.',
+    'Servicios profesionales de vuelos con drones en zonas urbanas en Ecuador. Operaciones aéreas seguras y autorizadas para filmación, inspección, monitoreo y producción audiovisual en entornos urbanos complejos.',
   keywords: [
-    'clientes JB.SKYLENS',
-    'empresas que usan drones',
-    'clientes de servicios con drones',
-    'empresas atendidas con drones',
+    'drones en ciudad',
+    'vuelos urbanos con drones',
+    'operaciones con drones en zonas urbanas',
+    'filmación aérea en ciudad',
 
-    'drones para empresas ecuador',
-    'servicios de drones empresariales',
-    'drones para industria',
-    'drones para puertos',
-    'drones para eventos empresariales',
+    'drones para zonas urbanas ecuador',
+    'servicios de drones urbanos',
+    'drones para inspecciones en ciudad',
+    'monitoreo urbano con drones',
 
-    'clientes de filmación aérea',
-    'clientes de fotografía aérea',
-    'clientes de producción audiovisual',
+    'drones para edificios',
+    'filmación aérea urbana',
+    'producción audiovisual urbana',
+    'tomas aéreas en ciudad',
 
-    'empresas de esmeraldas con drones',
-    'clientes corporativos con drones',
+    'servicios de drones en esmeraldas',
+    'operaciones profesionales con drones',
+    'vuelos autorizados con drones',
 
-    'confianza en servicios con drones',
-    'casos de éxito con drones',
-    'proyectos empresariales con drones',
-
-    'clientes JB SKYLENS drones',
-    'empresas que confían en JB.SKYLENS',
-    'servicios profesionales con drones',
-    'empresa de drones confiable',
+    'JB.SKYLENS vuelos urbanos',
+    'empresa de drones profesional',
+    'servicios técnicos con drones',
+    'drones para proyectos urbanos'
   ]
   ,
-  canonical: 'https://dron.joaobarres.dev/clients',
+  canonical: 'https://dron.joaobarres.dev/services/urban-flight-operations',
 })
 
 export default function urbanFlightOperations() {
@@ -73,7 +70,7 @@ export default function urbanFlightOperations() {
               'Grandes clientes confían en nuestra expertise para integrar estos vuelos en sus producciones, garantizando innovación y calidad sin igual.',
               'Asimismo, facilitamos retransmisiones en directo que transmiten la emoción de todo tipo de eventos, ya sean deportivos o culturales en tiempo real, sin olvidar otros trabajos con drones como pueden ser las inspecciones técnicas en infraestructuras o mapeos topográficos para proyectos de urbanismo.'
             ],
-            Galeria: [ 
+            Galeria: [
               {
                 label: 'vuelo en ciudad',
                 video: 'provincializacion-esmeralda',
@@ -113,8 +110,8 @@ export default function urbanFlightOperations() {
           {
             src: 'cityFlight'
           }
-        ]} 
-        
+        ]}
+
         index={0}
       />
 

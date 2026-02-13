@@ -4,37 +4,34 @@ import { PageServices, createMetadata } from '@/app/utils'
 export const metadata = createMetadata({
   title: 'Localización y Reconocimiento | JB.SKYLENS',
   description:
-    'Empresas y personas que han confiado en JB.SKYLENS para servicios profesionales con drones en Ecuador.',
+    'Servicios profesionales de localización y reconocimiento con drones en Ecuador. Inspección aérea, monitoreo de zonas, búsqueda de áreas específicas y análisis visual para seguridad, industria y proyectos técnicos.',
   keywords: [
-    'clientes JB.SKYLENS',
-    'empresas que usan drones',
-    'clientes de servicios con drones',
-    'empresas atendidas con drones',
+    'drones para localización',
+    'reconocimiento aéreo con drones',
+    'inspección aérea con drones',
+    'monitoreo de zonas con drones',
 
-    'drones para empresas ecuador',
-    'servicios de drones empresariales',
+    'drones para seguridad ecuador',
+    'servicios de drones para vigilancia',
+    'drones para búsqueda de áreas',
+    'reconocimiento territorial con drones',
+
     'drones para industria',
     'drones para puertos',
-    'drones para eventos empresariales',
+    'inspección de infraestructura con drones',
+    'monitoreo industrial aéreo',
 
-    'clientes de filmación aérea',
-    'clientes de fotografía aérea',
-    'clientes de producción audiovisual',
+    'servicios de drones en esmeraldas',
+    'operaciones profesionales con drones',
+    'análisis visual con drones',
 
-    'empresas de esmeraldas con drones',
-    'clientes corporativos con drones',
-
-    'confianza en servicios con drones',
-    'casos de éxito con drones',
-    'proyectos empresariales con drones',
-
-    'clientes JB SKYLENS drones',
-    'empresas que confían en JB.SKYLENS',
-    'servicios profesionales con drones',
-    'empresa de drones confiable',
+    'JB.SKYLENS reconocimiento',
+    'empresa de drones profesional',
+    'servicios técnicos con drones',
+    'drones para proyectos empresariales'
   ]
   ,
-  canonical: 'https://dron.joaobarres.dev/clients',
+  canonical: 'https://dron.joaobarres.dev/services/location-scouting-and-recon',
 })
 
 export default function urbanFlightOperations() {
@@ -67,7 +64,7 @@ export default function urbanFlightOperations() {
         ]}
         Animations={[
           {
-            src: 'cityFlight', 
+            src: 'cityFlight',
           }
         ]}
         CalltoAction={[

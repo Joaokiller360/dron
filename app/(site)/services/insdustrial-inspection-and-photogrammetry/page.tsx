@@ -2,36 +2,33 @@
 import { PageServices, createMetadata } from '@/app/utils'
 
 export const metadata = createMetadata({
-  title: 'Industrial, inspección y fotogrametria | JB.SKYLENS',
+  title: 'Industrial, inspección y fotogrametría | JB.SKYLENS',
   description:
-    'Empresas y personas que han confiado en JB.SKYLENS para servicios profesionales con drones en Ecuador.',
+    'Servicios profesionales de inspección industrial y fotogrametría con drones en Ecuador. Levantamientos topográficos, análisis técnico, monitoreo de infraestructura y soluciones aéreas para proyectos industriales y portuarios.',
   keywords: [
-    'clientes JB.SKYLENS',
-    'empresas que usan drones',
-    'clientes de servicios con drones',
-    'empresas atendidas con drones',
+    'fotogrametría con drones',
+    'inspección industrial con drones',
+    'levantamientos topográficos con drones',
+    'análisis técnico aéreo',
 
-    'drones para empresas ecuador',
-    'servicios de drones empresariales',
-    'drones para industria',
+    'drones para industria ecuador',
+    'inspección de infraestructura con drones',
     'drones para puertos',
-    'drones para eventos empresariales',
+    'monitoreo industrial aéreo',
 
-    'clientes de filmación aérea',
-    'clientes de fotografía aérea',
-    'clientes de producción audiovisual',
+    'modelos 3D con drones',
+    'mapeo aéreo profesional',
+    'topografía con drones',
+    'ortomosaicos con drones',
 
-    'empresas de esmeraldas con drones',
-    'clientes corporativos con drones',
+    'servicios de drones en esmeraldas',
+    'operaciones técnicas con drones',
+    'drones para ingeniería',
 
-    'confianza en servicios con drones',
-    'casos de éxito con drones',
-    'proyectos empresariales con drones',
-
-    'clientes JB SKYLENS drones',
-    'empresas que confían en JB.SKYLENS',
-    'servicios profesionales con drones',
-    'empresa de drones confiable',
+    'JB.SKYLENS industrial',
+    'empresa de drones profesional',
+    'servicios técnicos con drones',
+    'drones para proyectos industriales'
   ]
   ,
   canonical: 'https://dron.joaobarres.dev/clients',

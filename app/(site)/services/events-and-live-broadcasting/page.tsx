@@ -1,5 +1,37 @@
+import { createMetadata, PageServices } from '@/app/utils'
 
-import { PageServices } from '@/app/utils'
+export const metadata = createMetadata({
+  title: 'Eventos y Retransmisiones | JB.SKYLENS',
+  description:
+    'Servicios profesionales de cobertura de eventos y retransmisiones con drones en Ecuador. Filmación aérea en vivo, grabación de eventos, shows, conciertos, celebraciones y transmisiones profesionales desde el aire.',
+  keywords: [
+    'drones para eventos',
+    'filmación aérea de eventos',
+    'cobertura de eventos con drones',
+    'retransmisión aérea en vivo',
+
+    'drones para conciertos',
+    'drones para festivales',
+    'drones para bodas y celebraciones',
+    'video aéreo para eventos',
+
+    'servicios de drones para eventos ecuador',
+    'filmación de eventos en esmeraldas',
+    'producción audiovisual para eventos',
+    'tomas aéreas de eventos',
+
+    'streaming con drones',
+    'transmisión en vivo con drones',
+    'cobertura profesional de eventos',
+
+    'JB.SKYLENS eventos',
+    'empresa de drones para eventos',
+    'servicios profesionales con drones',
+    'filmación profesional aérea'
+  ]
+  ,
+  canonical: 'https://dron.joaobarres.dev/services/events-and-live-broadcasting',
+})
 
 export default function urbanFlightOperations() {
   return (

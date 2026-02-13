@@ -1,5 +1,37 @@
+import { createMetadata, PageServices } from '@/app/utils'
 
-import { PageServices } from '@/app/utils'
+export const metadata = createMetadata({
+  title: 'Film and TV Production | JB.SKYLENS',
+  description:
+    'Servicios profesionales de filmación aérea con drones en Ecuador para cine, televisión, comerciales y producciones audiovisuales. Tomas cinematográficas de alta calidad para proyectos creativos y publicitarios.',
+  keywords: [
+    'filmación con drones',
+    'drones para cine',
+    'producción audiovisual con drones',
+    'tomas aéreas cinematográficas',
+
+    'drones para televisión',
+    'servicios de drones para productoras',
+    'filmación aérea profesional',
+    'drones para comerciales',
+
+    'video aéreo cinematográfico',
+    'producción de video con drones',
+    'drones para rodajes',
+    'tomas aéreas profesionales',
+
+    'servicios de drones en ecuador',
+    'filmación aérea en esmeraldas',
+    'operaciones audiovisuales con drones',
+
+    'JB.SKYLENS film',
+    'empresa de drones para cine',
+    'drones para producciones',
+    'servicios profesionales de drones'
+  ]
+  ,
+  canonical: 'https://dron.joaobarres.dev/services/film-and-tv-production',
+})
 
 export default function urbanFlightOperations() {
   return (
