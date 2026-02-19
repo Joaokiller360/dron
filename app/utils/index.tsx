@@ -1,4 +1,4 @@
-import Navbar from './nav'
+import Navbar, { NavPast } from './nav'
 import { ButtonNav, Button } from './button'
 import { Templets, TitleProject } from './layout'
 import { CheckIcon, CopyIcon } from './icons/icons'
@@ -16,6 +16,7 @@ import { ScrollBottonEffect, ScrollRevealEffect } from './animation'
 
 export {
   Navbar,
+  NavPast,
   ButtonNav,
   Button,
   Templets,

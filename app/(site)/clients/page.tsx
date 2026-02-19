@@ -185,8 +185,29 @@ const grandConsomer = [
         icon: <Instagram size={24} strokeWidth={2} />
       }
     ]
+  },
+  {
+    clients: [
+      {
+        client: 'Corona',
+        organizacion: 'Event Garden'
+      }
+    ],
+    content: [
+      {
+        imgName: 'corona'
+      }
+    ],
+    buttons: [
+      {
+        id: 1,
+        href: 'https://www.instagram.com/rumbekemusicentertainment',
+        active: true,
+        name: 'Instagram',
+        icon: <Instagram size={24} strokeWidth={2} />
+      }
+    ]
   }
-
 ]
 
 

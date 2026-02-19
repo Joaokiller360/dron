@@ -4,7 +4,7 @@ import "./globals.css";
 
 import Script from "next/script";
 
-import { createMetadata, Navbar } from '@/app/utils'
+import { createMetadata, Navbar, NavPast } from '@/app/utils'
 import { Footer } from '@/app/component';
 import FlowbiteInit from "./flowbait-init";
 
@@ -51,7 +51,7 @@ export default function RootLayout({
         <FlowbiteInit />
         <div className="flex flex-col min-h-screen">
 
-          <Navbar />
+          <NavPast />
 
           {/* CONTENIDO */}
           <main className="flex-1 text-white">

@@ -15,7 +15,7 @@ export function Img({ name = '', urlImg = '', href = '', style = '' }: IMG) {
   return (
     <>
       <a href={href} className={`${style} relative flex flex-col px-4 pt-40 pb-4 overflow-hidden font-black rounded-lg group grow cursor-pointer`}>
-        <img src={urlImg} alt={name} className="absolute inset-0 object-cover w-full h-full transition-transform duration-500 ease-in-out group-hover:scale-105" />
+        <img src={urlImg  || '/img/palmas-atardecer.jpg'} alt={name} className="absolute inset-0 object-cover w-full h-full transition-transform duration-500 ease-in-out group-hover:scale-105" />
         <div className="absolute inset-0 bg-linear-to-b from-gray-900/25 to-gray-900/5" />
         <h3 className="absolute top-0 left-0 z-10 p-4 text-xl font-black xs:text-xl md:text-3xl">{name}</h3>
       </a>

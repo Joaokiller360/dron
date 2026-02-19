@@ -53,8 +53,15 @@ export function CardVideo({ index = 0, title = '', organizacion = '', nameButton
               imgName && (
                 <img
                   loading="lazy"
-                  src={`https://res.cloudinary.com/dzlavqhid/image/upload/${imgName}.jpg`}
-                  alt={imgName}
+                  src={
+                    imgName
+                      ? `https://res.cloudinary.com/dzlavqhid/image/upload/${imgName}.jpg`
+                      : '/img/palmas-atardecer.jpg'
+                  }
+                  onError={(e) => {
+                    e.currentTarget.src = "/img/palmas-atardecer.jpg";
+                  }}
+                  alt={imgName || "imagen"}
                   className="object-cover w-full h-64 transition-transform duration-500 group-hover:scale-105"
                 />
               )
@@ -180,8 +187,15 @@ export function CardClient({ index = 0, buttons = [], content = [], clients = []
                   <>
                     <img
                       loading="lazy"
-                      src={`https://res.cloudinary.com/dzlavqhid/image/upload/${media?.imgName}.jpg`}
-                      alt={d?.cliente?.client}
+                      src={
+                        media?.imgName
+                          ? `https://res.cloudinary.com/dzlavqhid/image/upload/${media.imgName}.jpg`
+                          : '/img/palmas-atardecer.jpg'
+                      }
+                      onError={(e) => {
+                        e.currentTarget.src = "/img/palmas-atardecer.jpg";
+                      }}
+                      alt={d?.cliente?.client || "imagen"}
                       className="object-cover w-full h-auto mb-5 transition-transform duration-500 group-hover:scale-105 rounded-2xl"
                     />
                   </>
@@ -237,8 +251,15 @@ export function CardClient({ index = 0, buttons = [], content = [], clients = []
                     <>
                       <img
                         loading="lazy"
-                        src={`https://res.cloudinary.com/dzlavqhid/image/upload/${media?.imgName}.jpg`}
-                        alt={d?.cliente?.client}
+                        src={
+                          media?.imgName
+                            ? `https://res.cloudinary.com/dzlavqhid/image/upload/${media?.imgName}.jpg`
+                            : '/img/palmas-atardecer.jpg'
+                        }
+                        onError={(e) => {
+                          e.currentTarget.src = "/img/palmas-atardecer.jpg";
+                        }}
+                        alt={d?.cliente?.client || "imagen"}
                         className="w-auto h-56 mb-6 bg-white rounded-2xl"
                       />
                     </>
@@ -284,76 +305,6 @@ export function CardClient({ index = 0, buttons = [], content = [], clients = []
           </>
         )
       )}
-
-      {/*
-
-      
-Componente guardado
-
-<div className="relative w-full py-6 sm:py-8 bg-honeydew-900 rounded-2xl">
-        <div className="flex flex-col items-center mx-5">
-
-          <>
-
-            <div className="relative overflow-hidden">
-
-              {media?.imgName ? (
-                <>
-                  <img
-                    loading="lazy"
-                    src={`https://res.cloudinary.com/dzlavqhid/image/upload/${media.imgName}.jpg`}
-                    alt={media.imgName}
-                    className="object-cover w-full h-64 mb-5 transition-transform duration-500 group-hover:scale-105 rounded-2xl"
-                  />
-                </>
-              ) : (
-                media?.videoname && (
-                  <>
-                    <video
-                      className="object-cover w-full h-64 mb-5 rounded-2xl"
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                      preload="metadata"
-                    >
-                      <source src={`https://res.cloudinary.com/dzlavqhid/video/upload/${media.videoname}.mp4`} type="video/mp4" />
-                      {media.videoname}
-                    </video>
-                  </>
-                )
-              )}
-
-            </div>
-
-            <span className="mb-0.5 text-xl text-center font-semibold tracking-tight text-heading">
-              {client}
-            </span>
-            <span className="text-xl text-body">
-              {organizacion}
-            </span>
-
-            <div className={`grid gap-2 px-6 mt-4 md:mt-6 ${activeButtons.length === 1 ? 'flex items-center justify-center' : 'grid-cols-2'} `} >
-              {activeButtons.map(({ id, href, name, icon }) => (
-                <Button
-                  key={id}
-                  text={name}
-                  href={href}
-                  style="w-full max-w-xs cursor-pointer transition duration-500 bg-honeydew-900 hover:bg-white text-white hover:text-black dark:hover:text-white dark:bg-white dark:hover:bg-honeydew-800 dark:text-black"
-                  icon={icon}
-                />
-              ))}
-            </div>
-
-          </>
-
-        </div>
-      </div>
-  
-*/}
-
-
-
     </>
   )
 }
@@ -510,8 +461,16 @@ export function PageServices({
 
         {/* Imagen de fondo del banner */}
         <img
-          src={`https://res.cloudinary.com/dzlavqhid/image/upload/${banner.imagen}.webp`}
-          alt={banner.imagen}
+          loading="lazy"
+          src={
+            banner?.imagen
+              ? `https://res.cloudinary.com/dzlavqhid/image/upload/${banner.imagen}.jpg`
+              : '/img/palmas-atardecer.jpg'
+          }
+          onError={(e) => {
+            e.currentTarget.src = "/img/palmas-atardecer.jpg";
+          }}
+          alt={banner?.title || "imagen"}
           className="absolute inset-0 object-cover object-center w-full h-full -z-10"
         />
 
@@ -798,19 +757,13 @@ export function PageServices({
                     <ScrollRevealEffect>
                       <div className="flex justify-center w-full pt-5">
                         <div className="w-[96vw] sm:w-[90vw] md:w-[52rem] lg:w-[64rem] xl:w-[75rem]">
-
-
                           <div
-                            className={`
-        grid gap-3
-        ${e.Galeria.length === 1
-                                ? "grid-cols-1 justify-items-center"
-                                : "grid-cols-1 sm:grid-cols-2"}
-      `}
+                            className={`grid gap-3 ${e.Galeria.length === 1
+                              ? "grid-cols-1 justify-items-center"
+                              : "grid-cols-1 sm:grid-cols-2"}`}
                           >
                             {e.Galeria.map((g, l) => (
                               <div key={l} className="w-full max-w-[900px]">
-
                                 {g.video && (
                                   <video
                                     className="object-cover w-full rounded-2xl aspect-video"
@@ -821,7 +774,7 @@ export function PageServices({
                                     preload="metadata"
                                   >
                                     <source
-                                      src={`https://res.cloudinary.com/dzlavqhid/video/upload/${g.video}.mp4`}
+                                      src={`https://res.cloudinary.com/dzlavqhid/video/upload/${g?.video}.mp4`}
                                       type="video/mp4"
                                     />
                                   </video>
@@ -830,9 +783,16 @@ export function PageServices({
                                 {g.urlImg && (
                                   <img
                                     loading="lazy"
-                                    src={`https://res.cloudinary.com/dzlavqhid/image/upload/${g.urlImg}.jpg`}
-                                    alt={g.label}
-                                    className="object-cover w-full rounded-2xl aspect-video"
+                                    src={
+                                      g?.urlImg
+                                        ? `https://res.cloudinary.com/dzlavqhid/image/upload/${g?.urlImg}.jpg`
+                                        : '/img/palmas-atardecer.jpg'
+                                    }
+                                    onError={(e) => {
+                                      e.currentTarget.src = "/img/palmas-atardecer.jpg";
+                                    }}
+                                    alt={g?.label || "imagen"}
+                                    className="object-cover w-full h-auto mb-5 transition-transform duration-500 group-hover:scale-105 rounded-2xl"
                                   />
                                 )}
 

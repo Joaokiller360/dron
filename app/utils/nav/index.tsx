@@ -1,8 +1,9 @@
 'use client'
 
-import { Video, Route, Factory, Helicopter, TvMinimalPlay } from 'lucide-react';
+import { Video, Route, Factory, Helicopter, TvMinimalPlay, Camera } from 'lucide-react';
 import { usePathname } from "next/navigation";
 import { Logo } from '../logo';
+import Link from 'next/link';
 
 interface route {
   icon?: React.ReactNode
@@ -106,5 +107,99 @@ export default function Navbar() {
         </div>
       </nav>
     </>
+  );
+}
+
+
+
+interface ButtonNavProps {
+  hrf?: string;
+  text?: string;
+  icon?: React.ReactNode;
+}
+
+export function ButtonNav({ hrf = '', text = '', icon }: ButtonNavProps) {
+  return (
+    <Link
+      href={hrf}
+      style={{ display: 'flex', alignItems: 'center', gap: '8px' }} // Estilos directamente en el Link
+    >
+      {icon && <span>{icon}</span>}
+      <span className="hidden sm:inline">{text}</span>
+    </Link>
+  );
+}
+
+import { BookText, HomeIcon, UserRound, Rocket, ContactRound } from "lucide-react";
+
+const itemsNavbar = [
+  {
+    id: 1,
+    title: "Inicio",
+    icon: <HomeIcon size={25} color="#fff" strokeWidth={1} />,
+    link: "/",
+  },
+  {
+    id: 2,
+    title: "Servicios",
+    icon: <UserRound size={25} color="#fff" strokeWidth={1} />,
+    link: "/services",
+  },
+  {
+    id: 3,
+    title: "Equipo",
+    icon: <Rocket size={25} color="#fff" strokeWidth={1} />,
+    link: "/teams",
+  },
+  {
+    id: 4,
+    title: "Portafolio",
+    icon: <Camera size={25} color="#fff" strokeWidth={1} />,
+    link: "/portfolio",
+  },
+  {
+    id: 5,
+    title: "Clientes",
+    icon: <BookText size={25} color="#fff" strokeWidth={1} />,
+    link: "/clients",
+  },
+  {
+    id: 6,
+    title: "Contacto",
+    icon: <ContactRound size={25} color="#fff" strokeWidth={1} />,
+    link: "/contact",
+  }
+];
+
+export function NavPast() {
+  return (
+    <nav className="fixed z-40 flex justify-center w-full px-2 top-8">
+      <div
+        className="flex items-center max-w-full gap-1 px-2 py-2 overflow-x-auto rounded-full bg-black/40 backdrop-blur-sm whitespace-nowrap scrollbar-hide md:flex-wrap md:justify-center md:overflow-visible"
+      >
+        {/* Logo solo en desktop */}
+        <div className="items-center hidden mr-2 xl:flex">
+          <Logo
+            href="/"
+            name="jb.skylens"
+            style="h-7 rounded-full bg-white"
+            imgName="logo-p"
+          />
+        </div>
+
+        {itemsNavbar.map((item) => (
+          <div
+            key={item.id}
+            className="flex-shrink-0 px-3 py-2 transition rounded-full hover:bg-colorButton"
+          >
+            <ButtonNav
+              hrf={item.link}
+              text={item.title}
+              icon={item.icon}
+            />
+          </div>
+        ))}
+      </div>
+    </nav>
   );
 }

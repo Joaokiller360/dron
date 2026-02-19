@@ -1,6 +1,6 @@
 'use client'
 
-import { SeparatorUp } from '@/app/utils'
+import { SeparatorUp, ScrollRevealEffect } from '@/app/utils'
 
 const logos = [
   {
@@ -46,10 +46,10 @@ interface Styles {
   colors?: string;
 }
 
-export const AnimatedLogoCloud = ({ colors = '' }:Styles) => {
+export const AnimatedLogoCloud = ({ colors = '' }: Styles) => {
   return (
     <div className="w-full py-12">
-      <div className="mx-auto w-full px-6 md:px-8">
+      <div className="w-full px-6 mx-auto md:px-8">
         <div
           className="relative mt-6 overflow-hidden"
           style={{
@@ -64,7 +64,7 @@ export const AnimatedLogoCloud = ({ colors = '' }:Styles) => {
               .map((_, index) => (
                 <div
                   key={index}
-                  className="flex shrink-0 flex-row justify-around gap-6"
+                  className="flex flex-row justify-around gap-6 shrink-0"
                 >
                   {logos.map((logo, key) => (
                     <img
@@ -88,23 +88,29 @@ export default function Logos() {
   return (
     <>
       <SeparatorUp colorsPrimary="bg-honeydew-800 dark:bg-honeydew-900" colorsSecundary="text-honeydew-900 dark:text-honeydew-800" />
-      <div className="bg-honeydew-900 dark:bg-honeydew-800 py-8 sm:py-16 lg:py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid space-y-4 text-center mb-10">
-            <div className="text-sm lg:text-lg font-mono mx-10 font-light gradient-text">
-              <span>- </span>
-              <span className="uppercase">
-                Los grandes confian en nosotros
-              </span>
-              <span> -</span>
+      <div className="py-8 bg-honeydew-900 dark:bg-honeydew-800 sm:py-16 lg:py-24">
+        <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <div className="grid mb-10 space-y-4 text-center">
+            <div className="mx-10 font-mono text-sm font-light lg:text-lg gradient-text">
+              <ScrollRevealEffect>
+                <span>- </span>
+                <span className="uppercase">
+                  Los grandes confian en nosotros
+                </span>
+                <span> -</span>
+              </ScrollRevealEffect>
             </div>
-            <span className="text-xl sm:text-4xl font-mono font-bold sm:my-5 gradient-text uppercase">
-              Nuestros Clientes
-            </span>
+            <ScrollRevealEffect>
+              <span className="font-mono text-xl font-bold uppercase sm:text-4xl sm:my-5 gradient-text">
+                Nuestros Clientes
+              </span>
+            </ScrollRevealEffect>
           </div>
 
-          <div className="bg-honeydew-800 dark:bg-honeydew-900 rounded-2xl sm:p-10 shadow-lg">
-            < AnimatedLogoCloud colors='invert'/>
+          <div className="shadow-lg bg-honeydew-800 dark:bg-honeydew-900 rounded-2xl sm:p-10">
+            <ScrollRevealEffect>
+              < AnimatedLogoCloud colors='invert' />
+            </ScrollRevealEffect>
           </div>
         </div>
       </div>
