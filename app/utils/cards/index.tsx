@@ -1,6 +1,6 @@
 'use client'
 import { Button, ScrollBottonEffect } from '@/app/utils'
-import { Video } from 'lucide-react'
+import { HousePlus, Video } from 'lucide-react'
 
 interface SectionCard {
   children: React.ReactNode
@@ -340,6 +340,7 @@ interface p {
 }
 
 interface List {
+  label?: string
   text?: string[]
 }
 
@@ -352,7 +353,7 @@ interface Galery {
 
 interface page {
   D: d[]
-  Content: content[]
+  Content?: content[]
   keyword?: string[]
   keywordLink?: keywordLink
   index: number
@@ -374,8 +375,12 @@ interface galeria {
 
 interface CalltoAction {
   callToAction?: string
+  SubTitle?: string
   text?: string[]
+  text2?: string[]
   buttons?: ButtonItem[]
+  list?: List[]
+  Animations?: animation[]
 }
 
 interface animation {
@@ -420,6 +425,11 @@ const listServices = [
     icon: <MapPinHouse size={38} className="mb-2" />,
     label: 'drones para inmobiliaria',
     hreft: 'real-estate'
+  },
+  {
+    icon: <HousePlus size={38} className="mb-2" />,
+    label: 'tours virtuales 360',
+    hreft: 'tours-360'
   }
 ]
 
@@ -508,7 +518,7 @@ export function PageServices({
         <section className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
 
           {/* Renderiza cada sección de contenido principal */}
-          {Content.map((section, index) => (
+          {Content?.map((section, index) => (
             <ScrollRevealEffect key={index}>
               <div key={index} className="p-5 bg-gray-200 rounded-2xl sm:p-10">
                 <React.Fragment>
@@ -534,7 +544,7 @@ export function PageServices({
                   <div className='text-justify sm:text-xl'>
                     {/* Texto principal de la sección */}
                     {section.text && (
-                      <div>
+                      <div className='pb-2'>
                         {section.text.map((paragraph, i) => (
                           <ScrollRevealEffect key={i} index={i}>
                             <span className="block pt-2">
@@ -546,18 +556,23 @@ export function PageServices({
                     )}
 
                     {/* Lista de elementos destacados de la sección */}
-                    {section.list?.map((item, j) => (
+                    {Array.isArray(section.list) && section.list?.map((item, j) => (
                       <ScrollRevealEffect key={j} index={j}>
-                        <ul className="py-4 space-y-3">
-                          <li className="flex items-start gap-3">
-                            <span className="flex items-center justify-center w-5 h-5 mt-1">
-                              <CheckCircle className="w-4 h-4 text-honeydew-800" />
-                            </span>
-                            <span>
-                              {item.text && highlightText(item.text.join(' '), keyword)}
-                            </span>
-                          </li>
-                        </ul>
+                        <span className="pb-2 font-bold">{item.label}</span>
+                        {Array.isArray(item.text) && (
+                          <ul className="pb-2 space-y-3">
+                            {item.text.map((text, k) => (
+                              <li key={k} className="flex items-start gap-3">
+                                <span className="flex items-center justify-center w-5 h-5 mt-1">
+                                  <CheckCircle className="w-4 h-4 text-honeydew-800" />
+                                </span>
+                                <span>
+                                  {text && highlightText(text, keyword)}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
                       </ScrollRevealEffect>
                     ))}
 
@@ -621,7 +636,6 @@ export function PageServices({
                           </div>
                         </div>
                       </ScrollRevealEffect>
-
                     ))}
 
                     {/* Secciones adicionales de párrafos y botones */}
@@ -677,12 +691,18 @@ export function PageServices({
 
                 {/* Título de la llamada a la acción */}
                 <ScrollBottonEffect>
-                  <span className='text-sm font-bold text-justify uppercase sm:text-xl'>{c.callToAction}</span>
+                  <span className='pb-2 text-sm font-bold text-justify uppercase sm:text-xl'>{c?.callToAction}</span>
+                </ScrollBottonEffect>
+
+                {/* Título de la llamada a la acción */}
+                <ScrollBottonEffect>
+                  <span className='flex justify-center pb-2 text-sm font-bold text-center uppercase sm:text-xl'>{c?.SubTitle}</span>
                 </ScrollBottonEffect>
 
                 {/* Texto de la llamada a la acción */}
-                <div className='grid sm:text-xl'>
-                  {Array.isArray(c.text) && c.text.map((text, idx) => (
+
+                {Array.isArray(c?.text) && c.text.map((text, idx) => (
+                  <div className='grid sm:text-xl' key={idx}>
                     <ScrollRevealEffect key={idx} index={idx}>
                       <span className='mt-2'>
                         {text &&
@@ -693,8 +713,62 @@ export function PageServices({
                           )}
                       </span>
                     </ScrollRevealEffect>
-                  ))}
-                </div>
+                  </div>
+                ))}
+
+                {/* Lista de elementos destacados de la sección */}
+                {Array.isArray(c.list) && c.list?.map((item, j) => (
+                  <ScrollRevealEffect key={j} index={j}>
+                    <span className="py-2 text-xl font-bold">{item?.label}</span>
+                    {Array.isArray(item?.text) && (
+                      <ul className="space-y-3">
+                        {item?.text.map((text, k) => (
+                          <li key={k} className="flex items-start gap-3">
+                            <span className="flex items-center justify-center w-5 h-5 mt-1">
+                              <CheckCircle className="w-4 h-4 text-honeydew-800" />
+                            </span>
+                            <span className='text-xl'>
+                              {text && highlightText(text, keyword)}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </ScrollRevealEffect>
+                ))}
+
+                {Array.isArray(c?.text2) && c.text2.map((text, idx) => (
+                  <div className='grid pt-2 sm:text-xl' key={idx}>
+                    <ScrollRevealEffect key={idx} index={idx}>
+                      <span className='mt-2'>
+                        {text &&
+                          highlightText(
+                            text,
+                            keyword,
+                            keywordLink
+                          )}
+                      </span>
+                    </ScrollRevealEffect>
+                  </div>
+                ))}
+
+                {/* Animaciones Lottie si existen */}
+                {c?.Animations?.map((a, i) => (
+                  <ScrollRevealEffect key={i} index={i}>
+                    <div className="flex items-center justify-center w-full">
+                      <div className="w-[85vw] sm:w-[70vw] md:w-[28rem] lg:w-[32rem] xl:w-[36rem] ">
+                        <div className="relative w-full aspect-[16/9]">
+                          <DotLottieReact
+                            src={`/animation/${a.src}.json`}
+                            loop
+                            autoplay
+                            className="absolute inset-0 w-full h-full"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </ScrollRevealEffect>
+                ))}
 
                 {/* Botones de la llamada a la acción */}
                 {Array.isArray(c.buttons) && (

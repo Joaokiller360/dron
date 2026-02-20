@@ -287,6 +287,28 @@ const clients = [
         icon: <FileSearchCorner size={24} strokeWidth={2} />
       }
     ]
+  },
+  {
+    services: [
+      {
+        title: 'Tours virtuales 360',
+        description: 'Creación de recorridos virtuales interactivos en 360 grados, ideales para mostrar espacios comerciales, turísticos o inmobiliarios de manera innovadora y atractiva'
+      }
+    ],
+    content: [
+      {
+        imgName: 'tours-360'
+      }
+    ],
+    buttons: [
+      {
+        id: 1,
+        href: `${link}tours-360`,
+        active: true,
+        name: 'Ver Más',
+        icon: <FileSearchCorner size={24} strokeWidth={2} />
+      }
+    ]
   }
 ]
 
