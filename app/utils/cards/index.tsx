@@ -696,7 +696,7 @@ export function PageServices({
 
                 {/* Título de la llamada a la acción */}
                 <ScrollBottonEffect>
-                  <span className='flex justify-center pb-2 text-sm font-bold text-center uppercase sm:text-xl'>{c?.SubTitle}</span>
+                  <span className='flex justify-center pb-2 text-lg font-bold text-center uppercase sm:text-xl'>{c?.SubTitle}</span>
                 </ScrollBottonEffect>
 
                 {/* Texto de la llamada a la acción */}
@@ -719,7 +719,7 @@ export function PageServices({
                 {/* Lista de elementos destacados de la sección */}
                 {Array.isArray(c.list) && c.list?.map((item, j) => (
                   <ScrollRevealEffect key={j} index={j}>
-                    <span className="py-2 text-xl font-bold">{item?.label}</span>
+                    <span className="py-2 text-lg font-bold md:text-xl">{item?.label}</span>
                     {Array.isArray(item?.text) && (
                       <ul className="space-y-3">
                         {item?.text.map((text, k) => (
@@ -727,7 +727,7 @@ export function PageServices({
                             <span className="flex items-center justify-center w-5 h-5 mt-1">
                               <CheckCircle className="w-4 h-4 text-honeydew-800" />
                             </span>
-                            <span className='text-xl'>
+                            <span className='text-lg md:text-xl'>
                               {text && highlightText(text, keyword)}
                             </span>
                           </li>
