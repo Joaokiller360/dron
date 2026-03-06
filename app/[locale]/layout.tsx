@@ -3,10 +3,12 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 import Script from "next/script";
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages, getLocale } from 'next-intl/server';
 
-import { createMetadata, Navbar, NavPast } from '@/app/utils'
+import { createMetadata, NavPast } from '@/app/utils'
 import { Footer } from '@/app/component';
-import FlowbiteInit from "./flowbait-init";
+import FlowbiteInit from "@/app/flowbait-init";
 
 
 const geistSans = Geist({
@@ -23,13 +25,16 @@ export const metadata = createMetadata({
   href: 'logo-ico',
 })
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="es">
+    <html lang={locale}>
       {/* Google Analytics */}
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${process.env.GOOGLE_ANALYTICS}`}
@@ -48,18 +53,20 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <FlowbiteInit />
-        <div className="flex flex-col min-h-screen">
+        <NextIntlClientProvider messages={messages}>
+          <FlowbiteInit />
+          <div className="flex flex-col min-h-screen">
 
-          <NavPast />
+            <NavPast />
 
-          {/* CONTENIDO */}
-          <main className="flex-1 text-white">
-            {children}
-          </main>
+            {/* CONTENIDO */}
+            <main className="flex-1 text-white">
+              {children}
+            </main>
 
-          <Footer />
-        </div>
+            <Footer />
+          </div>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

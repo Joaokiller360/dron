@@ -4,44 +4,50 @@ import { Templets, Button, ScrollBottonEffect } from "@/app/utils";
 import { Clapperboard, Handshake, Drone } from "lucide-react";
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
-const banner = {
-  ubication: {
-    ubi: `Ecuador – Esmeraldas`,
-  },
-  banner: {
-    title: 'Empresa audiovisual de drones en Esmeraldas',
-  },
-  description: {
-    text: `Gracias a nuestros drones profesionales, es posible conseguir
-    secuencias aéreas agresivas, veloces y de alta calidad para
-    producciones audiovisuales, eventos y empresas en Ecuador.`,
-  },
-  buttons: [
-    {
-      href: 'https://www.instagram.com/jb.skylens',
-      text: 'Ver demoreel',
-      style:
-        'cursor-pointer transition duration-500 bg-honeydew-500 hover:bg-white text-white hover:text-black dark:hover:text-white dark:bg-white dark:hover:bg-honeydew-500 dark:text-black',
-      icon: Clapperboard,
-    },
-    {
-      href: '/contact',
-      text: 'Pide presupuesto sin compromiso',
-      style:
-        'cursor-pointer text-center transition duration-500 bg-white text-black hover:bg-honeydew-500 hover:text-white dark:bg-honeydew-500 dark:hover:bg-white dark:hover:text-black dark:text-white',
-      icon: Handshake,
-    },
-    {
-      href: '/services',
-      text: 'Ver servicios',
-      style:
-        'cursor-pointer transition duration-500 bg-honeydew-500 hover:bg-white text-white hover:text-black dark:hover:text-white dark:bg-white dark:hover:bg-honeydew-500 dark:text-black',
-      icon: Drone,
-    }
-  ],
-};
+import { useLocale, useTranslations } from 'next-intl';
 
 export default function Inicio() {
+  const t = useTranslations('home');
+  const locale = useLocale();
+
+  // Solo agregar prefijo de idioma si NO es el idioma por defecto (es)
+  const prefix = locale === 'es' ? '' : `/${locale}`;
+  
+  const banner = {
+    ubication: {
+      ubi: `Ecuador – Esmeraldas`,
+    },
+    banner: {
+      title: t('title'),
+    },
+    description: {
+      text: t('description'),
+    },
+    buttons: [
+      {
+        href: 'https://www.instagram.com/jb.skylens',
+        text: t('buttons.learnMore'),
+        style:
+          'cursor-pointer transition duration-500 bg-honeydew-500 hover:bg-white text-white hover:text-black dark:hover:text-white dark:bg-white dark:hover:bg-honeydew-500 dark:text-black',
+        icon: Clapperboard,
+      },
+      {
+        href: `${prefix}/contact`,
+        text: t('buttons.requestQuote'),
+        style:
+          'cursor-pointer text-center transition duration-500 bg-white text-black hover:bg-honeydew-500 hover:text-white dark:bg-honeydew-500 dark:hover:bg-white dark:hover:text-black dark:text-white',
+        icon: Handshake,
+      },
+      {
+        href: `${prefix}/services`,
+        text: t('buttons.viewPortfolio'),
+        style:
+          'cursor-pointer transition duration-500 bg-honeydew-500 hover:bg-white text-white hover:text-black dark:hover:text-white dark:bg-white dark:hover:bg-honeydew-500 dark:text-black',
+        icon: Drone,
+      }
+    ],
+  };
+
   return (
     <Templets style="font-sans bg-honeydew-800 dark:bg-honeydew-900" key={'/'}>
 

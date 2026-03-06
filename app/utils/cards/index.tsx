@@ -29,7 +29,12 @@ interface CardVideo {
   index: number
 }
 
+import { useLocale, useTranslations } from 'next-intl'
+
 export function CardVideo({ index = 0, title = '', organizacion = '', nameButton = '', href = '', videoname = '', imgName = '', present = '' }: CardVideo) {
+
+  const t = useTranslations('portfolio')
+
   return (
     <>
       <ScrollRevealEffect index={index} key={title}>
@@ -79,12 +84,12 @@ export function CardVideo({ index = 0, title = '', organizacion = '', nameButton
               {/* Organizacion o Present */}
               {present ? (
                 <p className="mb-4 text-xl text-center line-clamp-3">
-                  Presenta: <span className='underline underline-offset-4'>{present}</span>
+                  {t('presentation.one')}: <span className='underline underline-offset-4'>{present}</span>
                 </p>
               ) : (
                 organizacion && (
                   <p className="mb-4 text-xl text-center line-clamp-3">
-                    Organizacion: <span className='underline underline-offset-4'>{organizacion}</span>
+                    {t('presentation.two')}: <span className='underline underline-offset-4'>{organizacion}</span>
                   </p>
                 )
               )}
@@ -95,7 +100,7 @@ export function CardVideo({ index = 0, title = '', organizacion = '', nameButton
               <Button
                 target='_blank'
                 href={href}
-                text={`Ver ${nameButton}`}
+                text={`${t('view')} ${nameButton}`}
                 style="cursor-pointer transition duration-500 bg-honeydew-900 hover:bg-white text-white hover:text-black dark:hover:text-white dark:bg-white dark:hover:bg-honeydew-800 dark:text-black"
                 icon={<Video size={24} strokeWidth={2} />}
               />
@@ -395,44 +400,6 @@ interface example {
   Galeria?: galeria[]
 }
 
-const listServices = [
-  {
-    icon: <Film size={38} className="mb-2" />,
-    label: 'drones para cine y publicidad',
-    hreft: 'film-and-tv-production'
-  },
-  {
-    icon: <MapPin size={38} className="mb-2" />,
-    label: 'drones de localizacion',
-    hreft: 'location-scouting-and-recon'
-  },
-  {
-    icon: <Factory size={38} className="mb-2" />,
-    label: 'drones industriales',
-    hreft: 'insdustrial-inspection-and-photogrammetry'
-  },
-  {
-    icon: <Building2 size={38} className="mb-2" />,
-    label: 'drones para vuelo en ciudad',
-    hreft: 'urban-flight-operations'
-  },
-  {
-    icon: <Earth size={38} className="mb-2" />,
-    label: 'drones para eventos y retransmisiones',
-    hreft: 'events-and-live-broadcasting'
-  },
-  {
-    icon: <MapPinHouse size={38} className="mb-2" />,
-    label: 'drones para inmobiliaria',
-    hreft: 'real-estate'
-  },
-  {
-    icon: <HousePlus size={38} className="mb-2" />,
-    label: 'tours virtuales 360',
-    hreft: 'tours-360'
-  }
-]
-
 export function Img({ urlImg = '', href = '', style = '' }: galeria) {
   return (
     <>
@@ -464,6 +431,33 @@ export function PageServices({
   const banner = D[0]
   // const section = Content[0]
 
+  const t = useTranslations('pageServices.services.list')
+
+  const listServices = [
+    'film',
+    'location',
+    'industrial',
+    'urban',
+    'events',
+    'realEstate',
+    'tours360'
+  ]
+
+  const Icons = {
+    Film,
+    MapPin,
+    Factory,
+    Building2,
+    Earth,
+    MapPinHouse,
+    HousePlus
+  }
+
+  const locale = useLocale();
+
+  // Solo agregar prefijo de idioma si NO es el idioma por defecto (es)
+  const prefix = locale === 'es' ? '' : `/${locale}`;
+
   return (
     <>
       {/* Encabezado con imagen de fondo y banner */}
@@ -493,19 +487,23 @@ export function PageServices({
           {/* Tarjetas de servicios principales */}
           <div className="grid gap-4 justify-items-center grid-cols-2 sm:grid-cols-4 lg:grid-cols-[repeat(auto-fit,minmax(7rem,1fr))] max-w-6xl">
 
-            {listServices.map((card, index) => (
-              <ScrollRevealEffect index={index} key={card.label}>
-                <a
-                  href={`/services/${card.hreft}`}
-                  className="flex flex-col items-center justify-center w-32 p-4 text-xs text-center text-white h-30 bg-honeydew-900/90 rounded-2xl"
-                >
-                  {card.icon}
-                  <span className="leading-tight uppercase">
-                    {card.label}
-                  </span>
-                </a>
-              </ScrollRevealEffect>
-            ))}
+            {listServices.map((key, index) => {
+              const Icon = Icons[t(`${key}.icon`) as keyof typeof Icons]
+
+              return (
+                <ScrollRevealEffect index={index} key={key}>
+                  <a
+                    href={`${prefix}/services/${t(`${key}.href`)}`}
+                    className="flex flex-col items-center justify-center w-32 p-4 text-xs text-center text-white h-30 bg-honeydew-900/90 rounded-2xl"
+                  >
+                    <Icon size={38} className="mb-2" />
+                    <span className="leading-tight uppercase">
+                      {t(`${key}.label`)}
+                    </span>
+                  </a>
+                </ScrollRevealEffect>
+              )
+            })}
 
           </div>
         </div>

@@ -9,8 +9,15 @@ export const metadata = createMetadata({
   index: false, // 👈 importante para SEO
 })
 
+import { useLocale, useTranslations } from 'next-intl';
 
 export default function Construction() {
+
+  const t = useTranslations('construtions');
+  const locale = useLocale();
+  // Solo agregar prefijo de idioma si NO es el idioma por defecto (es)
+  const prefix = locale === 'es' ? '' : `/${locale}`;
+
   return (
     <>
       <Templets
@@ -18,13 +25,13 @@ export default function Construction() {
       >
         <div className='relative z-10 px-10 overflow-hidden text-center lg:gap-8 xl:gap-0 lg:py-60 lg:px-0'>
           <p className='mt-4 text-3xl font-bold sm:text-5xl text-customRed'>405</p>
-          <h1 className='mt-4 text-3xl font-bold tracking-tight sm:text-5xl'>Página En Construccion</h1>
-          <p className='mt-6 text-base leading-7'>Lo sentimos, no hemos podido mostrar la página que estabas buscando.</p>
+          <h1 className='mt-4 text-3xl font-bold tracking-tight sm:text-5xl'>{t('title')}</h1>
+          <p className='mt-6 text-base leading-7'>{t('subTitle')}</p>
           <div className="flex justify-center pt-5">
             <Button
-              href="/"
+              href={`${prefix}/`}
               style="bg-honeydew-500 text-black hover:bg-white"
-              text="Volver al inicio"
+              text={t('button.returnHome')}
             />
           </div>
         </div>

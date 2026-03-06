@@ -2,7 +2,7 @@
 
 import { Button, ScrollRevealEffect, SeparatorUp, ScrollBottonEffect } from "@/app/utils"
 import { Clapperboard } from "lucide-react";
-
+import { useLocale, useTranslations } from 'next-intl';
 
 interface IMG {
   name?: string
@@ -15,7 +15,7 @@ export function Img({ name = '', urlImg = '', href = '', style = '' }: IMG) {
   return (
     <>
       <a href={href} className={`${style} relative flex flex-col px-4 pt-40 pb-4 overflow-hidden font-black rounded-lg group grow cursor-pointer`}>
-        <img src={urlImg  || '/img/palmas-atardecer.jpg'} alt={name} className="absolute inset-0 object-cover w-full h-full transition-transform duration-500 ease-in-out group-hover:scale-105" />
+        <img src={urlImg || '/img/palmas-atardecer.jpg'} alt={name} className="absolute inset-0 object-cover w-full h-full transition-transform duration-500 ease-in-out group-hover:scale-105" />
         <div className="absolute inset-0 bg-linear-to-b from-gray-900/25 to-gray-900/5" />
         <h3 className="absolute top-0 left-0 z-10 p-4 text-xl font-black xs:text-xl md:text-3xl">{name}</h3>
       </a>
@@ -23,69 +23,69 @@ export function Img({ name = '', urlImg = '', href = '', style = '' }: IMG) {
   )
 }
 
-const gallery = {
-  title: 'Galeria',
-
-  mainGrid: 'grid-cols-1 sm:grid-cols-2 md:grid-cols-5',
-
-  blocks: [
-    {
-      wrapper: 'flex flex-col h-auto col-span-2 text-white sm:col-span-1 md:col-span-2 md:h-full hover:text-white/80',
-      type: 'single',
-      item: {
-        name: 'Bodas',
-        href: '/portfolio',
-        urlImg:
-          'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?q=80&w=2940&auto=format&fit=crop',
-      },
-    },
-
-    {
-      wrapper: 'col-span-2 text-white sm:col-span-1 md:col-span-2 hover:text-white/80',
-      type: 'nested',
-      item: {
-        name: 'XV',
-        href: '/portfolio',
-        urlImg:
-          'https://images.unsplash.com/photo-1504675099198-7023dd85f5a3?q=80&w=2940&auto=format&fit=crop',
-        style: 'mb-4',
-      },
-      childrenGrid: 'grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-2',
-      children: [
-        {
-          name: 'Eventos',
-          href: '/portfolio',
-          urlImg:
-            'https://images.unsplash.com/photo-1571104508999-893933ded431?q=80&w=2940&auto=format&fit=crop',
-        },
-        {
-          name: 'Inspecciones',
-          href: '/portfolio',
-          urlImg:
-            'https://images.unsplash.com/photo-1626897505254-e0f811aa9bf7?q=80&w=2940&auto=format&fit=crop',
-        },
-      ],
-    },
-
-    {
-      wrapper: 'flex flex-col h-auto col-span-2 sm:col-span-1 md:col-span-1 md:h-full',
-      type: 'single',
-      item: {
-        name: 'Reals',
-        href: '/portfolio',
-        urlImg:
-          'https://images.unsplash.com/photo-1693680501357-a342180f1946?q=80&w=2940&auto=format&fit=crop',
-      },
-    },
-  ],
-
-  cta: {
-    href: '/portfolio',
-    text: 'Ver Trabajos',
-  },
-}
-
 export default function Galery() {
+  const t = useTranslations('home');
+  const locale = useLocale();
+  // Solo agregar prefijo de idioma si NO es el idioma por defecto (es)
+  const prefix = locale === 'es' ? '' : `/${locale}`;
+
+  const gallery = {
+    title: t('gallery.title'),
+    mainGrid: 'grid-cols-1 sm:grid-cols-2 md:grid-cols-5',
+    blocks: [
+      {
+        wrapper: 'flex flex-col h-auto col-span-2 text-white sm:col-span-1 md:col-span-2 md:h-full hover:text-white/80',
+        type: 'single',
+        item: {
+          name: t('gallery.events.one'),
+          href: `${prefix}/portfolio`,
+          urlImg:
+            'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?q=80&w=2940&auto=format&fit=crop',
+        },
+      },
+      {
+        wrapper: 'col-span-2 text-white sm:col-span-1 md:col-span-2 hover:text-white/80',
+        type: 'nested',
+        item: {
+          name: t('gallery.events.two'),
+          href: `${prefix}/portfolio`,
+          urlImg:
+            'https://images.unsplash.com/photo-1504675099198-7023dd85f5a3?q=80&w=2940&auto=format&fit=crop',
+          style: 'mb-4',
+        },
+        childrenGrid: 'grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-2',
+        children: [
+          {
+            name: t('gallery.events.three'),
+            href: `${prefix}/portfolio`,
+            urlImg:
+              'https://images.unsplash.com/photo-1571104508999-893933ded431?q=80&w=2940&auto=format&fit=crop',
+          },
+          {
+            name: t('gallery.events.four'),
+            href: `${prefix}/portfolio`,
+            urlImg:
+              'https://images.unsplash.com/photo-1626897505254-e0f811aa9bf7?q=80&w=2940&auto=format&fit=crop',
+          },
+        ],
+      },
+      {
+        wrapper: 'flex flex-col h-auto col-span-2 sm:col-span-1 md:col-span-1 md:h-full',
+        type: 'single',
+        item: {
+          name: t('gallery.events.five'),
+          href: `${prefix}/portfolio`,
+          urlImg:
+            'https://images.unsplash.com/photo-1693680501357-a342180f1946?q=80&w=2940&auto=format&fit=crop',
+        },
+      },
+    ],
+    cta: {
+      href: `${prefix}/portfolio`,
+      text: t('gallery.button.viewPortfolio'),
+    },
+  };
+
   return (
     <>
       <SeparatorUp colorsPrimary="bg-honeydew-800 dark:bg-honeydew-900" colorsSecundary="text-honeydew-900 dark:text-honeydew-800" />

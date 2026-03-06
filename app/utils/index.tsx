@@ -1,5 +1,5 @@
-import Navbar, { NavPast } from './nav'
-import { ButtonNav, Button } from './button'
+import { NavPast } from './nav'
+import { ButtonNav, Button, LanguageSwitcher } from './button'
 import { Templets, TitleProject } from './layout'
 import { CheckIcon, CopyIcon } from './icons/icons'
 import { CopyText } from './email'
@@ -15,8 +15,8 @@ import { highlightText, keywordLink } from './highlightText'
 import { ScrollBottonEffect, ScrollRevealEffect } from './animation'
 
 export {
-  Navbar,
   NavPast,
+  LanguageSwitcher,
   ButtonNav,
   Button,
   Templets,

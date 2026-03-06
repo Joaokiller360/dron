@@ -1,0 +1,603 @@
+{
+  "nav": {
+    "home": "Home",
+    "services": "Services",
+    "portfolio": "Portfolio",
+    "clients": "Clients",
+    "teams": "Teams",
+    "contact": "Contact"
+  },
+  "home": {
+    "metadeta": {
+      "TitleMeta": "JB.SKYLENS",
+      "DescriptionMeta": "JB.SKYLENS offers professional drone services in Ecuador: inspections, aerial photography, video, events and technical solutions with drones.",
+      "keywords": [
+        "drones esmeraldas",
+        "drone services esmeraldas",
+        "aerial photography esmeraldas",
+        "drone video esmeraldas",
+        "drone operators esmeraldas",
+        "professional drones esmeraldas",
+        "aerial filming esmeraldas",
+        "drone inspections esmeraldas",
+        "drones in esmeraldas ecuador",
+        "drone service esmeraldas",
+        "drones ecuador",
+        "drone services ecuador",
+        "aerial photography ecuador",
+        "professional aerial video ecuador",
+        "technical inspection with drones",
+        "drones for events ecuador",
+        "event filming with drones",
+        "audiovisual production with drones",
+        "drone surveying",
+        "drones for companies",
+        "infrastructure inspection with drones",
+        "drones for industrial safety",
+        "drones for real estate",
+        "aerial real estate photography",
+        "corporate video with drones",
+        "aerial audiovisual services",
+        "drones for advertising",
+        "professional aerial content",
+        "certified drone operator",
+        "JB.SKYLENS",
+        "JB SKYLENS drones",
+        "JB.SKYLENS services",
+        "Joao Barres",
+        "drone company in ecuador",
+        "professional drone services"
+      ]
+    },
+    "ubi": "Ecuador – Esmeraldas",
+    "title": "Drone Aerial Company in Esmeraldas",
+    "description": "Thanks to our professional drones, it is possible to capture aggressive, fast, and high-quality aerial sequences for audiovisual productions, events, and companies in Ecuador.",
+    "buttons": {
+      "learnMore": "View Demo Reel",
+      "requestQuote": "Request Quote Without Commitment",
+      "viewPortfolio": "View Services"
+    },
+    "gallery": {
+      "title": "Our Services",
+      "events": {
+        "one": "Weddings",
+        "two": "XV",
+        "three": "Events",
+        "four": "Inspections",
+        "five": "Reals"
+      },
+      "button": {
+        "viewPortfolio": "View Works"
+      }
+    },
+    "whyChooseUs": {
+      "title": "Why choose JB.SKYLENS as a drone company in Ecuador?",
+      "text": {
+        "one": "We offer <strong>professional drone services in Ecuador</strong>, with a turnkey model, backed by a specialized team with over <strong>40 certified flight hours</strong>.",
+        "two": "At JB.SKYLENS, we work with high standards of quality, regulatory compliance, and operational efficiency, achieving precise aerial shots in less time and reducing costs in audiovisual productions, technical inspections, and events."
+      },
+      "items": {
+        "experience": {
+          "title": "The value of experience",
+          "description": "We are backed by more than 50 national and international productions"
+        },
+        "fleet": {
+          "title": "THE MOST COMPLETE FLEET",
+          "description": "In Ecuador, with the best cameras and lenses on the market for film and television"
+        },
+        "permits": {
+          "title": "PERMIT PROCESSING",
+          "description": "Streamlined method, coordination with authorities included in the services"
+        },
+        "anywhere": {
+          "title": "We fly anywhere",
+          "description": "At any time and in any condition, challenge us!"
+        },
+        "quality": {
+          "title": "Commitment to quality",
+          "description": "And efficiency; we work in record time, saving operational costs"
+        },
+        "ready": {
+          "title": "Drones \"ready to go\"",
+          "description": "Including pilot and camera operator, backup drone, monitor, and essential equipment"
+        }
+      }
+    },
+    "clients": {
+      "label": "The big ones who have trusted us",
+      "title": "Our Clients"
+    },
+    "whatDeDo": {
+      "label": "what we do",
+      "title": "know what we do",
+      "titleButton": "JOBS  RPAS/AUS",
+      "description": "We operate our aerial drone units anywhere in ECUADOR for all types of RPAS/UAS jobs; we are a drone company authorized to fly throughout ECUADOR.",
+      "items": {
+        "one": "We fly in any scenario: city, controlled airspace (CTR/ATZ), at night and regardless of weather conditions",
+        "two": "We can operate multiple units simultaneously in different locations around the world",
+        "three": "Our drones are registered, insured and subjected to meticulous maintenance"
+      }
+    },
+    "about": {
+      "title": "About Us",
+      "paragraphs": {
+        "one": "JB SkyLens is an independent drone operator in Ecuador 🇪🇨, specialized in professional aerial content. With more than 50 completed projects, I offer dynamic and high-quality shots for events, productions, inspections, and tourism promotion.",
+        "two": "Ideal for operating precisely in urban, coastal, and port areas. My approach combines safety, creativity, and fast delivery, adapting to each client's needs.",
+        "three": "JB SkyLens continues to grow, incorporating new technologies and expanding services to provide innovative aerial solutions for all types of projects."
+      }
+    }
+  },
+  "services": {
+    "metadeta": {
+      "TitleMeta": "Drone Services | JB.SKYLENS",
+      "DescriptionMeta": "Drone services in Ecuador: technical inspections, aerial photography, professional video, events, and industrial solutions.",
+      "keywords": [
+        "professional drone services company in esmeraldas",
+        "professional aerial filming for companies in esmeraldas",
+        "technical inspection service with drones in esmeraldas",
+        "drones for port and dock inspection in esmeraldas",
+        "professional aerial photography for real estate projects in esmeraldas",
+        "drones for industrial safety and surveillance in esmeraldas",
+        "topographic surveys with drones in esmeraldas",
+        "drones for recording social events in esmeraldas",
+        "corporate audiovisual production with drones in esmeraldas",
+        "certified drone services for companies in esmeraldas",
+        "drones esmeraldas",
+        "drone company esmeraldas",
+        "drone services esmeraldas",
+        "professional drones esmeraldas",
+        "drone filming esmeraldas",
+        "aerial photography esmeraldas",
+        "drone inspection esmeraldas",
+        "drones for companies esmeraldas",
+        "industrial drones esmeraldas",
+        "drone operator esmeraldas",
+        "professional drone services in esmeraldas",
+        "aerial filming company in esmeraldas",
+        "professional aerial photography in esmeraldas",
+        "technical inspection with drones in esmeraldas",
+        "drones for industrial safety in esmeraldas",
+        "drones for industrial projects in esmeraldas",
+        "drones for ports in esmeraldas",
+        "drones for ships in esmeraldas",
+        "drones for docks and port terminals in esmeraldas",
+        "drones for topographic surveys in esmeraldas",
+        "company specialized in professional drone services in esmeraldas",
+        "professional aerial filming service for companies in esmeraldas",
+        "technical infrastructure inspection with drones in esmeraldas",
+        "drones for port inspection and port operations in esmeraldas",
+        "professional aerial photography for real estate projects in esmeraldas",
+        "drones for industrial safety and aerial surveillance in esmeraldas",
+        "high-precision topographic surveys with drones in esmeraldas",
+        "drones for ship and vessel inspection in esmeraldas",
+        "certified and legal drone services in esmeraldas",
+        "drone company with experience in industrial projects in esmeraldas",
+        "drones for industrial inspection in esmeraldas",
+        "drones for metal structure inspection in esmeraldas",
+        "drones for civil works monitoring in esmeraldas",
+        "drones for industrial roof inspection in esmeraldas",
+        "drones for structural evaluation in esmeraldas",
+        "technical drone services for companies in esmeraldas",
+        "drones for project control and monitoring in esmeraldas",
+        "drones for industrial facility surveillance in esmeraldas",
+        "drones for port areas in esmeraldas",
+        "drones for critical infrastructure in esmeraldas",
+        "audiovisual production with drones in esmeraldas",
+        "professional corporate video with drones in esmeraldas",
+        "cinematic aerial filming in esmeraldas",
+        "drones for advertising and marketing in esmeraldas",
+        "aerial audiovisual content for brands in esmeraldas",
+        "event recording with drones in esmeraldas",
+        "drones for promotional videos in esmeraldas",
+        "aerial photography for social media in esmeraldas",
+        "drones for advertising campaigns in esmeraldas",
+        "professional aerial audiovisual services in esmeraldas",
+        "certified drone company in esmeraldas",
+        "authorized drone operator in esmeraldas",
+        "drone services with legal permits in esmeraldas",
+        "professional drone company in esmeraldas",
+        "drone solutions for companies in esmeraldas",
+        "comprehensive drone services in esmeraldas",
+        "leading drone services company in esmeraldas",
+        "professional drones for business projects in esmeraldas",
+        "advanced drone services in esmeraldas",
+        "reliable drone company in esmeraldas",
+        "company specialized in drone services in quito",
+        "professional aerial filming for construction companies in quito",
+        "technical infrastructure inspection with drones in quito",
+        "drones for building and facade inspection in quito",
+        "professional aerial photography for real estate in quito",
+        "high-precision topographic surveys with drones in quito",
+        "drones for civil works monitoring in quito",
+        "aerial audiovisual production for brands in quito",
+        "drones for advertising and digital marketing in quito",
+        "professional drone services with legal permits in quito",
+        "professional drone services company in guayaquil",
+        "aerial filming of industrial projects in guayaquil",
+        "industrial inspection with drones for factories in guayaquil",
+        "drones for port and maritime area inspection in guayaquil",
+        "professional aerial photography for companies in guayaquil",
+        "drones for industrial safety and aerial surveillance in guayaquil",
+        "topographic surveys with drones for construction companies in guayaquil",
+        "aerial audiovisual production for advertising campaigns in guayaquil",
+        "drones for recording corporate events in guayaquil",
+        "certified and authorized drone services in guayaquil",
+        "professional technical inspection service with drones in ecuador",
+        "drones specialized in critical infrastructure inspection",
+        "industrial roof and cover inspection with drones",
+        "bridge and viaduct inspection using professional drones",
+        "drones for industrial project monitoring and control",
+        "drones for aerial surveillance in industrial areas",
+        "drone services for structural evaluation",
+        "drones for port facility inspection",
+        "drones for ship and vessel inspection",
+        "drone services for advanced industrial safety",
+        "professional aerial filming services with drones",
+        "aerial audiovisual production for companies and brands",
+        "professional corporate video recorded with drones",
+        "aerial audiovisual content for digital marketing",
+        "cinematic aerial filming with professional drones",
+        "high-resolution aerial photography with drones",
+        "drones for recording advertising spots",
+        "production of promotional videos with drones",
+        "aerial audiovisual services for social media",
+        "drones for high-impact visual content",
+        "drone company with proven experience in ecuador",
+        "certified professional drone operator in ecuador",
+        "drone services with legal compliance in ecuador",
+        "company specialized in drones for businesses",
+        "technical and audiovisual solutions with drones",
+        "comprehensive professional drone services",
+        "drone company for industrial and commercial projects",
+        "advanced drone services for inspection and video",
+        "leading drone services company in ecuador",
+        "high-quality professional drone services"
+      ]
+    },
+    "title": "explore our services",
+    "label": "Services",
+    "items": {
+      "film": {
+        "title": "Filming for cinema, series, and movies",
+        "description": "Aerial audiovisual production with cinematic quality, ideal for dynamic scenes, creative shots, and high-impact visual storytelling",
+        "button": "View More"
+      },
+      "location": {
+        "title": "Location and reconnaissance",
+        "description": "Visual terrain analysis for planning, area evaluation, and decision-making before starting a project or production",
+        "button": "View More"
+      },
+      "industrial": {
+        "title": "Industrial, inspection, and photogrammetry",
+        "description": "Technical aerial capture for infrastructure inspection, photogrammetric surveys, and industrial monitoring with high precision",
+        "button": "View More"
+      },
+      "urban": {
+        "title": "Urban flight",
+        "description": "Drone operations in urban environments, complying with regulations and ensuring safety for commercial and audiovisual projects",
+        "button": "View More"
+      },
+      "events": {
+        "title": "Events and live broadcasts",
+        "description": "Aerial coverage in real time or recorded for events, shows, and special activities, providing a unique and immersive perspective",
+        "button": "View More"
+      },
+      "realestate": {
+        "title": "Drones for real estate",
+        "description": "Aerial capture of properties for the real estate sector, showcasing locations, features, and details attractively for potential buyers",
+        "button": "View More"
+      },
+      "tours360": {
+        "title": "360 Virtual Tours",
+        "description": "Creation of interactive 360-degree virtual tours, ideal for showcasing commercial, touristic, or real estate spaces in an innovative and attractive way",
+        "button": "View More"
+      }
+    }
+  },
+  "pageServices": {
+    "services": {
+      "list": {
+        "film": {
+          "icon": "Film",
+          "label": "Drones for film and advertising",
+          "href": "film-and-tv-production"
+        },
+        "location": {
+          "icon": "MapPin",
+          "label": "Location drones",
+          "href": "location-scouting-and-recon"
+        },
+        "industrial": {
+          "icon": "Factory",
+          "label": "Industrial drones",
+          "href": "industrial-inspection-and-photogrammetry"
+        },
+        "urban": {
+          "icon": "Building2",
+          "label": "Drones for urban flight",
+          "href": "urban-flight-operations"
+        },
+        "events": {
+          "icon": "Earth",
+          "label": "Drones for events",
+          "href": "events-and-live-broadcasting"
+        },
+        "realEstate": {
+          "icon": "MapPinHouse",
+          "label": "Drones for real estate",
+          "href": "real-estate"
+        },
+        "tours360": {
+          "icon": "HousePlus",
+          "label": "360 virtual tours",
+          "href": "tours-360"
+        }
+      }
+    },
+    "eventsBroadcast": {
+      "metadata": {
+        "title": "Events and Live Broadcasts | JB.SKYLENS",
+        "description": "Professional event coverage and live broadcast services with drones in Ecuador. Live aerial filming, event recording, shows, concerts, celebrations, and professional aerial transmissions.",
+        "keywords": [
+          "drones for events",
+          "aerial event filming",
+          "event coverage with drones",
+          "live aerial broadcast",
+          "drones for concerts",
+          "drones for festivals",
+          "drones for weddings and celebrations",
+          "aerial video for events",
+          "drone services for events ecuador",
+          "event filming in esmeraldas",
+          "audiovisual production for events",
+          "aerial shots of events",
+          "drone streaming",
+          "live broadcast with drones",
+          "professional event coverage",
+          "drone company for events",
+          "professional drone services",
+          "professional aerial filming"
+        ],
+        "canonical": "https://dron.joaobarres.dev/en/services/events-and-live-broadcasting"
+      },
+      "hero": {
+        "label": "Services",
+        "title": "Events and Live Broadcasts"
+      },
+      "regulation": {
+        "keywords": [
+          {
+            "key": "dgac",
+            "label": "DGAC-Ecuador-(RDAC 101)"
+          }
+        ],
+        "links": {
+          "dgac": "https://www.aviacioncivil.gob.ec/"
+        }
+      },
+      "content": {
+        "label": "Services",
+        "subTitle": "The best images of your event",
+        "text": [
+          "Drones for use in the city are useful for various tasks, such as capturing aerial images for audiovisual productions, infrastructure inspections, or emergency services.",
+          "However, it is necessary to obtain a special permit from DGAC-Ecuador-(RDAC 101) to operate in what is known as CTR (Air Traffic Control) because these areas have a higher density of air traffic and specific safety protocols must be followed.",
+          "It is important to have authorized and experienced professional operators to ensure flight safety and compliance with air regulations in these areas."
+        ]
+      },
+      "callToAction": {
+        "title": "Our commitment to safety and professionalism",
+        "text": [
+          "At JB.SkyLens we work under strict safety standards and in compliance with the official regulations of DGAC-Ecuador-(RDAC 101). Our team of professional pilots guarantees legal, safe, and efficient aerial operations in every project.",
+          "We manage permits, registrations, and mandatory requirements so that every flight is in order, because we understand that in aerial work, safety, responsibility, and legality are not optional—they are part of the service."
+        ],
+        "button": "Request more information"
+      },
+      "example": {
+        "label": "Our work",
+        "subTitle": "Application example",
+        "galleryLabel": "Live broadcast"
+      }
+    }
+  },
+  "portfolio": {
+    "metadeta": {
+      "TitleMeta": "Portfolio | JB.SKYLENS",
+      "DescriptionMeta": "Explore the JB.SKYLENS portfolio with real projects of aerial photography, drone video, events, and inspections in Ecuador.",
+      "keywords": [
+        "drones portfolio esmeraldas",
+        "drone works esmeraldas",
+        "drone projects ecuador",
+        "drone filming examples",
+        "professional aerial photography",
+        "professional aerial video",
+        "audiovisual production with drones",
+        "drone videos for events",
+        "aerial event filming",
+        "corporate videos with drones",
+        "advertising videos with drones",
+        "real estate aerial photography",
+        "drones for concerts",
+        "drones for festivals",
+        "drones for social events",
+        "drones for corporate events",
+        "drone inspections completed",
+        "drone surveys completed",
+        "technical works with drones",
+        "JB.SKYLENS portfolio",
+        "JB SKYLENS projects",
+        "Joao Barres works",
+        "audiovisual company with drones",
+        "professional aerial content",
+        "professional drones in action"
+      ]
+    },
+    "label": "Portfolio",
+    "title": "our projects",
+    "description": "We have participated in productions of all sizes and types. Discover the incredible aerial shots we capture with our professional team.",
+    "events": {
+      "one": "Events - Marina Ecovida",
+      "two": "Events - Various",
+      "three": "Documentaries",
+      "four": "Governmental"
+    },
+    "presentation": {
+      "one": "Presents",
+      "two": "Organization"
+    },
+    "view": "View",
+    "collToAction": {
+      "text": "We are the solution you are looking for!",
+      "buttonText": "Contact Us"
+    }
+  },
+  "clients": {
+    "metadeta": {
+      "TitleMeta": "Clients | JB.SKYLENS",
+      "DescriptionMeta": "Meet the clients of JB.SKYLENS, companies and brands that have trusted our professional drone services in Ecuador.",
+      "keywords": [
+        "JB.SKYLENS clients",
+        "companies that have trusted JB.SKYLENS",
+        "brands that have worked with JB.SKYLENS",
+        "clients of drone services in esmeraldas",
+        "clients of professional aerial filming",
+        "clients of professional aerial photography",
+        "clients of technical inspection with drones",
+        "clients of audiovisual production with drones",
+        "clients of events with drones",
+        "clients of drones for real estate",
+        "clients of drones for advertising",
+        "clients of drones for digital marketing",
+        "clients of drones for industrial projects",
+        "clients of drones for industrial safety",
+        "clients of drones for ports and maritime areas",
+        "clients of drones for topographic surveys",
+        "clients of drones for industrial monitoring",
+        "clients of drones for cinematographic filming",
+        "clients of drones for professional visual content"
+      ]
+    },
+    "canonical": "https://dron.joaobarres.dev/en/clients",
+    "label": "Our Clients",
+    "title": "The big ones who have trusted us",
+    "description": "Our team of professionals strives to offer a satisfaction guarantee to our end clients. We work with the major entertainment houses and leading brands in the world.",
+    "sectionClients": {
+      "one": "Mass consumption",
+      "two": "Documentaries and cinema",
+      "three": "Governmental",
+      "four": "Television"
+    },
+    "collToAction": {
+      "text": "We are the solution you are looking for!",
+      "buttonText": "Contact Us"
+    },
+    "presentation": {
+      "one": "Documentaries",
+      "two": "Governmental",
+      "three": "Foundation",
+      "four": "Big Brands",
+      "five": "Television"
+    }
+  },
+  "teams": {
+    "metadeta": {
+      "TitleMeta": "Our Team | JB.SKYLENS",
+      "DescriptionMeta": "Meet the JB.SKYLENS team, specialists in drone operation, technical inspections, and aerial audiovisual production.",
+      "keywords": [
+        "JB.SKYLENS team",
+        "professional drone team",
+        "certified drone operators",
+        "drone pilots ecuador",
+        "drone specialists",
+        "audiovisual team with drones",
+        "aerial audiovisual producers",
+        "drone technicians",
+        "aerial filming experts",
+        "drone company in esmeraldas",
+        "drone company in ecuador",
+        "technical drone team",
+        "professional drone operator",
+        "experienced drone pilot",
+        "drone inspection team",
+        "industrial safety team",
+        "technical inspection team",
+        "audiovisual production team",
+        "Joao Barres",
+        "JB.SKYLENS founder",
+        "JB SKYLENS drones team",
+        "drone professionals",
+        "professional audiovisual company"
+      ]
+    },
+    "label": "Meet our team of",
+    "title": "Professionals",
+    "description": "We have a great team of professionals, pilots, technicians, camera operators, and producers, so your recordings always have the best quality.",
+    "collToAction": {
+      "text": "We are the solution you are looking for!",
+      "buttonText": "Contact Us"
+    }
+  },
+  "contact": {
+    "metadeta": {
+      "TitleMeta": "Contact | JB.SKYLENS",
+      "DescriptionMeta": "Contact us for professional drone services in Ecuador. Quotes for inspections, events, aerial photography and video.",
+      "keywords": [
+        "contact JB.SKYLENS",
+        "drone quote",
+        "drones Ecuador contact",
+        "drone services Ecuador"
+      ]
+    },
+    "label": "more information",
+    "title": "Contact Us",
+    "description": "Get in touch with us for more information about our services and to receive a tailored quote.",
+    "map": {
+      "title": "Our Location",
+      "address": "Esmeraldas, Ecuador",
+      "email": "Email",
+      "phone": "Phone",
+      "copyEmail": "Email Copied Successfully",
+      "copyPhone": "Phone Number Copied Successfully"
+    },
+    "from": {
+      "title": "Contact Form",
+      "subtitle": "Fill in the fields below to contact us",
+      "name": "Full Name",
+      "email": "Email",
+      "number": "Mobile Number",
+      "message": "Message",
+      "send": "Send Message",
+      "success": "Message sent successfully!",
+      "error": "Error sending message"
+    }
+  },
+  "construtions": {
+    "title": "Page Under Construction",
+    "subTitle": "Sorry, we couldn't display the page you were looking for.",
+    "button": {
+      "returnHome": "Return to Home"
+    }
+  },
+  "footer": {
+    "rights": "All rights reserved",
+    "resources": {
+      "title": "Resources",
+      "home": "Home",
+      "services": "Services",
+      "portfolio": "Portfolio",
+      "teams": "Teams"
+    },
+    "legal": {
+      "title": "Legal",
+      "privacy": "Privacy Policy",
+      "terms": "Terms & Conditions"
+    },
+    "language": {
+      "title": "Language"
+    },
+    "contactArea": {
+      "title": "Contact Area",
+      "email": "Email",
+      "phone": "Phone"
+    }
+  }
+}

@@ -2,34 +2,38 @@
 
 import { Activity, CircleUser, Drone } from 'lucide-react'
 import { ScrollRevealEffect, SeparatorUp, ScrollBottonEffect } from '@/app/utils'
-
-const whatWeDo = {
-  eyebrow: 'A QUÉ NOS DEDICAMOS',
-  titleTop: 'CONOCE LO QUE HACEMOS',
-  titleBottom: 'TRABAJOS  RPAS/AUS',
-  description:
-    'Operamos nuestras unidades de drones aéreos en cualquier lugar del ECUADOR para todo tipo de trabajos RPAS/UAS; somos una empresa de drones autorizada para volar en todo ECUADOR.',
-
-  items: [
-    {
-      text:
-        'Volamos en cualquier escenario: ciudad, espacio aéreo controlado (CTR/ATZ), de noche y sin importar las condiciones meteorológicas',
-      icon: Activity,
-    },
-    {
-      text:
-        'Podemos operar múltiples unidades de forma simultánea en distintos lugares del mundo',
-      icon: CircleUser,
-    },
-    {
-      text:
-        'Nuestros drones están matriculados, asegurados y sometidos a un mantenimiento minucioso',
-      icon: Drone,
-    },
-  ],
-}
+import { useTranslations } from 'next-intl';
 
 export default function WhatDeDo() {
+
+  const t = useTranslations('home');
+
+  const whatWeDo = {
+    eyebrow: t('whatDeDo.label'),
+    titleTop: t('whatDeDo.title'),
+    titleBottom: t('whatDeDo.titleButton'),
+    description:
+      t('whatDeDo.description'),
+
+    items: [
+      {
+        text:
+          `${t('whatDeDo.items.one')}`,
+        icon: Activity,
+      },
+      {
+        text:
+          `${t('whatDeDo.items.two')}`,
+        icon: CircleUser,
+      },
+      {
+        text:
+          `${t('whatDeDo.items.three')}`,
+        icon: Drone,
+      },
+    ],
+  }
+
   return (
     <>
       <SeparatorUp

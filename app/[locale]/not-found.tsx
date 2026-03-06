@@ -1,5 +1,5 @@
 
-import { Button, createMetadata, Templets } from "./utils"
+import { Button, createMetadata, Templets } from "@/app/utils"
 
 export const metadata = createMetadata({
   title: 'Página no encontrada',

@@ -83,8 +83,16 @@ export const AnimatedLogoCloud = ({ colors = '' }: Styles) => {
   )
 }
 
+import { useLocale, useTranslations } from 'next-intl'
 
 export default function Logos() {
+
+  const t = useTranslations('home');
+  const locale = useLocale();
+
+  // Solo agregar prefijo de idioma si NO es el idioma por defecto (es)
+  const prefix = locale === 'es' ? '' : `/${locale}`;
+
   return (
     <>
       <SeparatorUp colorsPrimary="bg-honeydew-800 dark:bg-honeydew-900" colorsSecundary="text-honeydew-900 dark:text-honeydew-800" />
@@ -95,14 +103,14 @@ export default function Logos() {
               <ScrollRevealEffect>
                 <span>- </span>
                 <span className="uppercase">
-                  Los grandes confian en nosotros
+                  {t('clients.label')}
                 </span>
                 <span> -</span>
               </ScrollRevealEffect>
             </div>
             <ScrollRevealEffect>
               <span className="font-mono text-xl font-bold uppercase sm:text-4xl sm:my-5 gradient-text">
-                Nuestros Clientes
+                {t('clients.title')}
               </span>
             </ScrollRevealEffect>
           </div>

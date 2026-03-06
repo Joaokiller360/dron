@@ -9,7 +9,21 @@
   </url>
 
   <url>
+    <loc>https://dron.joaobarres.dev/en/</loc>
+    <lastmod>2026-01-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <url>
     <loc>https://dron.joaobarres.dev/contact</loc>
+    <lastmod>2026-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://dron.joaobarres.dev/en/contact</loc>
     <lastmod>2026-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -23,7 +37,21 @@
   </url>
 
   <url>
+    <loc>https://dron.joaobarres.dev/en/portfolio</loc>
+    <lastmod>2026-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
     <loc>https://dron.joaobarres.dev/teams</loc>
+    <lastmod>2026-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://dron.joaobarres.dev/en/teams</loc>
     <lastmod>2026-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -37,7 +65,21 @@
   </url>
 
   <url>
+    <loc>https://dron.joaobarres.dev/en/clients</loc>
+    <lastmod>2026-01-01</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
     <loc>https://dron.joaobarres.dev/services</loc>
+    <lastmod>2026-01-01</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://dron.joaobarres.dev/en/services</loc>
     <lastmod>2026-01-01</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.6</priority>
@@ -51,7 +93,21 @@
   </url>
 
   <url>
+    <loc>https://dron.joaobarres.dev/en/services/events-and-live-broadcasting</loc>
+    <lastmod>2026-01-01</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
     <loc>https://dron.joaobarres.dev/services/film-and-tv-production</loc>
+    <lastmod>2026-01-01</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://dron.joaobarres.dev/en/services/film-and-tv-production</loc>
     <lastmod>2026-01-01</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
@@ -65,7 +121,21 @@
   </url>
 
   <url>
+    <loc>https://dron.joaobarres.dev/en/services/insdustrial-inspection-and-photogrammetry</loc>
+    <lastmod>2026-01-01</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
     <loc>https://dron.joaobarres.dev/services/location-scouting-and-recon</loc>
+    <lastmod>2026-01-01</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://dron.joaobarres.dev/en/services/location-scouting-and-recon</loc>
     <lastmod>2026-01-01</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
@@ -79,7 +149,21 @@
   </url>
 
   <url>
+    <loc>https://dron.joaobarres.dev/en/services/urban-flight-operations</loc>
+    <lastmod>2026-01-01</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
     <loc>https://dron.joaobarres.dev/services/real-estate</loc>
+    <lastmod>2026-01-01</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://dron.joaobarres.dev/en/services/real-estate</loc>
     <lastmod>2026-01-01</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
@@ -92,7 +176,14 @@
     <priority>0.5</priority>
   </url>
 
-<url>
+  <url>
+    <loc>https://dron.joaobarres.dev/en/services/tours-360</loc>
+    <lastmod>2026-01-01</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
     <loc>https://dron.joaobarres.dev/construction</loc>
     <lastmod>2026-01-01</lastmod>
     <changefreq>yearly</changefreq>
@@ -100,7 +191,21 @@
   </url>
 
   <url>
+    <loc>https://dron.joaobarres.dev/en/construction</loc>
+    <lastmod>2026-01-01</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
     <loc>https://dron.joaobarres.dev/legal/terms-and-conditions</loc>
+    <lastmod>2026-01-01</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://dron.joaobarres.dev/en/legal/terms-and-conditions</loc>
     <lastmod>2026-01-01</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>

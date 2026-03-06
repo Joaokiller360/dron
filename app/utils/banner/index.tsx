@@ -19,7 +19,7 @@ export default function Banner({ label = '', title = '', description = '' }: Ban
                 <div className="mx-10 font-mono text-sm font-light lg:text-lg gradient-text">
                   <span>- </span>
                   <span className="uppercase">
-                    {label}
+                    {label || ''}
                   </span>
                   <span> -</span>
                 </div>
@@ -27,12 +27,12 @@ export default function Banner({ label = '', title = '', description = '' }: Ban
 
               <ScrollBottonEffect>
                 <h1 className="my-5 font-mono text-4xl font-bold uppercase gradient-text">
-                  {title}
+                  {title || ''}
                 </h1>
               </ScrollBottonEffect>
               <ScrollBottonEffect>
                 <span className="mx-10 font-mono text-sm font-light lg:text-lg gradient-text">
-                  {description}
+                  {description || ''}
                 </span>
               </ScrollBottonEffect>
             </section>
@@ -47,7 +47,7 @@ export default function Banner({ label = '', title = '', description = '' }: Ban
                   <div className="mx-10 font-mono text-sm font-light lg:text-lg gradient-text">
                     <span>- </span>
                     <span className="uppercase">
-                      {label}
+                      {label || ''}
                     </span>
                     <span> -</span>
                   </div>
@@ -55,7 +55,7 @@ export default function Banner({ label = '', title = '', description = '' }: Ban
 
                 <ScrollBottonEffect>
                   <span className="my-5 font-mono text-4xl font-bold uppercase gradient-text">
-                    {title}
+                    {title || ''}
                   </span>
                 </ScrollBottonEffect>
               </section>
