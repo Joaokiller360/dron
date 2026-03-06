@@ -18,7 +18,22 @@
 
 ## 📋 Descripción
 
+
 **JB.SKYLENS** es una operadora de drones independiente en Ecuador 🇪🇨, especializada en contenido aéreo profesional. Este repositorio contiene el código fuente de su sitio web, desarrollado con tecnologías modernas para ofrecer una experiencia rápida, responsive y optimizada para SEO.
+
+---
+
+## 🌍 Internacionalización y SEO avanzado
+
+El sitio está completamente **multilingüe** (español e inglés) usando [next-intl](https://next-intl-docs.vercel.app/), con:
+
+- 🌐 **Navegación multilingüe**: rutas amigables, con prefijo /en para inglés y sin prefijo para español (por defecto).
+- 🏷️ **Traducción dinámica de metadatos**: títulos, descripciones y Open Graph traducidos por página usando `getMessages` en el server.
+- 🗺️ **Sitemap.xml**: indexa todas las rutas en español e inglés para SEO internacional.
+- 🗝️ **Gestión robusta de claves de traducción**: todos los textos y palabras clave de servicios están en `/translate/es.json` y `/translate/en.json`.
+- ✨ **Resaltado de palabras clave**: los servicios resaltan palabras clave automáticamente si coinciden exactamente con las definidas en el JSON de traducción.
+
+---
 
 ### ✨ Características principales
 
@@ -201,25 +216,26 @@ El proyecto utiliza una paleta de colores personalizada llamada **Honeydew**:
 
 | Ruta | Descripción |
 |------|-------------|
-| `/` | Página de inicio con hero, galería, servicios y CTA |
-| `/services` | Lista completa de servicios ofrecidos |
-| `/services/events-and-live-broadcasting` | Servicios para eventos y transmisiones |
-| `/services/film-and-tv-production` | Producción para cine y TV |
-| `/services/insdustrial-inspection-and-photogrammetry` | Inspecciones y fotogrametría |
-| `/services/location-scouting-and-recon` | Reconocimiento de locaciones |
-| `/services/urban-flight-operations` | Operaciones urbanas |
-| `/portfolio` | Portafolio de trabajos realizados |
-| `/teams` | Equipo de trabajo |
-| `/contact` | Formulario de contacto |
-| `/clients` | Clientes (en desarrollo) |
-| `/legal/privacy-policies` | Política de privacidad |
-| `/legal/terms-and-conditions` | Términos y condiciones |
+| `/` / `/en` | Página de inicio (español/inglés) |
+| `/services` / `/en/services` | Lista de servicios (español/inglés) |
+| `/services/events-and-live-broadcasting` / `/en/services/events-and-live-broadcasting` | Servicios para eventos y transmisiones (español/inglés) |
+| `/services/film-and-tv-production` / `/en/services/film-and-tv-production` | Producción para cine y TV (español/inglés) |
+| `/services/insdustrial-inspection-and-photogrammetry` / `/en/services/insdustrial-inspection-and-photogrammetry` | Inspecciones y fotogrametría (español/inglés) |
+| `/services/location-scouting-and-recon` / `/en/services/location-scouting-and-recon` | Reconocimiento de locaciones (español/inglés) |
+| `/services/urban-flight-operations` / `/en/services/urban-flight-operations` | Operaciones urbanas (español/inglés) |
+| `/portfolio` / `/en/portfolio` | Portafolio de trabajos (español/inglés) |
+| `/teams` / `/en/teams` | Equipo de trabajo (español/inglés) |
+| `/contact` / `/en/contact` | Formulario de contacto (español/inglés) |
+| `/clients` / `/en/clients` | Clientes (en desarrollo, ambos idiomas) |
+| `/legal/privacy-policies` / `/en/legal/privacy-policies` | Política de privacidad (español/inglés) |
+| `/legal/terms-and-conditions` / `/en/legal/terms-and-conditions` | Términos y condiciones (español/inglés) |
 
 ---
 
 ## 🔧 Componentes Principales
 
 ### Componentes de UI (`/app/component`)
+
 
 - **`Inicio`** - Hero section con animación Lottie de dron
 - **`Galery`** - Galería de imágenes/videos
@@ -232,8 +248,8 @@ El proyecto utiliza una paleta de colores personalizada llamada **Honeydew**:
 
 ### Utilidades (`/app/utils`)
 
-- **`createMetadata`** - Generador de metadata SEO dinámico
-- **`Navbar`** - Navegación principal
+- **`createMetadata`** - Generador de metadata SEO dinámico y traducido
+- **`Navbar`** - Navegación principal multilingüe
 - **`Button`** - Botones personalizados con variantes
 - **`SectionCard`** / **`CardVideo`** / **`CardClient`** - Tarjetas de contenido
 - **`Banner`** - Banners de página
@@ -246,18 +262,21 @@ El proyecto utiliza una paleta de colores personalizada llamada **Honeydew**:
 
 ## 📱 SEO y Optimización
 
+
 El proyecto incluye:
 
-- ✅ Metadata dinámica por página con keywords optimizados
-- ✅ Open Graph y Twitter Cards
-- ✅ Sitemap XML para indexación
-- ✅ Robots.txt configurado
-- ✅ Google Analytics integrado
-- ✅ Google Search Console verification
-- ✅ Estructura semántica HTML5
-- ✅ Imágenes optimizadas
-- ✅ Lazy loading
-- ✅ Fuentes optimizadas (Geist Sans & Mono)
+- ✅ **Internacionalización completa** (español/inglés) con next-intl
+- ✅ **Navegación y rutas multilingües**
+- ✅ **Metadata dinámica y traducida** por página con keywords optimizados
+- ✅ **Open Graph y Twitter Cards** traducidos
+- ✅ **Sitemap XML** con rutas en ambos idiomas
+- ✅ **Robots.txt** configurado
+- ✅ **Google Analytics** integrado
+- ✅ **Google Search Console verification**
+- ✅ **Estructura semántica HTML5**
+- ✅ **Imágenes optimizadas**
+- ✅ **Lazy loading**
+- ✅ **Fuentes optimizadas** (Geist Sans & Mono)
 
 ---
 
