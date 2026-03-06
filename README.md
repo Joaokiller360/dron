@@ -2,11 +2,12 @@
 
 <div align="center">
 
-![Next.js](https://img.shields.io/badge/Next.js-16.0.7-black?style=for-the-badge&logo=next.js)
+![Next.js](https://img.shields.io/badge/Next.js-16.1.5-black?style=for-the-badge&logo=next.js)
 ![React](https://img.shields.io/badge/React-19.2.3-61DAFB?style=for-the-badge&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript)
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4-06B6D4?style=for-the-badge&logo=tailwindcss)
 ![Framer Motion](https://img.shields.io/badge/Framer_Motion-12-0055FF?style=for-the-badge&logo=framer)
+![next-intl](https://img.shields.io/badge/next--intl-4.1.0-blue?style=for-the-badge)
 
 **Sitio web profesional de servicios con drones en Ecuador**
 
@@ -18,31 +19,89 @@
 
 ## 📋 Descripción
 
-
 **JB.SKYLENS** es una operadora de drones independiente en Ecuador 🇪🇨, especializada en contenido aéreo profesional. Este repositorio contiene el código fuente de su sitio web, desarrollado con tecnologías modernas para ofrecer una experiencia rápida, responsive y optimizada para SEO.
-
----
-
-## 🌍 Internacionalización y SEO avanzado
-
-El sitio está completamente **multilingüe** (español e inglés) usando [next-intl](https://next-intl-docs.vercel.app/), con:
-
-- 🌐 **Navegación multilingüe**: rutas amigables, con prefijo /en para inglés y sin prefijo para español (por defecto).
-- 🏷️ **Traducción dinámica de metadatos**: títulos, descripciones y Open Graph traducidos por página usando `getMessages` en el server.
-- 🗺️ **Sitemap.xml**: indexa todas las rutas en español e inglés para SEO internacional.
-- 🗝️ **Gestión robusta de claves de traducción**: todos los textos y palabras clave de servicios están en `/translate/es.json` y `/translate/en.json`.
-- ✨ **Resaltado de palabras clave**: los servicios resaltan palabras clave automáticamente si coinciden exactamente con las definidas en el JSON de traducción.
-
----
 
 ### ✨ Características principales
 
+- � **Sitio multilingüe** (Español e Inglés) con next-intl
 - 🎬 **Producción audiovisual** con drones profesionales
 - 📸 **Fotografía aérea** de alta calidad
 - 🔍 **Inspecciones técnicas** industriales y estructurales
 - 🎉 **Cobertura de eventos** en vivo
 - 🏗️ **Levantamientos topográficos** y fotogrametría
 - 🌊 **Operaciones en zonas costeras** y portuarias
+- 🔎 **SEO optimizado** con metadata dinámica por idioma
+
+---
+
+## 🌍 Internacionalización (i18n)
+
+El proyecto utiliza **next-intl** para soporte multilingüe completo:
+
+### Idiomas soportados
+
+| Idioma | Código | Prefijo URL |
+|--------|--------|-------------|
+| Español | `es` | Sin prefijo (por defecto) |
+| Inglés | `en` | `/en/` |
+
+### Configuración
+
+```typescript
+// i18n/routing.ts
+export const routing = defineRouting({
+  locales: ['es', 'en'],
+  defaultLocale: 'es',
+  localePrefix: 'as-needed' // Solo muestra prefijo para idiomas no predeterminados
+});
+```
+
+### Estructura de traducciones
+
+Los archivos de traducción están en `/translate/`:
+
+```json
+// translate/es.json
+{
+  "nav": {
+    "home": "Inicio",
+    "services": "Servicios",
+    "portfolio": "Portafolio"
+  },
+  "metadata": {
+    "title": "JB.SKYLENS - Servicios con Drones",
+    "description": "Operadora de drones en Ecuador..."
+  }
+}
+```
+
+### Uso en componentes
+
+```tsx
+// Cliente
+import { useTranslations } from 'next-intl';
+
+function Component() {
+  const t = useTranslations('nav');
+  return <span>{t('home')}</span>;
+}
+
+// Servidor (metadata)
+import { getMessages } from 'next-intl/server';
+
+export async function generateMetadata({ params }) {
+  const { locale } = await params;
+  const messages = await getMessages({ locale });
+  return { title: messages.metadata.title };
+}
+```
+
+### Navegación multilingüe
+
+- Los enlaces se adaptan automáticamente al idioma actual
+- El prefijo `/es` se omite para español (idioma por defecto)
+- El prefijo `/en` se añade para inglés
+- Selector de idioma en el navbar
 
 ---
 
@@ -50,7 +109,7 @@ El sitio está completamente **multilingüe** (español e inglés) usando [next-
 
 | Tecnología | Versión | Descripción |
 |------------|---------|-------------|
-| **Next.js** | 16.0.7 | Framework de React para producción |
+| **Next.js** | 16.1.5 | Framework de React para producción |
 | **React** | 19.2.3 | Biblioteca de UI |
 | **TypeScript** | 5.x | Tipado estático |
 | **Tailwind CSS** | 4.x | Framework de estilos utility-first |
@@ -59,6 +118,7 @@ El sitio está completamente **multilingüe** (español e inglés) usando [next-
 | **Lucide React** | 0.555.0 | Iconos |
 | **EmailJS** | 4.4.1 | Envío de emails desde el cliente |
 | **Lottie** | 0.17.13 | Animaciones vectoriales |
+| **next-intl** | 4.1.0 | Internacionalización (i18n) |
 
 ---
 
@@ -67,21 +127,26 @@ El sitio está completamente **multilingüe** (español e inglés) usando [next-
 ```
 jbskylens-dron/
 ├── app/
-│   ├── (site)/                    # Páginas del sitio
-│   │   ├── clients/               # Página de clientes
-│   │   ├── construction/          # Página en construcción
-│   │   ├── contact/               # Formulario de contacto
-│   │   ├── legal/                 # Páginas legales
-│   │   │   ├── privacy-policies/  # Política de privacidad
-│   │   │   └── terms-and-conditions/ # Términos y condiciones
-│   │   ├── portfolio/             # Portafolio de proyectos
-│   │   ├── services/              # Servicios
-│   │   │   ├── events-and-live-broadcasting/
-│   │   │   ├── film-and-tv-production/
-│   │   │   ├── insdustrial-inspection-and-photogrammetry/
-│   │   │   ├── location-scouting-and-recon/
-│   │   │   └── urban-flight-operations/
-│   │   └── teams/                 # Equipo de trabajo
+│   ├── [locale]/                  # Rutas con idioma dinámico (es/en)
+│   │   ├── (site)/                # Páginas del sitio
+│   │   │   ├── clients/           # Página de clientes
+│   │   │   ├── construction/      # Página en construcción
+│   │   │   ├── contact/           # Formulario de contacto
+│   │   │   ├── legal/             # Páginas legales
+│   │   │   │   ├── privacy-policies/
+│   │   │   │   └── terms-and-conditions/
+│   │   │   ├── portfolio/         # Portafolio de proyectos
+│   │   │   ├── services/          # Servicios
+│   │   │   │   ├── events-and-live-broadcasting/
+│   │   │   │   ├── film-and-tv-production/
+│   │   │   │   ├── insdustrial-inspection-and-photogrammetry/
+│   │   │   │   ├── location-scouting-and-recon/
+│   │   │   │   ├── real-estate/
+│   │   │   │   ├── tours-360/
+│   │   │   │   └── urban-flight-operations/
+│   │   │   └── teams/             # Equipo de trabajo
+│   │   ├── layout.tsx             # Layout con NextIntlClientProvider
+│   │   └── page.tsx               # Página de inicio
 │   │
 │   ├── component/                 # Componentes principales
 │   │   ├── about/                 # Sección "Sobre nosotros"
@@ -102,22 +167,23 @@ jbskylens-dron/
 │   │   ├── button/                # Botones personalizados
 │   │   ├── cards/                 # Tarjetas de contenido
 │   │   ├── email/                 # Utilidades de email
-│   │   ├── highlightText/         # Resaltado de texto
+│   │   ├── highlightText/         # Resaltado de texto con keywords
 │   │   ├── icons/                 # Iconos personalizados
 │   │   ├── layout/                # Layouts reutilizables
 │   │   ├── legalProps/            # Props para páginas legales
 │   │   ├── logo/                  # Componente logo
 │   │   ├── maps/                  # Animaciones Lottie
 │   │   ├── metadata/              # Generador de metadata SEO
-│   │   ├── nav/                   # Navegación
+│   │   ├── nav/                   # Navegación multilingüe
 │   │   ├── separador/             # Separadores visuales
 │   │   └── toast/                 # Notificaciones toast
 │   │
 │   ├── globals.css                # Estilos globales + tema personalizado
-│   ├── layout.tsx                 # Layout principal
-│   ├── page.tsx                   # Página de inicio
-│   ├── not-found.tsx              # Página 404
-│   └── flowbait-init.tsx          # Inicialización de Flowbite
+│   └── not-found.tsx              # Página 404
+│
+├── translate/                     # Archivos de traducción
+│   ├── es.json                    # Traducciones en español
+│   └── en.json                    # Traducciones en inglés
 │
 ├── public/
 │   ├── animation/                 # Animaciones Lottie JSON
@@ -125,11 +191,16 @@ jbskylens-dron/
 │   ├── img/                       # Imágenes estáticas
 │   ├── video/                     # Videos
 │   ├── robots.txt                 # Configuración para crawlers
-│   └── sitemap.xml                # Mapa del sitio para SEO
+│   └── sitemap.xml                # Mapa del sitio para SEO (es + en)
 │
+├── i18n/
+│   ├── routing.ts                 # Configuración de rutas i18n
+│   └── request.ts                 # Configuración de solicitudes i18n
+│
+├── middleware.ts                  # Middleware para manejo de idiomas
 ├── data.tsx                       # Datos de navegación
 ├── tailwind.config.js             # Configuración de Tailwind
-├── next.config.ts                 # Configuración de Next.js
+├── next.config.ts                 # Configuración de Next.js con i18n
 ├── nixpacks.toml                  # Configuración de despliegue
 ├── tsconfig.json                  # Configuración de TypeScript
 └── package.json                   # Dependencias y scripts
@@ -214,28 +285,29 @@ El proyecto utiliza una paleta de colores personalizada llamada **Honeydew**:
 
 ## 📄 Páginas del Sitio
 
-| Ruta | Descripción |
-|------|-------------|
-| `/` / `/en` | Página de inicio (español/inglés) |
-| `/services` / `/en/services` | Lista de servicios (español/inglés) |
-| `/services/events-and-live-broadcasting` / `/en/services/events-and-live-broadcasting` | Servicios para eventos y transmisiones (español/inglés) |
-| `/services/film-and-tv-production` / `/en/services/film-and-tv-production` | Producción para cine y TV (español/inglés) |
-| `/services/insdustrial-inspection-and-photogrammetry` / `/en/services/insdustrial-inspection-and-photogrammetry` | Inspecciones y fotogrametría (español/inglés) |
-| `/services/location-scouting-and-recon` / `/en/services/location-scouting-and-recon` | Reconocimiento de locaciones (español/inglés) |
-| `/services/urban-flight-operations` / `/en/services/urban-flight-operations` | Operaciones urbanas (español/inglés) |
-| `/portfolio` / `/en/portfolio` | Portafolio de trabajos (español/inglés) |
-| `/teams` / `/en/teams` | Equipo de trabajo (español/inglés) |
-| `/contact` / `/en/contact` | Formulario de contacto (español/inglés) |
-| `/clients` / `/en/clients` | Clientes (en desarrollo, ambos idiomas) |
-| `/legal/privacy-policies` / `/en/legal/privacy-policies` | Política de privacidad (español/inglés) |
-| `/legal/terms-and-conditions` / `/en/legal/terms-and-conditions` | Términos y condiciones (español/inglés) |
+| Ruta (ES) | Ruta (EN) | Descripción |
+|-----------|-----------|-------------|
+| `/` | `/en` | Página de inicio con hero, galería, servicios y CTA |
+| `/services` | `/en/services` | Lista completa de servicios ofrecidos |
+| `/services/events-and-live-broadcasting` | `/en/services/events-and-live-broadcasting` | Servicios para eventos y transmisiones |
+| `/services/film-and-tv-production` | `/en/services/film-and-tv-production` | Producción para cine y TV |
+| `/services/insdustrial-inspection-and-photogrammetry` | `/en/services/insdustrial-inspection-and-photogrammetry` | Inspecciones y fotogrametría |
+| `/services/location-scouting-and-recon` | `/en/services/location-scouting-and-recon` | Reconocimiento de locaciones |
+| `/services/urban-flight-operations` | `/en/services/urban-flight-operations` | Operaciones urbanas |
+| `/services/real-estate` | `/en/services/real-estate` | Fotografía inmobiliaria |
+| `/services/tours-360` | `/en/services/tours-360` | Tours virtuales 360° |
+| `/portfolio` | `/en/portfolio` | Portafolio de trabajos realizados |
+| `/teams` | `/en/teams` | Equipo de trabajo |
+| `/contact` | `/en/contact` | Formulario de contacto |
+| `/clients` | `/en/clients` | Clientes (en desarrollo) |
+| `/legal/privacy-policies` | `/en/legal/privacy-policies` | Política de privacidad |
+| `/legal/terms-and-conditions` | `/en/legal/terms-and-conditions` | Términos y condiciones |
 
 ---
 
 ## 🔧 Componentes Principales
 
 ### Componentes de UI (`/app/component`)
-
 
 - **`Inicio`** - Hero section con animación Lottie de dron
 - **`Galery`** - Galería de imágenes/videos
@@ -248,8 +320,8 @@ El proyecto utiliza una paleta de colores personalizada llamada **Honeydew**:
 
 ### Utilidades (`/app/utils`)
 
-- **`createMetadata`** - Generador de metadata SEO dinámico y traducido
-- **`Navbar`** - Navegación principal multilingüe
+- **`createMetadata`** - Generador de metadata SEO dinámico
+- **`Navbar`** - Navegación principal
 - **`Button`** - Botones personalizados con variantes
 - **`SectionCard`** / **`CardVideo`** / **`CardClient`** - Tarjetas de contenido
 - **`Banner`** - Banners de página
@@ -262,21 +334,20 @@ El proyecto utiliza una paleta de colores personalizada llamada **Honeydew**:
 
 ## 📱 SEO y Optimización
 
-
 El proyecto incluye:
 
-- ✅ **Internacionalización completa** (español/inglés) con next-intl
-- ✅ **Navegación y rutas multilingües**
-- ✅ **Metadata dinámica y traducida** por página con keywords optimizados
-- ✅ **Open Graph y Twitter Cards** traducidos
-- ✅ **Sitemap XML** con rutas en ambos idiomas
-- ✅ **Robots.txt** configurado
-- ✅ **Google Analytics** integrado
-- ✅ **Google Search Console verification**
-- ✅ **Estructura semántica HTML5**
-- ✅ **Imágenes optimizadas**
-- ✅ **Lazy loading**
-- ✅ **Fuentes optimizadas** (Geist Sans & Mono)
+- ✅ **Sitio multilingüe** con español e inglés
+- ✅ Metadata dinámica por página **traducida según el idioma**
+- ✅ Open Graph y Twitter Cards con soporte i18n
+- ✅ Sitemap XML con **rutas en ambos idiomas** (`/` y `/en/`)
+- ✅ Robots.txt configurado
+- ✅ Google Analytics integrado
+- ✅ Google Search Console verification
+- ✅ Estructura semántica HTML5
+- ✅ Imágenes optimizadas
+- ✅ Lazy loading
+- ✅ Fuentes optimizadas (Geist Sans & Mono)
+- ✅ **Keywords resaltados** automáticamente en contenido de servicios
 
 ---
 
