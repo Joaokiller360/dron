@@ -400,73 +400,75 @@
     },
     "locationRecon": {
       "metadata": {
-      "title": "Location and Reconnaissance | JB.SKYLENS",
-      "description": "Professional location and reconnaissance services with drones in Ecuador. Aerial inspection, area monitoring, search for specific areas, and visual analysis for security, industry, and technical projects.",
-      "keywords": [
-        "drones for location",
-        "aerial reconnaissance with drones",
-        "aerial inspection with drones",
-        "area monitoring with drones",
-        "drones for security ecuador",
-        "drone surveillance services",
-        "drones for area search",
-        "territorial reconnaissance with drones",
-        "drones for industry",
-        "drones for ports",
-        "infrastructure inspection with drones",
-        "aerial industrial monitoring",
-        "drone services in esmeraldas",
-        "professional drone operations",
-        "visual analysis with drones",
-        "JB.SKYLENS reconnaissance",
-        "professional drone company",
-        "technical drone services",
-        "drones for business projects"
-      ],
-      "canonical": "https://dron.joaobarres.dev/en/services/location-scouting-and-recon"
+        "title": "Location and Reconnaissance | JB.SKYLENS",
+        "description": "Professional location and reconnaissance services with drones in Ecuador. Aerial inspection, area monitoring, search for specific areas, and visual analysis for security, industry, and technical projects.",
+        "keywords": [
+          "drones for location",
+          "aerial reconnaissance with drones",
+          "aerial inspection with drones",
+          "area monitoring with drones",
+          "drones for security ecuador",
+          "drone surveillance services",
+          "drones for area search",
+          "territorial reconnaissance with drones",
+          "drones for industry",
+          "drones for ports",
+          "infrastructure inspection with drones",
+          "aerial industrial monitoring",
+          "drone services in esmeraldas",
+          "professional drone operations",
+          "visual analysis with drones",
+          "JB.SKYLENS reconnaissance",
+          "professional drone company",
+          "technical drone services",
+          "drones for business projects"
+        ],
+        "canonical": "https://dron.joaobarres.dev/en/services/location-scouting-and-recon"
       },
       "hero": {
-      "image": "localizacion-reconocimiento",
-      "label": "Services",
-      "title": "Location and Reconnaissance"
+        "image": "localizacion-reconocimiento",
+        "label": "Services",
+        "title": "Location and Reconnaissance"
       },
       "regulation": {
-      "keywords": {
-        "dgac": {
-        "label": "DGAC Ecuador (RDAC 101)",
-        "href": "https://www.aviacioncivil.gob.ec/"
+        "keywords": {
+          "dgac": {
+            "label": "DGAC Ecuador (RDAC 101)"
+          },
+          "links": {
+            "dgac": "https://www.aviacioncivil.gob.ec/"
+          }
         }
-      }
       },
       "content": {
-      "label": "Services",
-      "subTitle": "FIND THE BEST LOCATION FOR YOUR PROJECT",
-      "text": [
-        "Allows you to explore and select locations quickly and accessibly, even in remote or hard-to-reach areas.",
-        "Provides unique panoramic views, making it easier to visualize and plan scenes from previously unattainable perspectives."
-      ]
+        "label": "Services",
+        "subTitle": "FIND THE BEST LOCATION FOR YOUR PROJECT",
+        "text": [
+          "Allows you to explore and select locations quickly and accessibly, even in remote or hard-to-reach areas.",
+          "Provides unique panoramic views, making it easier to visualize and plan scenes from previously unattainable perspectives."
+        ]
       },
       "animations": {
-      "main": {
-        "src": "cityFlight"
-      }
+        "main": {
+          "src": "cityFlight"
+        }
       },
       "cta": {
-      "title": "Our commitment to safety and professionalism",
-      "text": {
-        "one": "At JB.SkyLens we work under strict safety standards and in compliance with the official regulations of DGAC Ecuador (RDAC 101). Our team of professional pilots guarantees legal, safe, and efficient aerial operations in every project.",
-        "two": "We manage permits, registrations, and mandatory requirements so that every flight is in order, because we understand that in aerial work, safety, responsibility, and legality are not optional—they are part of the service."
-      },
-      "buttons": {
-        "contact": {
-        "label": "Contact Us",
-        "href": "/contact"
+        "title": "Our commitment to safety and professionalism",
+        "text": {
+          "one": "At JB.SkyLens we work under strict safety standards and in compliance with the official regulations of DGAC Ecuador (RDAC 101). Our team of professional pilots guarantees legal, safe, and efficient aerial operations in every project.",
+          "two": "We manage permits, registrations, and mandatory requirements so that every flight is in order, because we understand that in aerial work, safety, responsibility, and legality are not optional—they are part of the service."
         },
-        "portfolio": {
-        "label": "View Portfolio",
-        "href": "/portfolio"
+        "buttons": {
+          "contact": {
+            "label": "Contact Us",
+            "href": "/contact"
+          },
+          "portfolio": {
+            "label": "View Portfolio",
+            "href": "/portfolio"
+          }
         }
-      }
       }
     }
   },

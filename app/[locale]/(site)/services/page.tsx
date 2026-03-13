@@ -28,7 +28,7 @@ export default function Services() {
   const clients = [
     { key: "film", imgName: "grabacion-cine", href: `${link}film-and-tv-production` },
     { key: "location", imgName: "localizacion-reconocimiento", href: `${link}location-scouting-and-recon` },
-    { key: "industrial", imgName: "industria-inspeccion", href: `${link}insdustrial-inspection-and-photogrammetry` },
+    { key: "industrial", imgName: "insdustrial-inspeccion", href: `${link}insdustrial-inspection-and-photogrammetry` },
     { key: "urban", imgName: "vuelo-ciudad", href: `${link}urban-flight-operations` },
     { key: "events", imgName: "evento-retransmisiones", href: `${link}events-and-live-broadcasting` },
     { key: "realestate", imgName: "drones-inmobiliaria", href: `${link}real-estate` },

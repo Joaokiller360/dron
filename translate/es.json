@@ -435,6 +435,9 @@
           "dgac": {
             "label": "DGAC Ecuador (RDAC 101)",
             "href": "https://www.aviacioncivil.gob.ec/"
+          },
+          "links": {
+            "dgac": "https://www.aviacioncivil.gob.ec/"
           }
         }
       },
