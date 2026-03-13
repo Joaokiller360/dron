@@ -310,7 +310,7 @@
         "industrial": {
           "icon": "Factory",
           "label": "Industrial drones",
-          "href": "industrial-inspection-and-photogrammetry"
+          "href": "insdustrial-inspection-and-photogrammetry"
         },
         "urban": {
           "icon": "Building2",
@@ -431,13 +431,14 @@
         "title": "Location and Reconnaissance"
       },
       "regulation": {
-        "keywords": {
-          "dgac": {
-            "label": "DGAC Ecuador (RDAC 101)"
-          },
-          "links": {
-            "dgac": "https://www.aviacioncivil.gob.ec/"
+        "keywords": [
+          {
+            "key": "dgac",
+            "label": "DGAC-Ecuador-(RDAC 101)"
           }
+        ],
+        "links": {
+          "dgac": "https://www.aviacioncivil.gob.ec/"
         }
       },
       "content": {
@@ -672,5 +673,12 @@
       "email": "Email",
       "phone": "Phone"
     }
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "This section of JB.SKYLENS is currently under construction. Soon we will have new drone solutions.",
+    "heading": "Page Not Found",
+    "message": "Sorry, we couldn't find the page you were looking for. Please go back to the start.",
+    "button": "Back to home"
   }
 }
