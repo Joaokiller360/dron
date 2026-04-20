@@ -4,7 +4,7 @@
 import { Instagram, Twitter, Facebook } from 'lucide-react';
 
 // Importación de utilidades y componentes reutilizables
-import { CopyText, SeparatorUp, Logo, LanguageSwitcher } from '@/app/utils';
+import { CopyText, SeparatorUp, Logo, LanguageSwitcher, Year } from '@/app/utils';
 
 // Importación de hooks de internacionalización
 import { useLocale, useTranslations } from 'next-intl';
@@ -93,7 +93,7 @@ export default function Footer() {
           <hr className="my-6 border-default sm:mx-auto lg:my-8 text-white/80" />
           <div className="items-center sm:flex sm:justify-between">
             {/* Derechos de autor */}
-            <span className="text-sm text-body sm:text-center">© 2026 <a href="https://joaobarres.dev/" className="hover:underline">JoaoBarres</a>. {t('rights')}
+            <span className="text-sm text-body sm:text-center">© <Year /> <a href="https://joaobarres.dev/" className="hover:underline">JoaoBarres</a>. {t('rights')}
             </span>
             {/* Redes sociales */}
             <div className="flex items-center pt-5 sm:pt-0">

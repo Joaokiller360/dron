@@ -7,8 +7,8 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getLocale } from 'next-intl/server';
 
 import { createMetadata, NavPast } from '@/app/utils'
+import FlowbiteInit from "../flowbait-init";
 import { Footer } from '@/app/component';
-import FlowbiteInit from "@/app/flowbait-init";
 
 
 const geistSans = Geist({
@@ -36,11 +36,6 @@ export default async function RootLayout({
   return (
     <html lang={locale}>
       {/* Google Analytics */}
-      <Script
-        src={`https://www.googletagmanager.com/gtag/js?id=${process.env.GOOGLE_ANALYTICS}`}
-        strategy="afterInteractive"
-      />
-
       <Script id="google-analytics" strategy="afterInteractive">
         {`
             window.dataLayer = window.dataLayer || [];

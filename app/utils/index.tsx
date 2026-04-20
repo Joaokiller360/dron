@@ -13,6 +13,7 @@ import { Favicon, Logo } from './logo'
 import LegalPage from './legalProps'
 import { highlightText, keywordLink } from './highlightText'
 import { ScrollBottonEffect, ScrollRevealEffect } from './animation'
+import Year from './years'
 
 export {
   NavPast,
@@ -39,6 +40,7 @@ export {
   highlightText,
   PageServices,
   ScrollRevealEffect,
-  ScrollBottonEffect
+  ScrollBottonEffect,
+  Year
 }
 export type { keywordLink }

@@ -7,6 +7,7 @@ interface Meta {
   canonical?: string
   index?: boolean
   href?: string
+  image?: string
 }
 
 export const createMetadata = ({
@@ -16,20 +17,55 @@ export const createMetadata = ({
   canonical,
   index = true,
   href,
-}: Meta): Metadata => ({
-  ...(title && { title: `${title} | JB.SKYLENS - DRON` }),
-  ...(description && { description }),
-  ...(keywords && { keywords }),
-  ...(canonical && {
-    alternates: { canonical },
-  }),
-  robots: {
-    index,
-    follow: index,
-  },
-  ...(href && {
-    icons: {
-      icon: `https://res.cloudinary.com/dzlavqhid/image/upload/${href}.ico`,
+  image,
+}: Meta): Metadata => {
+  const fullTitle = title ? `${title} | JB.SKYLENS - DRON` : 'JB.SKYLENS - DRON'
+
+  return {
+    title: fullTitle,
+    description,
+    keywords,
+
+    ...(canonical && {
+      alternates: { canonical },
+    }),
+
+    robots: {
+      index,
+      follow: index,
     },
-  }),
-})
+
+    ...(href && {
+      icons: {
+        icon: `https://res.cloudinary.com/dzlavqhid/image/upload/${href}.ico`,
+      },
+    }),
+
+    // 🔥 OPEN GRAPH (WhatsApp, Facebook, etc)
+    openGraph: {
+      title: fullTitle,
+      description,
+      url: canonical,
+      siteName: 'JB Skylens',
+      images: image
+        ? [
+          {
+            url: image,
+            width: 1200,
+            height: 630,
+          },
+        ]
+        : [],
+      locale: 'es_EC',
+      type: 'website',
+    },
+
+    // 🔥 TWITTER
+    twitter: {
+      card: 'summary_large_image',
+      title: fullTitle,
+      description,
+      images: image ? [image] : [],
+    },
+  }
+}
