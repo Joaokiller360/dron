@@ -15,24 +15,28 @@ interface Section {
 
 interface LegalList {
   header?: string
-  description?: string
+  description?: string[]
   items: string[]
 }
 
 import Banner from "../banner"
 import { ScrollRevealEffect, SectionCard, highlightText, ScrollBottonEffect } from "@/app/utils"
+import { desc } from "framer-motion/client"
+import { useTranslations } from "next-intl";
 
 export default function LegalPage({
   title,
   label,
-  subtitle,
   lastUpdate,
   content,
   keyword = [],
 }: LegalPageProps) {
+
+  const t = useTranslations('legalPage.section');
+
   return (
     <>
-      <Banner label={label} title={title} description={subtitle} />
+      <Banner label={label} title={title} />
 
       <section className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <section className="space-y-6">
@@ -42,7 +46,7 @@ export default function LegalPage({
                 <ScrollRevealEffect key={index}>
                   {/* Heading */}
                   {section.heading && (
-                    <h2 className="pt-4 text-2xl font-semibold text-heading">
+                    <h2 className="pt-4 text-2xl font-semibold uppercase text-heading">
                       {section.heading}
                     </h2>
                   )}
@@ -51,7 +55,7 @@ export default function LegalPage({
                   {section.text && (
                     <div className="space-y-3 text-muted">
                       {section.text.map((paragraph, i) => (
-                        <p key={i}>
+                        <p className="text-xl" key={i}>
                           {highlightText(paragraph, keyword)}
                         </p>
                       ))}
@@ -72,11 +76,12 @@ export default function LegalPage({
                           )}
 
                           <div className="pl-3">
-                            {list.description && (
-                              <p className="text-lg text-muted">
-                                {highlightText(list.description, keyword)}
+                            
+                             {(Array.isArray(list.description) ? list.description : []).map((desc, h) => (
+                              <p className="pl-2 text-lg text-muted" key={h}>
+                                {highlightText(desc, keyword)}
                               </p>
-                            )}
+                            ))}
 
                             <ul className="pl-6 space-y-2 list-disc text-muted">
                               {list.items.map((item, j) => (
@@ -96,7 +101,7 @@ export default function LegalPage({
             <ScrollBottonEffect>
               {lastUpdate && (
                 <p className="mt-6 text-sm font-bold text-muted">
-                  Última actualización:{" "}
+                  {`${t('lastUpdate')}`}:{" "}
                   <span className="underline underline-offset-4">
                     {lastUpdate}
                   </span>

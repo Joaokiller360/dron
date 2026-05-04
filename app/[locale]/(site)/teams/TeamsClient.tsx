@@ -114,7 +114,7 @@ export default function TeamsClient() {
         textColor='font-semibold text-3xl uppercase font-mono'
         text={t('text')}
         buttonText={t('buttonText')}
-        buttonhref={`${prefix}/portfolio`}
+        buttonhref={`${prefix}/contact`}
         buttonColor='cursor-pointer text-center transition duration-500 bg-white text-black hover:bg-honeydew-900 hover:text-white dark:bg-honeydew-800 dark:hover:bg-white dark:hover:text-black dark:text-white flex justify-center'
       />
     </>

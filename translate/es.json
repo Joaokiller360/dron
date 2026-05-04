@@ -680,5 +680,151 @@
     "heading": "Página No Encontrada",
     "message": "Lo sentimos, no hemos podido encontrar la página que estabas buscando. Por favor vuelve al inicio.",
     "button": "Volver al inicio"
+  },
+  "legal": {
+    "privacy": {
+      "title": "Política de Privacidad",
+      "label": "Nosotros",
+      "lastUpdate": "23 de Enero del 2026",
+      "keywords": [
+        "Sitio",
+        "http://www.allaboutcookies.org"
+      ],
+      "content": {
+        "one": {
+          "subTitle": "INTRODUCCIÓN",
+          "text": "Esta Política de privacidad describe cómo se recopila, utiliza y comparte su información personal cuando visita o hace una compra en https://dron.joaobarres.dev (denominado en lo sucesivo el 'Sitio')"
+        },
+        "two": {
+          "subTitle": "1. INFORMACIÓN PERSONAL QUE RECOPILAMOS",
+          "text": [
+            "Cuando visita el Sitio, recopilamos automáticamente cierta información sobre su dispositivo, incluida información sobre su navegador web, dirección IP, zona horaria y algunas de las cookies que están instaladas en su dispositivo.",
+            "Además, a medida que navega por el Sitio, recopilamos información sobre lapáginas web individuales o los productos que ve, las páginas web o los términos de búsqueda que lo remitieron al Sitio e información sobre cómo interactúa usted con el Sitio.",
+            "Nos referimos a esta información recopilada automáticamente como “Información del dispositivo”",
+            "Recopilamos Información del dispositivo mediante el uso de las siguientes tecnologías:"
+          ],
+          "list": {
+            "header": "Cookies",
+            "description": "Las cookies son archivos de datos que se colocan en su dispositivo o computadora y a menudo incluyen un identificador único anónimo. Para obtener más información sobre las cookies y cómo deshabilitarlas, visite http://www.allaboutcookies.org.",
+            "items": [
+              "Cookies persistentes: Estas cookies permanecen en su dispositivo hasta que las elimina o su navegador las elimina automáticamente después de un período de tiempo determinado.",
+              "Cookies de terceros: Estas cookies se colocan a través de nuestro Sitio por nuestros socios publicitarios y analíticos. Estas cookies pueden reconocer su computadora tanto en nuestro Sitio como en otros sitios web."
+            ]
+          }
+        }
+      }
+    },
+    "terms": {
+      "title": "Términos & Condiciones",
+      "label": "Nuestros",
+      "lastUpdate": "23 de Enero del 2026",
+      "keywords": [
+        "JB.SKYLNES - DRON",
+        "https://dron.joaobarres.dev",
+        "contacto@joaobarres.dev",
+        "nosotros",
+        "nuestro",
+        "nos",
+        "9 De Octubre y Bolivar (Edificios Reinoso Of.1)"
+      ],
+      "content": {
+        "one": {
+          "subTitle": "1. INFORMACIÓN GENERAL",
+          "text": [
+            "Este sitio web es operado por JB.SKYLNES - DRON. En todo el sitio, los términos \"nosotros\", \"nos\" y \"nuestro\" se refieren a JB.SKYLNES - DRON.",
+            "Sitio web: https://dron.joaobarres.dev",
+            "Email de contacto: contacto@joaobarres.dev",
+            "Dirección: 9 De Octubre y Bolivar (Edificios Reinoso Of.1)"
+          ]
+        },
+        "two": {
+          "subTitle": "2. PRODUCTOS Y SERVICIOS",
+          "text": [
+            "Nos esforzamos por mostrar con la mayor precisión los colores y las imágenes de nuestros productos que aparecen en la web. No podemos garantizar que la visualización de cualquier color en su monitor sea exacta."
+          ]
+        },
+        "tree": {
+          "subTitle": "3. PRECIOS Y PAGOS",
+          "text":"Los precios varían según el tipo de servicio, la duración del evento y la ubicación. Para conocer una cotización personalizada, no dudes en contactarme directamente.",
+          "lists": [
+            {
+              "header": "3.1 Condiciones de Reserva",
+              "description": [
+                "Para confirmar y apartar la fecha de tu evento, se requiere un anticipo del 50% del valor total del servicio. El 50% restante se cancela el día del evento, antes de iniciar el trabajo.",
+                "La fecha queda reservada únicamente una vez recibido el anticipo. No se guardan fechas sin confirmación de pago."
+              ]
+            },
+            {
+              "header": "3.2 Movilización",
+              "description": [
+                "Si el evento se realiza fuera del área de cobertura habitual, se aplicará un costo adicional por movilización, el cual será informado previamente en la cotización según la distancia y las condiciones del lugar."
+              ]
+            },
+            {
+              "header": "3.3 Eventos de Larga Duración",
+              "description": [
+                "Bodas, matrimonios, quinceañeros, grados y otros eventos de larga duración tienen una tarifa diferenciada acorde al tiempo y esfuerzo que demanda el servicio. Este valor se detalla con claridad en cada cotización para que no haya sorpresas."
+              ]
+            }
+          ]
+        },
+        "four": {
+          "subTitle": "4. Entrega del Material",
+          "text": [
+            "Una vez finalizado el evento, todo el material editado se entrega de forma 100% digital, directamente desde la comodidad de tu hogar."
+          ],
+          "lists": [
+            {
+              "header": "4.1 ¿Cómo se entrega?",
+              "description": [
+                "El material se envía a través de plataformas digitales (Google Drive, WeTransfer, o similar), por lo que no necesitas desplazarte ni esperar envíos físicos. Recibirás un enlace de descarga directamente por WhatsApp o correo electrónico."
+              ]
+            },
+            {
+              "header": "4.2 Tiempo de Entrega",
+              "description": [
+                "El tiempo de entrega depende del paquete que hayas elegido y de la cantidad de material a editar"
+              ]
+            }
+          ]
+        },
+        "five": {
+          "subTitle": "5. POLÍTICA DE CANCELACIONES",
+          "text": [
+            "Aceptamos cancelaciones dentro de los 7 días anterior a la reserva del paquete."
+          ],
+          "lists": [
+            {
+              "header": "5.1 Proceso de Cancelacion",
+              "description": [
+                "Devolución del dinero:"
+              ],
+              "items": [
+                "A través de transferencia (cuenta de ahorros, cuenta corriente): se realiza aproximadamente dentro de los cinco días hábiles."
+              ]
+            }
+          ]
+        },
+        "six": {
+          "subTitle": "6. PRIVACIDAD Y PROTECCIÓN DE DATOS",
+          "text": [
+            "Nos comprometemos a proteger su privacidad. La información personal que nos proporcione se utilizará únicamente para procesar su pedido y mejorar su experiencia de compra."
+          ]
+        },
+        "seven": {
+          "subTitle": "7. MODIFICACIONES DE LOS TÉRMINOS",
+          "text": [
+            "Nos reservamos el derecho de modificar estos términos en cualquier momento. Los cambios entrarán en vigor inmediatamente después de su publicación en el sitio web."
+          ]
+        }
+
+      }
+    }
+  },
+  "legalPage": {
+    "section": {
+      "lastUpdate": "Última actualización"
+    },
+    "p": "d"
   }
 }

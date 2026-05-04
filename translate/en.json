@@ -680,5 +680,154 @@
     "heading": "Page Not Found",
     "message": "Sorry, we couldn't find the page you were looking for. Please go back to the start.",
     "button": "Back to home"
+  },
+  "legal": {
+    "privacy": {
+      "title": "Privacy Policy",
+      "label": "About Us",
+      "lastUpdate": "January 23, 2026",
+      "keywords": [
+        "Site",
+        "http://www.allaboutcookies.org"
+      ],
+      "content": {
+        "one": {
+          "subTitle": "INTRODUCTION",
+          "text": "This Privacy Policy describes how your personal information is collected, used, and shared when you visit or make a purchase from https://dron.joaobarres.dev (referred to hereinafter as the 'Site')."
+        },
+        "two": {
+          "subTitle": "1. PERSONAL INFORMATION WE COLLECT",
+          "text": [
+            "When you visit the Site, we automatically collect certain information about your device, including information about your web browser, IP address, time zone, and some of the cookies installed on your device.",
+            "Additionally, as you browse the Site, we collect information about the individual web pages or products you view, the web pages or search terms that referred you to the Site, and information about how you interact with the Site.",
+            "We refer to this automatically collected information as 'Device Information'.",
+            "We collect Device Information using the following technologies:"
+          ],
+          "list": {
+            "header": "Cookies",
+            "description": "Cookies are data files placed on your device or computer that often include an anonymous unique identifier. For more information about cookies and how to disable them, visit http://www.allaboutcookies.org.",
+            "items": [
+              "Persistent Cookies: These cookies remain on your device until you delete them or your browser automatically removes them after a set period of time.",
+              "Third-Party Cookies: These cookies are placed through our Site by our advertising and analytics partners. These cookies may recognize your computer both on our Site and on other websites."
+            ]
+          }
+        }
+      }
+    },
+    "terms": {
+      "title": "Terms & Conditions",
+      "label": "Our",
+      "lastUpdate": "January 23, 2026",
+      "keywords": [
+        "JB.SKYLNES - DRON",
+        "https://dron.joaobarres.dev",
+        "contacto@joaobarres.dev",
+        "we",
+        "our",
+        "us",
+        "9 De Octubre y Bolivar (Edificios Reinoso Of.1)"
+      ],
+      "content": {
+        "one": {
+          "subTitle": "1. GENERAL INFORMATION",
+          "text": [
+            "This website is operated by JB.SKYLNES - DRON. Throughout the site, the terms 'we', 'us', and 'our' refer to JB.SKYLNES - DRON.",
+            "Website: https://dron.joaobarres.dev",
+            "Contact email: contacto@joaobarres.dev",
+            "Address: 9 De Octubre y Bolivar (Edificios Reinoso Of.1)"
+          ]
+        },
+        "two": {
+          "subTitle": "2. PRODUCTS AND SERVICES",
+          "text": [
+            "We make every effort to display as accurately as possible the colors and images of our products that appear on the website. We cannot guarantee that your monitor's display of any color will be accurate."
+          ]
+        },
+        "tree": {
+          "subTitle": "3. PRICING AND PAYMENTS",
+          "text": "Prices vary depending on the type of service, the duration of the event, and the location. For a personalized quote, feel free to contact us directly.",
+          "lists": [
+            {
+              "header": "3.1 Booking Conditions",
+              "description": [
+                "To confirm and secure your event date, a 50% deposit of the total service fee is required. The remaining 50% is due on the day of the event, before work begins.",
+                "The date is only reserved once the deposit has been received. No dates will be held without payment confirmation."
+              ]
+            },
+            {
+              "header": "3.2 Travel & Mobility Fee",
+              "description": [
+                "If the event takes place outside the standard coverage area, an additional travel fee will apply. This amount will be communicated in advance within the quote, based on distance and location conditions."
+              ]
+            },
+            {
+              "header": "3.3 Extended Duration Events",
+              "description": [
+                "Weddings, quinceañeras, graduations, and other long-duration events are subject to a differentiated rate that reflects the time and effort the service requires. This amount will be clearly outlined in each quote so there are no surprises."
+              ]
+            }
+          ]
+        },
+        "four": {
+          "subTitle": "4. MATERIAL DELIVERY",
+          "text": [
+            "Once the event is completed, all edited material is delivered 100% digitally, straight to the comfort of your home."
+          ],
+          "lists": [
+            {
+              "header": "4.1 How Is It Delivered?",
+              "description": [
+                "Material is sent through digital platforms (Google Drive, WeTransfer, or similar), so there is no need to travel or wait for physical shipments. You will receive a download link directly via WhatsApp or email."
+              ]
+            },
+            {
+              "header": "4.2 Delivery Time",
+              "description": [
+                "Delivery time depends on the package you selected and the amount of material to be edited.",
+                "Basic package: 5 to 7 business days.",
+                "Intermediate package: 7 to 10 business days.",
+                "Full package / large events: 10 to 15 business days.",
+                "Delivery times are counted in business days (Monday through Friday), not including public holidays. The countdown begins from the day of the event. If you need the material urgently, please consult us before booking to check availability."
+              ]
+            }
+          ]
+        },
+        "five": {
+          "subTitle": "5. CANCELLATION POLICY",
+          "text": [
+            "We accept cancellations made within 7 days prior to the package booking date."
+          ],
+          "lists": [
+            {
+              "header": "5.1 Cancellation Process",
+              "description": [
+                "Refund method:"
+              ],
+              "items": [
+                "Via bank transfer (savings account or checking account): processed within approximately five business days."
+              ]
+            }
+          ]
+        },
+        "six": {
+          "subTitle": "6. PRIVACY AND DATA PROTECTION",
+          "text": [
+            "We are committed to protecting your privacy. Any personal information you provide will be used solely to process your order and improve your shopping experience."
+          ]
+        },
+        "seven": {
+          "subTitle": "7. CHANGES TO TERMS",
+          "text": [
+            "We reserve the right to modify these terms at any time. Changes will take effect immediately upon publication on the website."
+          ]
+        }
+      }
+    }
+  },
+  "legalPage": {
+    "section": {
+      "lastUpdate": "Last updated"
+    },
+    "p": "d"
   }
 }
