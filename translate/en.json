@@ -678,8 +678,11 @@
     "title": "Page not found",
     "description": "This section of JB.SKYLENS is currently under construction. Soon we will have new drone solutions.",
     "heading": "Page Not Found",
-    "message": "Sorry, we couldn't find the page you were looking for. Please go back to the start.",
-    "button": "Back to home"
+    "message": [
+      "We're sorry, we couldn't find the page you were looking for.",
+      "Please go back to the home page."
+    ],
+    "backToHome": "Back to home"
   },
   "legal": {
     "privacy": {

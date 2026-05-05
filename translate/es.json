@@ -678,8 +678,11 @@
     "title": "Página no encontrada",
     "description": "Esta sección de JB.SKYLENS se encuentra actualmente en construcción. Pronto tendremos nuevas soluciones con drones.",
     "heading": "Página No Encontrada",
-    "message": "Lo sentimos, no hemos podido encontrar la página que estabas buscando. Por favor vuelve al inicio.",
-    "button": "Volver al inicio"
+    "message": [
+      "Lo sentimos, no hemos podido encontrar la página que estabas buscando.",
+      "Por favor vuelve al inicio."
+    ],
+    "backToHome": "Volver al inicio"
   },
   "legal": {
     "privacy": {
