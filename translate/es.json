@@ -720,7 +720,7 @@
     "terms": {
       "title": "Términos & Condiciones",
       "label": "Nuestros",
-      "lastUpdate": "23 de Enero del 2026",
+      "lastUpdate": "01 de Mayo del 2026",
       "keywords": [
         "JB.SKYLNES - DRON",
         "https://dron.joaobarres.dev",
@@ -728,99 +728,309 @@
         "nosotros",
         "nuestro",
         "nos",
-        "9 De Octubre y Bolivar (Edificios Reinoso Of.1)"
+        "9 De Octubre y Bolívar, Edificios Reinoso Of.1",
+        "Contratante",
+        "Prestador",
+        "usted",
+        "cliente",
+        "anticipo",
+        "licencia",
+        "derechos de autor",
+        "Código INGENIOS",
+        "DGAC",
+        "Esmeraldas",
+        "dron",
+        "grabación",
+        "material audiovisual",
+        "cotización"
       ],
       "content": {
         "one": {
-          "subTitle": "1. INFORMACIÓN GENERAL",
+          "subTitle": "AVISO LEGAL INTRODUCTORIO",
           "text": [
-            "Este sitio web es operado por JB.SKYLNES - DRON. En todo el sitio, los términos \"nosotros\", \"nos\" y \"nuestro\" se refieren a JB.SKYLNES - DRON.",
-            "Sitio web: https://dron.joaobarres.dev",
-            "Email de contacto: contacto@joaobarres.dev",
-            "Dirección: 9 De Octubre y Bolivar (Edificios Reinoso Of.1)"
+            "Al contratar los servicios de JB.SKYLNES - DRON, acceder a su sitio web o realizar cualquier pago parcial o total, el cliente declara haber leído, comprendido y aceptado en su totalidad los presentes Términos y Condiciones. Este documento constituye un contrato legalmente vinculante entre el cliente (\"Contratante\") y JB.SKYLNES - DRON (\"Prestador\").",
+            "Estos términos se rigen por la legislación ecuatoriana vigente, incluyendo el Código Orgánico de la Economía Social de los Conocimientos, Creatividad e Innovación (Código INGENIOS), la Ley Orgánica de Protección de Datos Personales, el Código Civil, el Código de Comercio, y la Ley de Comercio Electrónico, Firmas Electrónicas y Mensajes de Datos del Ecuador."
           ]
         },
         "two": {
-          "subTitle": "2. PRODUCTOS Y SERVICIOS",
+          "subTitle": "1. INFORMACIÓN GENERAL",
           "text": [
-            "Nos esforzamos por mostrar con la mayor precisión los colores y las imágenes de nuestros productos que aparecen en la web. No podemos garantizar que la visualización de cualquier color en su monitor sea exacta."
+            "Este sitio web y los servicios asociados son operados por JB.SKYLNES - DRON, constituida bajo las leyes del Ecuador. Los términos \"nosotros\", \"nos\" y \"nuestro\" se refieren a JB.SKYLNES - DRON; \"usted\" y \"cliente\" se refieren al Contratante.",
+            "Sitio web: https://dron.joaobarres.dev",
+            "Email de contacto: contacto@joaobarres.dev",
+            "Dirección: 9 De Octubre y Bolívar, Edificios Reinoso Of.1"
           ]
         },
-        "tree": {
-          "subTitle": "3. PRECIOS Y PAGOS",
-          "text":"Los precios varían según el tipo de servicio, la duración del evento y la ubicación. Para conocer una cotización personalizada, no dudes en contactarme directamente.",
-          "lists": [
-            {
-              "header": "3.1 Condiciones de Reserva",
-              "description": [
-                "Para confirmar y apartar la fecha de tu evento, se requiere un anticipo del 50% del valor total del servicio. El 50% restante se cancela el día del evento, antes de iniciar el trabajo.",
-                "La fecha queda reservada únicamente una vez recibido el anticipo. No se guardan fechas sin confirmación de pago."
-              ]
-            },
-            {
-              "header": "3.2 Movilización",
-              "description": [
-                "Si el evento se realiza fuera del área de cobertura habitual, se aplicará un costo adicional por movilización, el cual será informado previamente en la cotización según la distancia y las condiciones del lugar."
-              ]
-            },
-            {
-              "header": "3.3 Eventos de Larga Duración",
-              "description": [
-                "Bodas, matrimonios, quinceañeros, grados y otros eventos de larga duración tienen una tarifa diferenciada acorde al tiempo y esfuerzo que demanda el servicio. Este valor se detalla con claridad en cada cotización para que no haya sorpresas."
-              ]
-            }
+        "three": {
+          "subTitle": "2. OBJETO DEL CONTRATO",
+          "text": [
+            "El objeto de la relación contractual es la prestación de servicios profesionales de grabación de video aérea y terrestre mediante aeronaves no tripuladas (drones), producción audiovisual, edición y entrega de material digital, así como el otorgamiento de licencias de uso sobre el material producido, de conformidad con estos Términos y la legislación ecuatoriana vigente."
           ]
         },
         "four": {
-          "subTitle": "4. Entrega del Material",
+          "subTitle": "3. PRODUCTOS Y SERVICIOS",
           "text": [
-            "Una vez finalizado el evento, todo el material editado se entrega de forma 100% digital, directamente desde la comodidad de tu hogar."
-          ],
-          "lists": [
-            {
-              "header": "4.1 ¿Cómo se entrega?",
-              "description": [
-                "El material se envía a través de plataformas digitales (Google Drive, WeTransfer, o similar), por lo que no necesitas desplazarte ni esperar envíos físicos. Recibirás un enlace de descarga directamente por WhatsApp o correo electrónico."
-              ]
-            },
-            {
-              "header": "4.2 Tiempo de Entrega",
-              "description": [
-                "El tiempo de entrega depende del paquete que hayas elegido y de la cantidad de material a editar"
-              ]
-            }
+            "JB.SKYLNES - DRON ofrece servicios de captación de imágenes y video con tecnología de dron para eventos, proyectos comerciales, inmobiliarios, publicitarios y otros. Nos esforzamos por mostrar con la mayor precisión posible los resultados en el sitio web. Sin embargo, las condiciones climáticas, de iluminación y del entorno pueden influir en el producto final, sin que esto constituya incumplimiento contractual. Los servicios se prestarán de conformidad con la normativa de la Dirección General de Aviación Civil (DGAC) del Ecuador."
           ]
         },
         "five": {
-          "subTitle": "5. POLÍTICA DE CANCELACIONES",
-          "text": [
-            "Aceptamos cancelaciones dentro de los 7 días anterior a la reserva del paquete."
-          ],
+          "subTitle": "4. PRECIOS Y PAGOS",
+          "text": "Los precios varían según el tipo de servicio, la duración del evento, la ubicación y el tipo de licencia de uso solicitada. Todos los precios se expresan en dólares americanos (USD), moneda de curso legal en el Ecuador.",
           "lists": [
             {
-              "header": "5.1 Proceso de Cancelacion",
+              "header": "4.1 Condiciones de Reserva",
               "description": [
-                "Devolución del dinero:"
+                "Para confirmar y apartar la fecha del servicio, se requiere un anticipo del 50% del valor total acordado en la cotización. El 50% restante deberá ser cancelado el día del evento o al momento de la llegada al lugar donde el cliente desea realizar la grabación, previamente al inicio del trabajo. La fecha queda reservada únicamente una vez recibido y verificado el pago del anticipo.",
+                "El envío y confirmación del pago del anticipo del 50% actuará como manifestación expresa de voluntad y constituirá un contrato vinculante entre el cliente y JB.SKYLNES - DRON, siendo plenamente válidos y exigibles desde ese momento todos los presentes Términos y Condiciones, de conformidad con el Art. 1461 y siguientes del Código Civil ecuatoriano y el Art. 48 de la Ley de Comercio Electrónico, Firmas Electrónicas y Mensajes de Datos. El cliente declara conocer y aceptar íntegramente estos Términos al realizar dicho pago, sin necesidad de firma adicional."
+              ]
+            },
+            {
+              "header": "4.2 Condiciones Climáticas y Decisión del Piloto",
+              "description": [
+                "En caso de que las condiciones climáticas representen un riesgo para la operación segura del dron (viento excesivo, lluvia, niebla, tormenta eléctrica u otras condiciones adversas), la decisión final sobre la viabilidad del vuelo corresponde única y exclusivamente al piloto operador de JB.SKYLNES - DRON. Esta determinación se tomará en función de la seguridad de las personas, los bienes y la aeronave, y ningún cliente, contratante o tercero podrá exigir el vuelo bajo condiciones que el piloto considere inseguras.",
+                "Reprogramación por clima — estando en el lugar: Si el piloto ya se encuentra presente en el lugar de grabación y las condiciones climáticas impiden realizar el vuelo, obligándose a reprogramar el servicio para otro día, se aplicará un recargo de USD $10,00 por concepto de movilización incurrida. Este valor deberá ser cancelado por el cliente antes de la nueva fecha de grabación.",
+                "Aviso previo con 1 hora de anticipación: Si el cliente o el piloto notifican con al menos una (1) hora de anticipación antes del inicio del servicio que las condiciones climáticas no permiten realizar la grabación, la reprogramación no generará ningún costo adicional por movilización. En este caso, se coordinará una nueva fecha de común acuerdo entre las partes sin penalización económica."
+              ]
+            },
+            {
+              "header": "4.3 Paquetes de Servicio",
+              "description": [
+                "JB.SKYLNES - DRON ofrece los siguientes paquetes de servicio. El precio de cada paquete será informado en la cotización personalizada."
               ],
               "items": [
-                "A través de transferencia (cuenta de ahorros, cuenta corriente): se realiza aproximadamente dentro de los cinco días hábiles."
+                "Paquete 1 — Básico (Cobertura Express): 20 a 30 minutos de vuelo. 3 fotos editadas. 2 videos cortos (30 segundos cada uno). Ideal para: contenido rápido, redes sociales, momentos puntuales.",
+                "Paquete 2 — Premium (Cobertura Completa): 1 a 1,5 horas de vuelo. 15 fotos editadas. 10 videos cortos (duración variada). Edición básica incluida. Ideal para: eventos, discotecas, marcas.",
+                "Paquete 3 — VIP (Producción Avanzada): 1,5 a 2 horas de vuelo. 25 fotos editadas. 20 videos cortos (30 segundos cada uno). Edición avanzada y más trabajada. Ideal para: eventos grandes, campañas publicitarias, clientes con requerimientos exigentes.",
+                "Paquete 4 — Inspección Técnica: Tiempo de vuelo según alcance del proyecto. Fotos técnicas detalladas y videos de inspección. Aplicaciones: buques, infraestructura, terrenos (invasiones, minería, entre otros). Material entregado listo para análisis técnico o pericial.",
+                "Paquete 5 — Promocional / Turístico: Tomas tipo cine (playas, negocios, hoteles y atractivos turísticos). Fotos y video promocional. Edición enfocada en marketing y promoción de marca o destino.",
+                "Extras: Entrega rápida 24h (costo adicional), videos y fotos adicionales (costo por unidad), movilización fuera de zona (según distancia, ver cláusula 4.6), reprogramación por clima estando en el lugar (USD $10,00, ver cláusula 4.2)."
+              ]
+            },
+            {
+              "header": "4.4 Larga Duración",
+              "description": [
+                "Bodas, matrimonios, quinceañeros, grados y otros eventos de larga duración tienen una tarifa diferenciada acorde al tiempo y esfuerzo que demanda el servicio, detallada con claridad en cada cotización."
+              ]
+            },
+            {
+              "header": "4.5 Área de Cobertura Habitual",
+              "description": [
+                "El área de cobertura habitual de JB.SKYLNES - DRON comprende la ciudad y parroquia de Esmeraldas, con un radio de hasta diez (10) kilómetros a partir del punto de base de operaciones ubicado en las coordenadas geográficas Latitud 0.96730, Longitud -79.65209. Todos los servicios que se presten dentro de esta zona no generarán costo adicional por concepto de movilización."
+              ]
+            },
+            {
+              "header": "4.6 Movilización fuera del Área de Cobertura",
+              "description": [
+                "Si el evento o grabación se realiza fuera del radio de cobertura habitual de diez (10) kilómetros descrito en la cláusula 4.5, se aplicará un costo adicional por movilización, el cual será informado previamente y de forma expresa en la cotización, según la distancia y las condiciones del lugar."
               ]
             }
           ]
         },
         "six": {
-          "subTitle": "6. PRIVACIDAD Y PROTECCIÓN DE DATOS",
+          "subTitle": "5. ENTREGA DEL MATERIAL",
           "text": [
-            "Nos comprometemos a proteger su privacidad. La información personal que nos proporcione se utilizará únicamente para procesar su pedido y mejorar su experiencia de compra."
+            "Una vez finalizado el evento y el proceso de edición, todo el material se entregará de forma 100% digital al cliente."
+          ],
+          "lists": [
+            {
+              "header": "5.1 ¿Cómo se realiza la entrega?",
+              "description": [
+                "El material se envía a través de plataformas digitales (Google Drive, WeTransfer o similar). El cliente recibirá un enlace de descarga por WhatsApp o correo electrónico. El Prestador no será responsable por la pérdida del enlace una vez enviado."
+              ]
+            },
+            {
+              "header": "5.2 Tiempo de Entrega",
+              "description": [
+                "El tiempo de entrega depende del paquete contratado y la cantidad de material a editar, especificado en la cotización. Los plazos comienzan a contar desde la finalización del evento."
+              ]
+            }
           ]
         },
         "seven": {
-          "subTitle": "7. MODIFICACIONES DE LOS TÉRMINOS",
+          "subTitle": "6. PROPIEDAD INTELECTUAL Y DERECHOS DE AUTOR",
+          "lists": [
+            {
+              "header": "6.1 Titularidad Original",
+              "description": [
+                "De conformidad con los Artículos 107 y siguientes del Código Orgánico de la Economía Social de los Conocimientos, Creatividad e Innovación (Código INGENIOS, R.O. Suplemento No. 899, 9 de diciembre de 2016), todas las grabaciones de video, imágenes aéreas, tomas, secuencias, composiciones, ediciones, postproducción y cualquier otro contenido audiovisual generado durante la prestación de los servicios son obras protegidas por el derecho de autor, cuya titularidad original y exclusiva pertenece a JB.SKYLNES - DRON en su calidad de autor y productor audiovisual."
+              ]
+            },
+            {
+              "header": "6.2 Reserva de Derechos",
+              "description": [
+                "JB.SKYLNES - DRON se reserva expresamente, conforme al Art. 123 del Código INGENIOS, todos los derechos morales y patrimoniales sobre las obras generadas, incluyendo: (a) el derecho de reproducción; (b) el derecho de distribución; (c) el derecho de comunicación pública; (d) el derecho de transformación o adaptación; y (e) el derecho de puesta a disposición del público. Estos derechos solo podrán ser ejercidos por el cliente mediante licencia expresa o cesión escrita."
+              ]
+            },
+            {
+              "header": "6.3 Uso en Portafolio",
+              "description": [
+                "El Prestador se reserva el derecho de utilizar fragmentos del material producido para su portafolio profesional, publicidad, redes sociales y demostraciones comerciales. Si el cliente no desea que su material sea utilizado con estos fines, deberá comunicarlo por escrito al momento de la contratación, lo cual podría implicar una tarifa adicional por exclusividad total."
+              ]
+            }
+          ]
+        },
+        "eight": {
+          "subTitle": "7. LICENCIAS DE USO CONCEDIDAS AL CLIENTE",
           "text": [
-            "Nos reservamos el derecho de modificar estos términos en cualquier momento. Los cambios entrarán en vigor inmediatamente después de su publicación en el sitio web."
+            "La entrega del material al cliente no implica la transferencia de la titularidad de los derechos de autor, sino únicamente el otorgamiento de una licencia de uso, conforme a lo contratado y según los Artículos 127 y siguientes del Código INGENIOS."
+          ],
+          "lists": [
+            {
+              "header": "7.1 Licencia de Uso Personal (Estándar)",
+              "description": [
+                "Salvo acuerdo contrario, el cliente recibe una licencia no exclusiva, intransferible y sin posibilidad de sublicencia, para el uso personal y privado del material. Comprende: (a) visualización y goce personal; (b) publicación en redes sociales personales del cliente con mención o crédito al Prestador cuando sea posible; y (c) compartición no lucrativa con familiares y amigos. Queda expresamente prohibido bajo esta licencia cualquier uso comercial, publicidad, lucro directo o indirecto, venta o sublicenciamiento del material."
+              ]
+            },
+            {
+              "header": "7.2 Licencia de Uso Comercial",
+              "description": [
+                "Cuando el cliente requiera utilizar el material para fines comerciales, publicitarios, de marketing, bienes raíces, plataformas con monetización, publicidad pagada (ads), difusión masiva o cualquier actividad que genere beneficio económico, deberá contratar expresamente la Licencia de Uso Comercial, la cual tiene un costo adicional al precio base del servicio.",
+                "La Licencia de Uso Comercial otorga al cliente el derecho no exclusivo de utilizar el material para los fines específicamente acordados en la cotización o contrato de licencia. El alcance geográfico, la duración, los medios de difusión y demás condiciones quedarán establecidos por escrito. Esta licencia no implica la transferencia del derecho de autor."
+              ]
+            },
+            {
+              "header": "7.3 Cesión Total de Derechos Patrimoniales",
+              "description": [
+                "Si el cliente desea adquirir la titularidad completa de los derechos patrimoniales sobre el material, incluyendo el derecho de modificación, sublicenciamiento, reproducción ilimitada y explotación comercial total, deberá solicitarlo expresamente y suscribir un Contrato de Cesión de Derechos Patrimoniales de Autor conforme al Art. 128 del Código INGENIOS, mediante instrumento escrito con firma de las partes y a un valor diferenciado. Los derechos morales del autor son irrenunciables e inalienables conforme al Art. 122 del Código INGENIOS."
+              ]
+            },
+            {
+              "header": "7.4 Prohibiciones Generales",
+              "description": [
+                "Con independencia del tipo de licencia contratada, queda expresamente prohibido al cliente:"
+              ],
+              "items": [
+                "Revender, sublicenciar o transferir el material a terceros sin autorización escrita del Prestador.",
+                "Eliminar, modificar u ocultar los metadatos, marcas de agua o cualquier indicación de autoría del material.",
+                "Utilizar el material en contextos que dañen la reputación, imagen o valores del Prestador.",
+                "Presentar el material como obra propia o de un tercero distinto al Prestador.",
+                "Utilizar el material en campañas políticas, contenido para adultos, material difamatorio o actividades ilícitas.",
+                "Utilizar el material más allá del alcance, plazo y territorio pactados en la licencia contratada."
+              ]
+            }
+          ]
+        },
+        "nine": {
+          "subTitle": "8. POLÍTICA DE CANCELACIONES Y DEVOLUCIONES",
+          "text": [
+            "De conformidad con el Art. 1505 y siguientes del Código Civil ecuatoriano y las disposiciones del Código de Comercio:"
+          ],
+          "lists": [
+            {
+              "header": "8.1 Cancelación por parte del Cliente",
+              "description": [
+                "Se aceptarán cancelaciones únicamente cuando sean notificadas por escrito al Prestador con mínimo siete (7) días hábiles de anticipación a la fecha del evento. Las cancelaciones dentro de este plazo darán derecho a la devolución del 100% del anticipo."
+              ]
+            },
+            {
+              "header": "8.2 Cancelación fuera de plazo",
+              "description": [
+                "Si la cancelación se realiza con menos de siete (7) días hábiles o el mismo día del evento, el anticipo quedará retenido como compensación por la reserva de la fecha y gastos operativos incurridos."
+              ]
+            },
+            {
+              "header": "8.3 Proceso de Devolución",
+              "description": [
+                "Las devoluciones procedentes se realizarán mediante transferencia bancaria (cuenta de ahorros o corriente) dentro de los cinco (5) días hábiles siguientes a la confirmación de la cancelación."
+              ]
+            },
+            {
+              "header": "8.4 Cancelación por parte del Prestador",
+              "description": [
+                "Si el Prestador cancela por causas imputables a él, se devolverá el 100% del anticipo. En caso de fuerza mayor o caso fortuito (mal clima extremo, prohibición de vuelo, emergencia sanitaria u otros debidamente justificados), se acordará una nueva fecha sin costo adicional o, de no ser posible, se devolverá el 100% del anticipo."
+              ]
+            }
+          ]
+        },
+        "ten": {
+          "subTitle": "9. PRIVACIDAD Y PROTECCIÓN DE DATOS PERSONALES",
+          "text": [
+            "De conformidad con la Ley Orgánica de Protección de Datos Personales del Ecuador (R.O. Suplemento No. 459 del 26 de mayo de 2021), JB.SKYLNES - DRON se compromete a:"
+          ],
+          "items": [
+            "Tratar los datos personales del cliente únicamente para los fines necesarios en la ejecución del servicio, gestión de pagos y comunicación.",
+            "No ceder, vender ni compartir datos personales con terceros sin el consentimiento previo del titular, salvo obligación legal.",
+            "Implementar medidas técnicas razonables para proteger la información personal contra acceso no autorizado o divulgación.",
+            "Respetar los derechos ARCO (Acceso, Rectificación, Cancelación y Oposición) del titular, ejercibles mediante solicitud escrita al email de contacto."
+          ]
+        },
+        "eleven": {
+          "subTitle": "10. RESPONSABILIDAD Y LIMITACIONES",
+          "lists": [
+            {
+              "header": "10.1 Condiciones externas",
+              "description": [
+                "El Prestador no será responsable por la calidad del material cuando esta se vea afectada por condiciones climáticas adversas, restricciones de espacio aéreo, interferencias electrónicas u otras circunstancias ajenas a su control."
+              ]
+            },
+            {
+              "header": "10.2 Obligaciones del Cliente",
+              "description": [
+                "El cliente es responsable de obtener los permisos necesarios del propietario o administrador del lugar de grabación y de garantizar condiciones mínimas de seguridad para la operación del dron. El incumplimiento exime al Prestador de cualquier responsabilidad derivada."
+              ]
+            },
+            {
+              "header": "10.3 Daño o Avería del Equipo durante la Grabación",
+              "description": [
+                "En caso de que el equipo de dron u otros equipos utilizados sufran daños, avería o pérdida durante el transcurso de una grabación o evento, siempre que dicho daño no sea exclusivamente imputable a una sola de las partes, la responsabilidad económica será compartida en partes iguales: 50% el Prestador y 50% el cliente.",
+                "Se considera causa compartida, entre otros: interferencias del entorno, condiciones del lugar bajo control del cliente, manipulación no autorizada del equipo por terceros presentes en el evento, o cualquier factor en que ambas partes hayan tenido participación o conocimiento. En caso de daño exclusivamente imputable al cliente o a terceros bajo su responsabilidad, la reparación o reposición será asumida en su totalidad por el cliente."
+              ]
+            },
+            {
+              "header": "10.4 Conservación del Material",
+              "description": [
+                "Una vez entregado el enlace de descarga, el Prestador no garantiza la conservación indefinida del material en sus servidores. Se recomienda al cliente realizar copias de seguridad de inmediato. El Prestador guardará el material por un mínimo de treinta (30) días calendario tras la entrega."
+              ]
+            }
+          ]
+        },
+        "twelve": {
+          "subTitle": "11. OPERACIÓN DE AERONAVES NO TRIPULADAS",
+          "text": [
+            "Los servicios de captación aérea se prestan en cumplimiento de la normativa emitida por la Dirección General de Aviación Civil (DGAC) del Ecuador y la regulación vigente para sistemas de aeronaves no tripuladas (UAS/RPAS). El Prestador se reserva el derecho de suspender la operación si las condiciones representan un riesgo para la seguridad de personas, bienes o la aeronave, o si las autoridades lo prohíben, aplicándose en dicho caso las disposiciones de la Sección 8.4."
+          ]
+        },
+        "thirteen": {
+          "subTitle": "12. MODIFICACIONES DE LOS TÉRMINOS",
+          "text": [
+            "JB.SKYLNES - DRON se reserva el derecho de modificar estos Términos en cualquier momento. Los cambios entrarán en vigor inmediatamente después de su publicación en https://dron.joaobarres.dev. La continuación del uso de los servicios implicará la aceptación de los nuevos términos. Las modificaciones no afectarán los contratos ya celebrados y vigentes al momento del cambio, salvo acuerdo expreso entre las partes."
+          ]
+        },
+        "fourteen": {
+          "subTitle": "13. RESOLUCIÓN DE CONFLICTOS Y JURISDICCIÓN",
+          "text": [
+            "Cualquier controversia derivada de la interpretación, ejecución o incumplimiento de estos Términos será resuelta, en primer lugar, mediante negociación directa de buena fe. De no llegarse a acuerdo en quince (15) días hábiles desde la notificación, las partes se someten expresamente a la jurisdicción y competencia de los jueces, tribunales y mediadores de la ciudad de Esmeraldas, provincia de Esmeraldas, República del Ecuador, renunciando a cualquier otro fuero o jurisdicción. Podrá recurrirse igualmente a los métodos alternativos de solución de conflictos previstos en la Ley de Arbitraje y Mediación del Ecuador, ante los centros de mediación competentes de la ciudad de Esmeraldas."
+          ]
+        },
+        "fifteen": {
+          "subTitle": "14. DISPOSICIONES FINALES",
+          "lists": [
+            {
+              "header": "14.1 Integración",
+              "description": [
+                "Estos Términos, junto con la cotización aceptada y cualquier contrato de licencia suscrito, constituyen el acuerdo completo entre las partes y reemplazan cualquier acuerdo anterior."
+              ]
+            },
+            {
+              "header": "14.2 Separabilidad",
+              "description": [
+                "Si alguna cláusula fuera declarada nula o inaplicable, las demás cláusulas conservarán plena validez."
+              ]
+            },
+            {
+              "header": "14.3 Renuncia",
+              "description": [
+                "El no ejercicio de cualquier derecho bajo estos Términos no constituirá renuncia a dicho derecho."
+              ]
+            },
+            {
+              "header": "14.4 Legislación Aplicable",
+              "description": [
+                "Estos Términos se rigen por las leyes de la República del Ecuador, en especial: el Código Civil, el Código de Comercio, el Código INGENIOS, la Ley Orgánica de Protección de Datos Personales, y la Ley de Comercio Electrónico, Firmas Electrónicas y Mensajes de Datos."
+              ]
+            }
           ]
         }
-
       }
     }
   },
