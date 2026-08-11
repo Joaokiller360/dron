@@ -43,6 +43,7 @@ export default async function LocaleLayout({
           `}
       </Script>
       <meta name="google-site-verification" content={process.env.GOOGLE_VERIFICATION} />
+      <meta name="facebook-domain-verification" content="su8ehc2fcspvkdjoxtlukqp5p6wobg" />
       <div className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <NextIntlClientProvider messages={messages}>
           <FlowbiteInit />

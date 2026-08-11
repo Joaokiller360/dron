@@ -42,7 +42,7 @@ export default function urbanFlightOperations() {
           regulation('keywords.0.label'),
         ]}
         keywordLink={{
-          [regulation('keywords.dgac.label')]: regulation('links.dgac')
+          [regulation('keywords.0.label')]: regulation('links.dgac')
         }}
         Content={[
           {

@@ -46,9 +46,11 @@ export default function LegalPage({
                 <ScrollRevealEffect key={index}>
                   {/* Heading */}
                   {section.heading && (
-                    <h2 className="pt-4 text-2xl font-semibold uppercase text-heading">
-                      {section.heading}
-                    </h2>
+                    <div className="pt-4">
+                      <a href={`#${section.heading}`} id={section.heading} className="text-2xl font-semibold uppercase text-heading">
+                        {section.heading}
+                      </a>
+                    </div>
                   )}
 
                   {/* Text */}
@@ -70,14 +72,14 @@ export default function LegalPage({
                       <ScrollRevealEffect key={i}>
                         <div className="space-y-2">
                           {list.header && (
-                            <h3 className="text-xl font-semibold text-heading">
+                            <a href={`#${list.header}`} id={list.header} className="text-xl font-semibold text-heading">
                               {list.header}
-                            </h3>
+                            </a>
                           )}
 
                           <div className="pl-3">
-                            
-                             {(Array.isArray(list.description) ? list.description : []).map((desc, h) => (
+
+                            {(Array.isArray(list.description) ? list.description : []).map((desc, h) => (
                               <p className="pl-2 text-lg text-muted" key={h}>
                                 {highlightText(desc, keyword)}
                               </p>
