@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ContactStatus {
+  NEW
+  READ
+  ARCHIVED
+}
+
+enum ProjectCategory {
+  BODAS
+  XV
+  EVENTOS
+  INMOBILIARIA
+  INSPECCION
+  TOURS360
+  PRODUCCION
+}
+
+model AdminUser {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  name         String
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("admin_users")
+}
+
+model ContactMessage {
+  id        String        @id @default(uuid())
+  name      String
+  phone     String
+  email     String
+  message   String
+  locale    String        @default("es")
+  status    ContactStatus @default(NEW)
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+
+  @@map("contact_messages")
+  @@index([status])
+}
+
+model Project {
+  id             String          @id @default(uuid())
+  slug           String          @unique
+  category       ProjectCategory
+  titleEs        String          @map("title_es")
+  titleEn        String?         @map("title_en")
+  descriptionEs  String?         @map("description_es")
+  descriptionEn  String?         @map("description_en")
+  coverUrl       String          @map("cover_url")
+  mediaUrls      String[]        @default([]) @map("media_urls")
+  published      Boolean         @default(true)
+  sortOrder      Int             @default(0) @map("sort_order")
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+
+  @@map("projects")
+  @@index([category])
+  @@index([published])
+}

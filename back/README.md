@@ -1,39 +1,97 @@
-# JB.SKYLENS backend (PostgREST)
+# JB.SKYLENS backend
 
-Postgres + PostgREST, exposing two tables from `db/schema.sql`:
+NestJS API backing the JB.SKYLENS site.
 
-- `api.contact_messages` — mirrors the fields in `front/app/[locale]/(site)/contact/ContactClient.tsx` (name, phone, email, message). Insert-only via the `web_anon`/`web_contact` role; only `web_admin` (authenticated) can read/update.
-- `api.projects` — portfolio/gallery items, meant to replace the static entries currently hardcoded in `front/translate/es.json` / `en.json` under `portfolio` and `home.gallery`. Public read of published rows; `web_admin` manages writes.
+| Tecnología | Versión | Uso |
+|---|---|---|
+| Node.js | 20.x | Runtime |
+| NestJS | 10.x | Framework principal |
+| TypeScript | 5.x | Lenguaje |
+| PostgreSQL | 16.x | Base de datos |
+| Prisma | 5.x | ORM |
+| JWT | — | Autenticación |
+| Bcrypt | — | Hash de contraseñas |
+| Swagger/OpenAPI | 7.x | Documentación |
+| Docker | — | Contenedores |
+| Winston | — | Logging |
 
-## Local run
+## Estructura
 
-```bash
-cp .env.example .env   # fill in real passwords/secret
-docker compose up -d
+```
+back/
+├── src/
+│   ├── auth/            # login (JWT), guard, estrategia passport-jwt
+│   ├── users/           # AdminUser lookups usados por auth
+│   ├── contact/         # POST público (form de contacto) + CRUD admin
+│   ├── projects/        # portfolio/galería: lectura pública + CRUD admin
+│   ├── health/          # GET /api/health (ping a la DB)
+│   ├── prisma/          # PrismaService/PrismaModule (@Global)
+│   ├── common/          # filtro de excepciones, interceptor de logging, winston
+│   ├── config/          # configuration.ts + validación de env (class-validator)
+│   ├── app.module.ts
+│   └── main.ts          # helmet, CORS, ValidationPipe, Swagger en /api/docs
+├── prisma/
+│   ├── schema.prisma    # AdminUser, ContactMessage, Project
+│   └── seed.ts          # crea el admin inicial desde ADMIN_EMAIL/ADMIN_PASSWORD
+├── Dockerfile
+├── docker-compose.yml   # postgres + api
+└── .env.example
 ```
 
-PostgREST will be at `http://localhost:3001`. Try:
+## Modelo de datos
+
+- **AdminUser** — cuentas de staff para el panel admin (email + passwordHash con bcrypt).
+- **ContactMessage** — mismos campos que el form en `front/app/[locale]/(site)/contact/ContactClient.tsx` (name, phone, email, message) + status (new/read/archived).
+- **Project** — reemplaza el contenido estático de portfolio/galería en `front/translate/{es,en}.json`: slug, category, title/description es+en, coverUrl, mediaUrls[], published, sortOrder.
+
+## Correr en local
 
 ```bash
-curl http://localhost:3001/projects
-curl -X POST http://localhost:3001/contact_messages \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Joao","phone":"0987654321","email":"a@b.com","message":"hola"}'
+cp .env.example .env        # completa DATABASE_URL, JWT_SECRET, etc.
+npm install
+npm run prisma:migrate:dev  # crea las tablas
+npm run prisma:seed         # crea el admin (ADMIN_EMAIL/ADMIN_PASSWORD del .env)
+npm run start:dev
 ```
 
-The anon role can only insert into `contact_messages` and read `projects` where `published = true` (enforced by RLS policies in `schema.sql`). Reading/managing everything else requires a JWT with `role: web_admin`, signed with `PGRST_JWT_SECRET`.
+- API: `http://localhost:3001/api`
+- Swagger: `http://localhost:3001/api/docs`
+- Health: `http://localhost:3001/api/health`
 
-## What's needed to deploy this for real
+Necesitas un Postgres corriendo; el más rápido es `docker compose up -d db` (usa el mismo `.env`).
 
-1. **A host to run two long-lived processes**: Postgres and PostgREST. Options, cheapest/simplest first:
-   - A single VPS (e.g. a $6/mo box) running this `docker-compose.yml` directly — least moving parts.
-   - Managed Postgres (Supabase, Neon, Railway Postgres, RDS) + PostgREST run separately as a container (Railway, Fly.io, Render) pointed at that DB via `PGRST_DB_URI`.
-   - Supabase specifically already *is* Postgres+PostgREST — if you go that route you don't need this compose file at all, just apply `schema.sql` to their SQL editor.
-2. **TLS + a domain** in front of PostgREST (it only speaks plain HTTP). A reverse proxy (Caddy/nginx/Traefik) or the platform's built-in HTTPS (Railway/Fly/Render all do this for you).
-3. **Real secrets**: strong `POSTGRES_PASSWORD`, `AUTHENTICATOR_PASSWORD`, and a `PGRST_JWT_SECRET` (32+ random bytes) — never the placeholders in `.env.example`. These must NOT go in the git repo.
-4. **A way to issue JWTs** for the `web_admin` role if you want an admin panel to manage `projects`/read `contact_messages` — e.g. a tiny login endpoint (could live in `front/` as a Next.js API route) that checks a password and signs a JWT with `{"role": "web_admin"}` using `PGRST_JWT_SECRET`.
-5. **Point the contact form at it**: swap (or complement) the EmailJS call in `front/app/hooks/from-email/index.tsx` for a `fetch('POST /contact_messages')` against the deployed PostgREST URL, using the anon key/role — no JWT needed for that one since it's insert-only.
-6. **Backups** for the Postgres volume (`pgdata`) if you self-host — managed Postgres providers handle this for you.
-7. **CORS**: if the front and PostgREST are on different domains, set `PGRST_SERVER_CORS_ALLOWED_ORIGINS` (or handle CORS at the reverse proxy) to the front's origin.
+## Correr todo con Docker
 
-Tell me which hosting route you want (VPS+compose, or managed Postgres + separate PostgREST container, or Supabase) and I'll wire the actual deploy config next.
+```bash
+cp .env.example .env
+docker compose up -d --build
+```
+
+Esto levanta Postgres + la API (corre `prisma migrate deploy` al arrancar). Falta correr el seed del admin una vez:
+
+```bash
+docker compose exec api npm run prisma:seed
+```
+
+## Endpoints principales
+
+| Método | Ruta | Auth | Descripción |
+|---|---|---|---|
+| POST | `/api/auth/login` | — | Login admin, devuelve JWT |
+| GET | `/api/auth/me` | Bearer | Usuario autenticado actual |
+| POST | `/api/contact-messages` | — | Público: enviar form de contacto (rate-limited) |
+| GET | `/api/contact-messages` | Bearer | Admin: listar mensajes |
+| PATCH | `/api/contact-messages/:id/status` | Bearer | Admin: marcar new/read/archived |
+| GET | `/api/projects` | — | Público: proyectos publicados |
+| GET | `/api/projects/admin` | Bearer | Admin: todos los proyectos |
+| POST/PATCH/DELETE | `/api/projects[...]` | Bearer | Admin: CRUD de proyectos |
+| GET | `/api/health` | — | Liveness/readiness |
+
+## Qué falta para desplegar
+
+1. **Host** que corra Docker (VPS, Railway, Render, Fly.io) — usa `docker-compose.yml` como base, o separa Postgres administrado (Neon/Supabase/RDS) de la API.
+2. **Secrets reales**: `POSTGRES_PASSWORD`, `JWT_SECRET` (32+ bytes random), `ADMIN_PASSWORD` — nunca los del `.env.example`, y nunca commiteados.
+3. **TLS + dominio** delante de la API (Nest sirve HTTP plano); usa el proxy/HTTPS del proveedor o Caddy/nginx.
+4. **CORS_ORIGIN** apuntando al dominio real del front (`front/`), no `*`, una vez en producción.
+5. **Conectar el front**: reemplazar la llamada a EmailJS en `front/app/hooks/from-email/index.tsx` por un `fetch('POST', '${API_URL}/api/contact-messages')`.
+6. **Backups** del volumen `pgdata` si el Postgres es autogestionado.
