@@ -17,7 +17,7 @@
 
 ---
 
-> **Monorepo**: código del sitio en [`front/`](./front), backend (PostgREST + Postgres) en [`back/`](./back).
+> **Monorepo**: código del sitio en [`front/`](./front), backend (NestJS + Prisma + PostgreSQL) en [`back/`](./back).
 
 ## 📋 Descripción
 
@@ -208,11 +208,13 @@ jbskylens-dron/
 │   ├── tsconfig.json               # Configuración de TypeScript
 │   └── package.json                # Dependencias y scripts
 │
-└── back/                           # Backend PostgREST + Postgres (ver back/README.md)
-    ├── db/
-    │   ├── schema.sql               # Tablas api.contact_messages y api.projects, roles, RLS
-    │   └── 02-set-authenticator-password.sh
-    ├── docker-compose.yml
+└── back/                           # Backend NestJS + Prisma (ver back/README.md)
+    ├── src/                        # auth, users, contact, projects, health, prisma, common
+    ├── prisma/
+    │   ├── schema.prisma            # AdminUser, ContactMessage, Project
+    │   └── seed.ts
+    ├── Dockerfile
+    ├── docker-compose.yml          # postgres + api
     └── .env.example
 ```
 
