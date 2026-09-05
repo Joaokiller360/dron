@@ -17,6 +17,8 @@
 
 ---
 
+> **Monorepo**: código del sitio en [`front/`](./front), backend (PostgREST + Postgres) en [`back/`](./back).
+
 ## 📋 Descripción
 
 **JB.SKYLENS** es una operadora de drones independiente en Ecuador 🇪🇨, especializada en contenido aéreo profesional. Este repositorio contiene el código fuente de su sitio web, desarrollado con tecnologías modernas para ofrecer una experiencia rápida, responsive y optimizada para SEO.
@@ -126,7 +128,8 @@ export async function generateMetadata({ params }) {
 
 ```
 jbskylens-dron/
-├── app/
+├── front/                          # Sitio Next.js (todo lo de abajo vive dentro de front/)
+│   └── app/
 │   ├── [locale]/                  # Rutas con idioma dinámico (es/en)
 │   │   ├── (site)/                # Páginas del sitio
 │   │   │   ├── clients/           # Página de clientes
@@ -201,9 +204,16 @@ jbskylens-dron/
 ├── data.tsx                       # Datos de navegación
 ├── tailwind.config.js             # Configuración de Tailwind
 ├── next.config.ts                 # Configuración de Next.js con i18n
-├── nixpacks.toml                  # Configuración de despliegue
-├── tsconfig.json                  # Configuración de TypeScript
-└── package.json                   # Dependencias y scripts
+│   ├── nixpacks.toml               # Configuración de despliegue
+│   ├── tsconfig.json               # Configuración de TypeScript
+│   └── package.json                # Dependencias y scripts
+│
+└── back/                           # Backend PostgREST + Postgres (ver back/README.md)
+    ├── db/
+    │   ├── schema.sql               # Tablas api.contact_messages y api.projects, roles, RLS
+    │   └── 02-set-authenticator-password.sh
+    ├── docker-compose.yml
+    └── .env.example
 ```
 
 ---
@@ -221,8 +231,8 @@ jbskylens-dron/
 # Clonar el repositorio
 git clone https://github.com/Joaokiller360/dron.git
 
-# Entrar al directorio
-cd dron
+# Entrar al directorio del sitio
+cd dron/front
 
 # Instalar dependencias
 npm install
