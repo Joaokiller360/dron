@@ -31,6 +31,24 @@ export default function From({ additionalClasses = '' }: LogoProps) {
 
     if (!form.current) return;
 
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    if (apiUrl) {
+      const formData = new FormData(form.current);
+      fetch(`${apiUrl}/contact-messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: String(formData.get('name') ?? ''),
+          phone: String(formData.get('number') ?? ''),
+          email: String(formData.get('email') ?? ''),
+          message: String(formData.get('message') ?? ''),
+          locale,
+        }),
+      }).catch((err) => {
+        console.error('No se pudo guardar el mensaje en la bandeja del dashboard', err);
+      });
+    }
+
     try {
       const serviceId = `${process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID}`;
       const templateId = `${process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID}`;
