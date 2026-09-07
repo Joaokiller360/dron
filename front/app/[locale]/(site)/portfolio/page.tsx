@@ -1,7 +1,6 @@
 import { CallAction } from '@/app/component'
 import { Banner, SectionCard, CardVideo, ScrollBottonEffect } from '@/app/utils'
-import { useLocale, useTranslations } from 'next-intl'
-import { getMessages } from 'next-intl/server';
+import { getLocale, getMessages, getTranslations } from 'next-intl/server';
 
 // Metadatos traducidos usando next-intl
 export async function generateMetadata() {
@@ -17,13 +16,46 @@ export async function generateMetadata() {
   };
 }
 
-export default function Portfolio() {
+interface DbProject {
+  id: string;
+  slug: string;
+  category: string;
+  titleEs: string;
+  titleEn?: string | null;
+  coverUrl: string;
+}
 
-  const t = useTranslations('portfolio.collToAction');
-  const eventes = useTranslations('portfolio.events');
-  const d = useTranslations('clients.presentation');
-  const _ = useTranslations('portfolio');
-  const locale = useLocale();
+const CATEGORY_LABELS: Record<string, string> = {
+  BODAS: 'Bodas',
+  XV: 'XV años',
+  EVENTOS: 'Eventos',
+  INMOBILIARIA: 'Inmobiliaria',
+  INSPECCION: 'Inspección',
+  TOURS360: 'Tours 360',
+  PRODUCCION: 'Producción',
+};
+
+async function getPublishedProjects(): Promise<DbProject[]> {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (!apiUrl) return [];
+  try {
+    const res = await fetch(`${apiUrl}/projects`, { cache: 'no-store' });
+    if (!res.ok) return [];
+    return await res.json();
+  } catch {
+    return [];
+  }
+}
+
+export default async function Portfolio() {
+
+  const projects = await getPublishedProjects();
+
+  const t = await getTranslations('portfolio.collToAction');
+  const eventes = await getTranslations('portfolio.events');
+  const d = await getTranslations('clients.presentation');
+  const _ = await getTranslations('portfolio');
+  const locale = await getLocale();
 
   // Solo agregar prefijo de idioma si NO es el idioma por defecto (es)
   const prefix = locale === 'es' ? '' : `/${locale}`;
@@ -259,6 +291,33 @@ export default function Portfolio() {
                 </div>
               </div>
             </SectionCard>
+
+            {/* proyectos publicados desde el dashboard */}
+            {projects.length > 0 && (
+              <SectionCard style="bg-honeydew-900 dark:bg-honeydew-800">
+                <div>
+                  <ScrollBottonEffect>
+                    <div className='flex justify-center font-mono text-3xl font-semibold uppercase'>
+                      <span>{locale === 'en' ? 'Latest projects' : 'Últimos proyectos'}</span>
+                    </div>
+                    <hr className="my-3 h-0.5 border-t-0 bg-white" />
+                  </ScrollBottonEffect>
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {projects.map((p, index) => (
+                      <CardVideo
+                        key={p.id}
+                        index={index}
+                        anchorId={p.slug}
+                        title={locale === 'en' && p.titleEn ? p.titleEn : p.titleEs}
+                        organizacion={CATEGORY_LABELS[p.category] ?? p.category}
+                        coverUrl={p.coverUrl}
+                        href={p.coverUrl}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </SectionCard>
+            )}
           </section>
         </section>
 

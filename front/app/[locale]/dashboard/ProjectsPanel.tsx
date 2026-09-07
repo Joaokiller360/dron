@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, FormEvent } from 'react';
-import { FolderKanban, Eye, EyeOff, Trash2, PlusCircle } from 'lucide-react';
+import { FolderKanban, Eye, EyeOff, Trash2, PlusCircle, ExternalLink } from 'lucide-react';
 import { ScrollRevealEffect } from '@/app/utils';
 import { apiFetch, ApiError, Project, PROJECT_CATEGORIES, ProjectCategory } from './lib/api';
 
@@ -183,6 +183,18 @@ export default function ProjectsPanel() {
                   <p className="font-semibold">{p.titleEs}</p>
                   <p className="text-sm text-white/50">/{p.slug}</p>
                 </div>
+
+                {p.published && (
+                  <a
+                    href={`/portfolio#${p.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-3 py-2 text-xs font-bold text-black transition rounded-xl bg-honeydew-500 hover:bg-white"
+                  >
+                    <ExternalLink size={14} />
+                    Ver publicación
+                  </a>
+                )}
 
                 <div className="flex gap-2 mt-auto">
                   <button

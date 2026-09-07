@@ -26,19 +26,21 @@ interface CardVideo {
   href?: string
   videoname?: string
   imgName?: string
+  coverUrl?: string
+  anchorId?: string
   index: number
 }
 
 import { useLocale, useTranslations } from 'next-intl'
 
-export function CardVideo({ index = 0, title = '', organizacion = '', nameButton = '', href = '', videoname = '', imgName = '', present = '' }: CardVideo) {
+export function CardVideo({ index = 0, title = '', organizacion = '', nameButton = '', href = '', videoname = '', imgName = '', coverUrl = '', anchorId = '', present = '' }: CardVideo) {
 
   const t = useTranslations('portfolio')
 
   return (
     <>
       <ScrollRevealEffect index={index} key={title}>
-        <div className="flex flex-col h-full p-6 rounded-xl bg-honeydew-800 dark:bg-honeydew-900" id={title}>
+        <div className="flex flex-col h-full p-6 rounded-xl bg-honeydew-800 dark:bg-honeydew-900" id={anchorId || title}>
 
           {/* Imagen o Video */}
           <div className="relative overflow-hidden rounded-lg">
@@ -54,6 +56,16 @@ export function CardVideo({ index = 0, title = '', organizacion = '', nameButton
                 <source src={`https://res.cloudinary.com/dzlavqhid/video/upload/${videoname}.mp4`} type="video/mp4" />
                 {videoname}
               </video>
+            ) : coverUrl ? (
+              <img
+                loading="lazy"
+                src={coverUrl}
+                onError={(e) => {
+                  e.currentTarget.src = "/img/palmas-atardecer.jpg";
+                }}
+                alt={title || "imagen"}
+                className="object-cover w-full h-64 transition-transform duration-500 group-hover:scale-105"
+              />
             ) : (
               imgName && (
                 <img
