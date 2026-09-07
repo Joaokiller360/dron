@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react';
+import { Activity, Mail, FolderKanban, LogOut, Radar } from 'lucide-react';
 import LoginForm from './LoginForm';
 import HealthPanel from './HealthPanel';
 import MessagesPanel from './MessagesPanel';
@@ -9,10 +10,10 @@ import { TOKEN_KEY } from './lib/api';
 
 type Tab = 'health' | 'messages' | 'projects';
 
-const TABS: { id: Tab; label: string }[] = [
-  { id: 'health', label: 'Estado' },
-  { id: 'messages', label: 'Mensajes' },
-  { id: 'projects', label: 'Proyectos' },
+const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
+  { id: 'health', label: 'Estado', icon: <Activity size={16} /> },
+  { id: 'messages', label: 'Mensajes', icon: <Mail size={16} /> },
+  { id: 'projects', label: 'Proyectos', icon: <FolderKanban size={16} /> },
 ];
 
 export default function DashboardClient() {
@@ -42,36 +43,48 @@ export default function DashboardClient() {
   }
 
   return (
-    <div className="min-h-screen px-4 pt-28 pb-10 text-white bg-honeydew-900 sm:px-8">
+    <div className="min-h-screen px-4 pb-10 text-white pt-28 bg-honeydew-900 sm:px-8">
       <div className="max-w-4xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">JB.SKYLENS Dashboard</h1>
-            <p className="text-sm text-white/60">{email}</p>
+        <div className="flex flex-wrap items-center justify-between gap-4 p-4 shadow-lg bg-honeydew-800 rounded-2xl sm:p-6">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center justify-center rounded-full w-11 h-11 bg-honeydew-900 shrink-0">
+              <Radar size={22} strokeWidth={1.5} />
+            </div>
+            <div>
+              <span className="font-mono text-xs font-light tracking-widest uppercase text-honeydew-400">
+                JB.SKYLENS
+              </span>
+              <h1 className="font-mono text-lg font-bold leading-tight uppercase sm:text-xl">Dashboard</h1>
+              <p className="text-xs text-white/50">{email}</p>
+            </div>
           </div>
           <button
             onClick={logout}
-            className="px-4 py-2 text-sm font-bold rounded-xl bg-honeydew-800 hover:bg-white hover:text-black"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold transition duration-500 rounded-xl bg-honeydew-900 hover:bg-white hover:text-black"
           >
+            <LogOut size={16} />
             Cerrar sesión
           </button>
         </div>
 
-        <nav className="flex gap-2">
-          {TABS.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
-              className={`px-4 py-2 rounded-xl font-semibold transition ${
-                tab === t.id
-                  ? 'bg-honeydew-500 text-black'
-                  : 'bg-honeydew-800 hover:bg-white hover:text-black'
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
-        </nav>
+        <div className="flex justify-center">
+          <nav className="inline-flex gap-1 p-1 overflow-x-auto rounded-full bg-black/30 backdrop-blur-sm max-w-full">
+            {TABS.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => setTab(t.id)}
+                className={`inline-flex shrink-0 items-center gap-2 px-4 py-2 rounded-full font-mono text-xs font-semibold uppercase tracking-wide transition ${
+                  tab === t.id
+                    ? 'bg-honeydew-500 text-black'
+                    : 'text-white/70 hover:text-white'
+                }`}
+              >
+                {t.icon}
+                {t.label}
+              </button>
+            ))}
+          </nav>
+        </div>
 
         {tab === 'health' && <HealthPanel />}
         {tab === 'messages' && <MessagesPanel />}
