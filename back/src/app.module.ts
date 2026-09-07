@@ -10,6 +10,9 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ContactModule } from './contact/contact.module';
 import { ProjectsModule } from './projects/projects.module';
+import { TeamMembersModule } from './team-members/team-members.module';
+import { ClientsModule } from './clients/clients.module';
+import { ServicesModule } from './services/services.module';
 import { HealthModule } from './health/health.module';
 
 @Module({
@@ -27,6 +30,9 @@ import { HealthModule } from './health/health.module';
     UsersModule,
     ContactModule,
     ProjectsModule,
+    TeamMembersModule,
+    ClientsModule,
+    ServicesModule,
     HealthModule,
   ],
   providers: [

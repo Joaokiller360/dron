@@ -68,3 +68,53 @@ model Project {
   @@index([category])
   @@index([published])
 }
+
+model TeamMember {
+  id        String   @id @default(uuid())
+  slug      String   @unique
+  name      String
+  role      String
+  photoUrl  String   @map("photo_url")
+  links     Json     @default("[]")
+  published Boolean  @default(true)
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("team_members")
+  @@index([published])
+}
+
+model Client {
+  id           String   @id @default(uuid())
+  slug         String   @unique
+  name         String
+  organization String
+  photoUrl     String   @map("photo_url")
+  links        Json     @default("[]")
+  published    Boolean  @default(true)
+  sortOrder    Int      @default(0) @map("sort_order")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("clients")
+  @@index([published])
+}
+
+model Service {
+  id            String   @id @default(uuid())
+  slug          String   @unique
+  titleEs       String   @map("title_es")
+  titleEn       String?  @map("title_en")
+  descriptionEs String?  @map("description_es")
+  descriptionEn String?  @map("description_en")
+  coverUrl      String   @map("cover_url")
+  href          String?
+  published     Boolean  @default(true)
+  sortOrder     Int      @default(0) @map("sort_order")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("services")
+  @@index([published])
+}
