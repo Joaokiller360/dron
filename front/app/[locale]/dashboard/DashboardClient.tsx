@@ -1,19 +1,25 @@
 'use client'
 
 import { useEffect, useState } from 'react';
-import { Activity, Mail, FolderKanban, LogOut, Radar } from 'lucide-react';
+import { Activity, Mail, FolderKanban, Users, Handshake, Wrench, LogOut, Radar } from 'lucide-react';
 import LoginForm from './LoginForm';
 import HealthPanel from './HealthPanel';
 import MessagesPanel from './MessagesPanel';
 import ProjectsPanel from './ProjectsPanel';
+import TeamPanel from './TeamPanel';
+import ClientsPanel from './ClientsPanel';
+import ServicesPanel from './ServicesPanel';
 import { TOKEN_KEY } from './lib/api';
 
-type Tab = 'health' | 'messages' | 'projects';
+type Tab = 'health' | 'messages' | 'projects' | 'team' | 'clients' | 'services';
 
 const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: 'health', label: 'Estado', icon: <Activity size={16} /> },
   { id: 'messages', label: 'Mensajes', icon: <Mail size={16} /> },
   { id: 'projects', label: 'Proyectos', icon: <FolderKanban size={16} /> },
+  { id: 'team', label: 'Equipo', icon: <Users size={16} /> },
+  { id: 'clients', label: 'Clientes', icon: <Handshake size={16} /> },
+  { id: 'services', label: 'Servicios', icon: <Wrench size={16} /> },
 ];
 
 export default function DashboardClient() {
@@ -44,7 +50,7 @@ export default function DashboardClient() {
 
   return (
     <div className="min-h-screen px-4 pb-10 text-white pt-28 bg-honeydew-900 sm:px-8">
-      <div className="max-w-4xl mx-auto space-y-6">
+      <div className="max-w-5xl mx-auto space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-4 p-4 shadow-lg bg-honeydew-800 rounded-2xl sm:p-6">
           <div className="flex items-center gap-4">
             <div className="flex items-center justify-center rounded-full w-11 h-11 bg-honeydew-900 shrink-0">
@@ -89,6 +95,9 @@ export default function DashboardClient() {
         {tab === 'health' && <HealthPanel />}
         {tab === 'messages' && <MessagesPanel />}
         {tab === 'projects' && <ProjectsPanel />}
+        {tab === 'team' && <TeamPanel />}
+        {tab === 'clients' && <ClientsPanel />}
+        {tab === 'services' && <ServicesPanel />}
       </div>
     </div>
   );

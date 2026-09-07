@@ -14,6 +14,7 @@ import LegalPage from './legalProps'
 import { highlightText, keywordLink } from './highlightText'
 import { ScrollBottonEffect, ScrollRevealEffect } from './animation'
 import Year from './years'
+import { linksToButtons } from './socialLinks'
 
 export {
   NavPast,
@@ -41,6 +42,7 @@ export {
   PageServices,
   ScrollRevealEffect,
   ScrollBottonEffect,
-  Year
+  Year,
+  linksToButtons
 }
 export type { keywordLink }

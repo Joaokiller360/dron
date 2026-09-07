@@ -1,9 +1,29 @@
 
 import { CallAction } from '@/app/component'
-import { Banner, SectionCard, CardClient, ScrollRevealEffect } from '@/app/utils'
+import { Banner, SectionCard, CardClient, ScrollRevealEffect, ScrollBottonEffect, linksToButtons } from '@/app/utils'
 import { PhoneCall, Instagram, EarthIcon } from 'lucide-react'
-import { useLocale, useTranslations } from 'next-intl'
-import { getMessages } from 'next-intl/server';
+import { getLocale, getMessages, getTranslations } from 'next-intl/server';
+
+interface DbClient {
+  id: string;
+  slug: string;
+  name: string;
+  organization: string;
+  photoUrl: string;
+  links: { platform: string; url: string }[];
+}
+
+async function getPublishedClients(): Promise<DbClient[]> {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (!apiUrl) return [];
+  try {
+    const res = await fetch(`${apiUrl}/clients`, { cache: 'no-store' });
+    if (!res.ok) return [];
+    return await res.json();
+  } catch {
+    return [];
+  }
+}
 
 export async function generateMetadata() {
   const messages = await getMessages();
@@ -18,14 +38,16 @@ export async function generateMetadata() {
   };
 }
 
-export default function Clients() {
+export default async function Clients() {
 
-  const _ = useTranslations('clients');
-  const section = useTranslations('clients.sectionClients');
-  const callToAction = useTranslations('clients.collToAction');
-  const present = useTranslations('clients.presentation');
+  const dbClients = await getPublishedClients();
 
-  const locale = useLocale();
+  const _ = await getTranslations('clients');
+  const section = await getTranslations('clients.sectionClients');
+  const callToAction = await getTranslations('clients.collToAction');
+  const present = await getTranslations('clients.presentation');
+
+  const locale = await getLocale();
 
   // Solo agregar prefijo de idioma si NO es el idioma por defecto (es)
   const prefix = locale === 'es' ? '' : `/${locale}`;
@@ -309,6 +331,32 @@ export default function Clients() {
                 </div>
               </div>
             </SectionCard>
+
+            {dbClients.length > 0 && (
+              <SectionCard style='bg-honeydew-900 dark:bg-honeydew-800'>
+                <div>
+                  <ScrollBottonEffect>
+                    <div className='flex justify-center font-mono text-3xl font-semibold uppercase'>
+                      <span>{locale === 'en' ? 'More clients' : 'Más clientes'}</span>
+                    </div>
+                    <hr className="my-3 h-0.5 border-t-0 bg-white" />
+                  </ScrollBottonEffect>
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {dbClients.map((c, index) => (
+                      <ScrollRevealEffect key={c.id} index={index}>
+                        <CardClient
+                          index={index}
+                          anchorId={c.slug}
+                          clients={[{ client: c.name, organizacion: c.organization }]}
+                          content={[{ coverUrl: c.photoUrl }]}
+                          buttons={linksToButtons(c.links)}
+                        />
+                      </ScrollRevealEffect>
+                    ))}
+                  </div>
+                </div>
+              </SectionCard>
+            )}
           </section>
         </section>
 

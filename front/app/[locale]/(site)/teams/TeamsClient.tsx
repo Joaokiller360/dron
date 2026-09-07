@@ -1,10 +1,19 @@
 'use client'
-import { Banner, SectionCard, CardClient, ScrollRevealEffect, ScrollBottonEffect } from '@/app/utils'
+import { Banner, SectionCard, CardClient, ScrollRevealEffect, ScrollBottonEffect, linksToButtons } from '@/app/utils'
 import { CallAction } from '@/app/component'
 import { Instagram, PhoneCall } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl';
 
-export default function TeamsClient() {
+export interface DbTeamMember {
+  id: string;
+  slug: string;
+  name: string;
+  role: string;
+  photoUrl: string;
+  links: { platform: string; url: string }[];
+}
+
+export default function TeamsClient({ dbMembers = [] }: { dbMembers?: DbTeamMember[] }) {
   const _ = useTranslations('teams');
   const t = useTranslations('teams.collToAction');
   const locale = useLocale();
@@ -103,6 +112,32 @@ export default function TeamsClient() {
                 </div>
               </div>
             </SectionCard>
+
+            {dbMembers.length > 0 && (
+              <SectionCard style='bg-honeydew-900 dark:bg-honeydew-800'>
+                <div>
+                  <ScrollBottonEffect>
+                    <div className='flex justify-center font-mono text-3xl font-semibold uppercase'>
+                      <span>{locale === 'en' ? 'More of the team' : 'Más del equipo'}</span>
+                    </div>
+                    <hr className="my-3 h-0.5 border-t-0 bg-white" />
+                  </ScrollBottonEffect>
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                    {dbMembers.map((m, index) => (
+                      <ScrollRevealEffect key={m.id} index={index}>
+                        <CardClient
+                          index={index}
+                          anchorId={m.slug}
+                          clients={[{ client: m.name, organizacion: m.role }]}
+                          content={[{ coverUrl: m.photoUrl }]}
+                          buttons={linksToButtons(m.links)}
+                        />
+                      </ScrollRevealEffect>
+                    ))}
+                  </div>
+                </div>
+              </SectionCard>
+            )}
           </section>
         </section>
       </section>

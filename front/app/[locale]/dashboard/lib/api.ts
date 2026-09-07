@@ -48,6 +48,56 @@ export interface Project {
   sortOrder: number;
 }
 
+export type LinkPlatform = 'instagram' | 'whatsapp' | 'website' | 'facebook' | 'tiktok';
+
+export const LINK_PLATFORMS: LinkPlatform[] = [
+  'instagram',
+  'whatsapp',
+  'website',
+  'facebook',
+  'tiktok',
+];
+
+export interface Link {
+  platform: LinkPlatform;
+  url: string;
+}
+
+export interface TeamMember {
+  id: string;
+  slug: string;
+  name: string;
+  role: string;
+  photoUrl: string;
+  links: Link[];
+  published: boolean;
+  sortOrder: number;
+}
+
+export interface Client {
+  id: string;
+  slug: string;
+  name: string;
+  organization: string;
+  photoUrl: string;
+  links: Link[];
+  published: boolean;
+  sortOrder: number;
+}
+
+export interface Service {
+  id: string;
+  slug: string;
+  titleEs: string;
+  titleEn?: string | null;
+  descriptionEs?: string | null;
+  descriptionEn?: string | null;
+  coverUrl: string;
+  href?: string | null;
+  published: boolean;
+  sortOrder: number;
+}
+
 export class ApiError extends Error {
   constructor(
     message: string,

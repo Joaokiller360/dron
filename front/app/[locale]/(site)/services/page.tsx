@@ -1,6 +1,28 @@
-import { Banner, CardClient, ScrollRevealEffect, SectionCard } from "@/app/utils";
-import { useLocale, useTranslations } from 'next-intl'
-import { getMessages } from 'next-intl/server';
+import { Banner, CardClient, ScrollRevealEffect, ScrollBottonEffect, SectionCard } from "@/app/utils";
+import { getLocale, getMessages, getTranslations } from 'next-intl/server';
+
+interface DbService {
+  id: string;
+  slug: string;
+  titleEs: string;
+  titleEn?: string | null;
+  descriptionEs?: string | null;
+  descriptionEn?: string | null;
+  coverUrl: string;
+  href?: string | null;
+}
+
+async function getPublishedServices(): Promise<DbService[]> {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (!apiUrl) return [];
+  try {
+    const res = await fetch(`${apiUrl}/services`, { cache: 'no-store' });
+    if (!res.ok) return [];
+    return await res.json();
+  } catch {
+    return [];
+  }
+}
 
 export async function generateMetadata() {
   const messages = await getMessages();
@@ -15,10 +37,12 @@ export async function generateMetadata() {
   };
 }
 
-export default function Services() {
+export default async function Services() {
 
-  const t = useTranslations('services');
-  const locale = useLocale();
+  const dbServices = await getPublishedServices();
+
+  const t = await getTranslations('services');
+  const locale = await getLocale();
 
   // Solo agregar prefijo de idioma si NO es el idioma por defecto (es)
   const prefix = locale === 'es' ? '' : `/${locale}`;
@@ -78,6 +102,45 @@ export default function Services() {
               </div>
 
             </SectionCard>
+
+            {dbServices.length > 0 && (
+              <SectionCard style="bg-honeydew-800 dark:bg-honeydew-900">
+                <div>
+                  <ScrollBottonEffect>
+                    <div className='flex justify-center font-mono text-3xl font-semibold uppercase'>
+                      <span>{locale === 'en' ? 'More services' : 'Más servicios'}</span>
+                    </div>
+                    <hr className="my-3 h-0.5 border-t-0 bg-white" />
+                  </ScrollBottonEffect>
+                  <div className="grid gap-4 mt-6 md:grid-cols-2 lg:grid-cols-3">
+                    {dbServices.map((s, index) => (
+                      <ScrollRevealEffect key={s.id} index={index}>
+                        <CardClient
+                          index={index}
+                          anchorId={s.slug}
+                          services={[
+                            {
+                              title: locale === 'en' && s.titleEn ? s.titleEn : s.titleEs,
+                              description:
+                                (locale === 'en' ? s.descriptionEn : s.descriptionEs) ?? '',
+                            },
+                          ]}
+                          content={[{ coverUrl: s.coverUrl }]}
+                          buttons={[
+                            {
+                              id: 1,
+                              href: s.href || s.coverUrl,
+                              active: true,
+                              name: locale === 'en' ? 'View' : 'Ver',
+                            },
+                          ]}
+                        />
+                      </ScrollRevealEffect>
+                    ))}
+                  </div>
+                </div>
+              </SectionCard>
+            )}
           </section>
         </section>
       </section>

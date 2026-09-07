@@ -3,7 +3,7 @@ import createNextIntlPlugin from 'next-intl/plugin';
 const withNextIntl = createNextIntlPlugin();
 
 const nextConfig = {
-  // tu configuración actual
+  allowedDevOrigins: ["192.168.1.6"]
 };
 
 export default withNextIntl(nextConfig)

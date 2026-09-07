@@ -145,6 +145,7 @@ interface CardClient {
   content?: Content[];
   clients?: Client[];
   services?: Services[];
+  anchorId?: string
   index: number
 }
 
@@ -165,6 +166,7 @@ interface Services {
 interface Content {
   videoname?: string
   imgName?: string
+  coverUrl?: string
 }
 
 interface Buttons {
@@ -175,7 +177,7 @@ interface Buttons {
   icon?: React.ReactNode
 }
 
-export function CardClient({ index = 0, buttons = [], content = [], clients = [], services = [] }: CardClient) {
+export function CardClient({ index = 0, buttons = [], content = [], clients = [], services = [], anchorId = '' }: CardClient) {
 
   const activeButtons = buttons.filter(
     ({ active, href }) => active && href
@@ -195,19 +197,21 @@ export function CardClient({ index = 0, buttons = [], content = [], clients = []
 
       {d?.cliente ? (
         <>
-          <div className="relative w-full py-6 sm:py-8 bg-honeydew-800 dark:bg-honeydew-900 rounded-2xl">
+          <div id={anchorId || undefined} className="relative w-full py-6 sm:py-8 bg-honeydew-800 dark:bg-honeydew-900 rounded-2xl">
             <div className="flex flex-col items-center mx-5">
               {/* Imagen o Video */}
               <div className="relative overflow-hidden">
 
-                {media?.imgName ? (
+                {media?.coverUrl || media?.imgName ? (
                   <>
                     <img
                       loading="lazy"
                       src={
-                        media?.imgName
-                          ? `https://res.cloudinary.com/dzlavqhid/image/upload/${media.imgName}.jpg`
-                          : '/img/palmas-atardecer.jpg'
+                        media?.coverUrl
+                          ? media.coverUrl
+                          : media?.imgName
+                            ? `https://res.cloudinary.com/dzlavqhid/image/upload/${media.imgName}.jpg`
+                            : '/img/palmas-atardecer.jpg'
                       }
                       onError={(e) => {
                         e.currentTarget.src = "/img/palmas-atardecer.jpg";
@@ -258,20 +262,22 @@ export function CardClient({ index = 0, buttons = [], content = [], clients = []
       ) : (
         d?.Services && (
           <>
-            <div className="relative w-full py-6 sm:py-8 bg-honeydew-900 dark:bg-honeydew-800 rounded-2xl">
+            <div id={anchorId || undefined} className="relative w-full py-6 sm:py-8 bg-honeydew-900 dark:bg-honeydew-800 rounded-2xl">
               <div className="flex flex-col items-center mx-5">
 
                 {/* Imagen o Video */}
                 <div className="relative overflow-hidden">
 
-                  {media?.imgName ? (
+                  {media?.coverUrl || media?.imgName ? (
                     <>
                       <img
                         loading="lazy"
                         src={
-                          media?.imgName
-                            ? `https://res.cloudinary.com/dzlavqhid/image/upload/${media?.imgName}.jpg`
-                            : '/img/palmas-atardecer.jpg'
+                          media?.coverUrl
+                            ? media.coverUrl
+                            : media?.imgName
+                              ? `https://res.cloudinary.com/dzlavqhid/image/upload/${media?.imgName}.jpg`
+                              : '/img/palmas-atardecer.jpg'
                         }
                         onError={(e) => {
                           e.currentTarget.src = "/img/palmas-atardecer.jpg";
