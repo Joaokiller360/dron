@@ -2,6 +2,16 @@ export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001
 
 export const TOKEN_KEY = 'jbskylens_dashboard_token';
 
+export function slugify(text: string): string {
+  return text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 export type ContactStatus = 'NEW' | 'READ' | 'ARCHIVED';
 
 export type ProjectCategory =
@@ -43,6 +53,7 @@ export interface Project {
   descriptionEs?: string | null;
   descriptionEn?: string | null;
   coverUrl: string;
+  href?: string | null;
   mediaUrls: string[];
   published: boolean;
   sortOrder: number;

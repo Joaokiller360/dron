@@ -3,13 +3,13 @@
 import { useEffect, useState, FormEvent } from 'react';
 import { FolderKanban, Eye, EyeOff, Trash2, PlusCircle, ExternalLink } from 'lucide-react';
 import { ScrollRevealEffect } from '@/app/utils';
-import { apiFetch, ApiError, Project, PROJECT_CATEGORIES, ProjectCategory } from './lib/api';
+import { apiFetch, ApiError, Project, PROJECT_CATEGORIES, ProjectCategory, slugify } from './lib/api';
 
 const emptyForm = {
-  slug: '',
   category: PROJECT_CATEGORIES[0],
   titleEs: '',
   coverUrl: '',
+  href: '',
 };
 
 export default function ProjectsPanel() {
@@ -17,10 +17,10 @@ export default function ProjectsPanel() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [form, setForm] = useState<{
-    slug: string;
     category: ProjectCategory;
     titleEs: string;
     coverUrl: string;
+    href: string;
   }>(emptyForm);
   const [creating, setCreating] = useState(false);
 
@@ -48,7 +48,7 @@ export default function ProjectsPanel() {
     try {
       await apiFetch<Project>('/projects', {
         method: 'POST',
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, slug: slugify(form.titleEs), href: form.href || undefined }),
       });
       setForm(emptyForm);
       await load();
@@ -101,13 +101,6 @@ export default function ProjectsPanel() {
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          <input
-            required
-            placeholder="slug-unico"
-            value={form.slug}
-            onChange={(e) => setForm({ ...form, slug: e.target.value })}
-            className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-          />
           <select
             value={form.category}
             onChange={(e) => setForm({ ...form, category: e.target.value as ProjectCategory })}
@@ -132,6 +125,13 @@ export default function ProjectsPanel() {
             placeholder="https://.../cover.jpg"
             value={form.coverUrl}
             onChange={(e) => setForm({ ...form, coverUrl: e.target.value })}
+            className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
+          />
+          <input
+            type="url"
+            placeholder="https://instagram.com/... (opcional)"
+            value={form.href}
+            onChange={(e) => setForm({ ...form, href: e.target.value })}
             className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
           />
         </div>

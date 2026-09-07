@@ -10,10 +10,10 @@ import {
   Link,
   LinkPlatform,
   LINK_PLATFORMS,
+  slugify,
 } from './lib/api';
 
 const emptyForm = {
-  slug: '',
   name: '',
   organization: '',
   photoUrl: '',
@@ -56,7 +56,7 @@ export default function ClientsPanel() {
       await apiFetch<Client>('/clients', {
         method: 'POST',
         body: JSON.stringify({
-          slug: form.slug,
+          slug: slugify(form.name),
           name: form.name,
           organization: form.organization,
           photoUrl: form.photoUrl,
@@ -114,13 +114,6 @@ export default function ClientsPanel() {
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          <input
-            required
-            placeholder="slug-unico"
-            value={form.slug}
-            onChange={(e) => setForm({ ...form, slug: e.target.value })}
-            className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-          />
           <input
             required
             placeholder="Nombre del cliente"

@@ -3,10 +3,9 @@
 import { useEffect, useState, FormEvent } from 'react';
 import { Wrench, Eye, EyeOff, Trash2, PlusCircle, ExternalLink } from 'lucide-react';
 import { ScrollRevealEffect } from '@/app/utils';
-import { apiFetch, ApiError, Service } from './lib/api';
+import { apiFetch, ApiError, Service, slugify } from './lib/api';
 
 const emptyForm = {
-  slug: '',
   titleEs: '',
   coverUrl: '',
   href: '',
@@ -44,7 +43,7 @@ export default function ServicesPanel() {
       await apiFetch<Service>('/services', {
         method: 'POST',
         body: JSON.stringify({
-          slug: form.slug,
+          slug: slugify(form.titleEs),
           titleEs: form.titleEs,
           coverUrl: form.coverUrl,
           href: form.href || undefined,
@@ -101,13 +100,6 @@ export default function ServicesPanel() {
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          <input
-            required
-            placeholder="slug-unico"
-            value={form.slug}
-            onChange={(e) => setForm({ ...form, slug: e.target.value })}
-            className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-          />
           <input
             required
             placeholder="Título"
