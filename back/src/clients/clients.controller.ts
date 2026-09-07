@@ -1,5 +1,15 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ClientsService } from './clients.service';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
@@ -11,17 +21,19 @@ export class ClientsController {
   constructor(private readonly clientsService: ClientsService) {}
 
   @Get()
+  @ApiQuery({ name: 'categoryId', required: false })
   @ApiOperation({ summary: 'Public: list published clients' })
-  findPublished() {
-    return this.clientsService.findPublished();
+  findPublished(@Query('categoryId') categoryId?: string) {
+    return this.clientsService.findPublished(categoryId);
   }
 
   @Get('admin')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @ApiQuery({ name: 'categoryId', required: false })
   @ApiOperation({ summary: 'Admin: list all clients, published or not' })
-  findAllForAdmin() {
-    return this.clientsService.findAllForAdmin();
+  findAllForAdmin(@Query('categoryId') categoryId?: string) {
+    return this.clientsService.findAllForAdmin(categoryId);
   }
 
   @Post()

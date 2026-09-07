@@ -13,14 +13,28 @@ enum ContactStatus {
   ARCHIVED
 }
 
-enum ProjectCategory {
-  BODAS
-  XV
-  EVENTOS
-  INMOBILIARIA
-  INSPECCION
-  TOURS360
-  PRODUCCION
+enum CategoryType {
+  PROJECT
+  CLIENT
+  SERVICE
+}
+
+model Category {
+  id        String       @id @default(uuid())
+  slug      String
+  name      String
+  type      CategoryType
+  sortOrder Int          @default(0) @map("sort_order")
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+
+  projects Project[]
+  clients  Client[]
+  services Service[]
+
+  @@unique([type, slug])
+  @@map("categories")
+  @@index([type])
 }
 
 model AdminUser {
@@ -50,23 +64,24 @@ model ContactMessage {
 }
 
 model Project {
-  id             String          @id @default(uuid())
-  slug           String          @unique
-  category       ProjectCategory
-  titleEs        String          @map("title_es")
-  titleEn        String?         @map("title_en")
-  descriptionEs  String?         @map("description_es")
-  descriptionEn  String?         @map("description_en")
-  coverUrl       String          @map("cover_url")
+  id             String    @id @default(uuid())
+  slug           String    @unique
+  categoryId     String    @map("category_id")
+  category       Category  @relation(fields: [categoryId], references: [id])
+  titleEs        String    @map("title_es")
+  titleEn        String?   @map("title_en")
+  descriptionEs  String?   @map("description_es")
+  descriptionEn  String?   @map("description_en")
+  coverUrl       String    @map("cover_url")
   href           String?
-  mediaUrls      String[]        @default([]) @map("media_urls")
-  published      Boolean         @default(true)
-  sortOrder      Int             @default(0) @map("sort_order")
-  createdAt      DateTime        @default(now()) @map("created_at")
-  updatedAt      DateTime        @updatedAt @map("updated_at")
+  mediaUrls      String[]  @default([]) @map("media_urls")
+  published      Boolean   @default(true)
+  sortOrder      Int       @default(0) @map("sort_order")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
 
   @@map("projects")
-  @@index([category])
+  @@index([categoryId])
   @@index([published])
 }
 
@@ -90,7 +105,8 @@ model Client {
   id           String   @id @default(uuid())
   slug         String   @unique
   name         String
-  organization String
+  categoryId   String   @map("category_id")
+  category     Category @relation(fields: [categoryId], references: [id])
   photoUrl     String   @map("photo_url")
   links        Json     @default("[]")
   published    Boolean  @default(true)
@@ -99,6 +115,7 @@ model Client {
   updatedAt    DateTime @updatedAt @map("updated_at")
 
   @@map("clients")
+  @@index([categoryId])
   @@index([published])
 }
 
@@ -111,11 +128,14 @@ model Service {
   descriptionEn String?  @map("description_en")
   coverUrl      String   @map("cover_url")
   href          String?
+  categoryId    String   @map("category_id")
+  category      Category @relation(fields: [categoryId], references: [id])
   published     Boolean  @default(true)
   sortOrder     Int      @default(0) @map("sort_order")
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
 
   @@map("services")
+  @@index([categoryId])
   @@index([published])
 }

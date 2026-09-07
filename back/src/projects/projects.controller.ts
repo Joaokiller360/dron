@@ -10,7 +10,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { ProjectCategory } from '@prisma/client';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
@@ -22,19 +21,19 @@ export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
   @Get()
-  @ApiQuery({ name: 'category', enum: ProjectCategory, required: false })
+  @ApiQuery({ name: 'categoryId', required: false })
   @ApiOperation({ summary: 'Public: list published portfolio projects' })
-  findPublished(@Query('category') category?: ProjectCategory) {
-    return this.projectsService.findPublished(category);
+  findPublished(@Query('categoryId') categoryId?: string) {
+    return this.projectsService.findPublished(categoryId);
   }
 
   @Get('admin')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiQuery({ name: 'category', enum: ProjectCategory, required: false })
+  @ApiQuery({ name: 'categoryId', required: false })
   @ApiOperation({ summary: 'Admin: list all projects, published or not' })
-  findAllForAdmin(@Query('category') category?: ProjectCategory) {
-    return this.projectsService.findAllForAdmin(category);
+  findAllForAdmin(@Query('categoryId') categoryId?: string) {
+    return this.projectsService.findAllForAdmin(categoryId);
   }
 
   @Get(':slug')

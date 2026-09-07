@@ -7,6 +7,7 @@ import {
   IsOptional,
   IsString,
   IsUrl,
+  IsUUID,
   Matches,
   MaxLength,
   ValidateNested,
@@ -26,13 +27,9 @@ export class CreateClientDto {
   @MaxLength(150)
   name: string;
 
-  @ApiProperty({
-    example: 'Grandes marcas',
-    description: 'Free-text category label shown under the name',
-  })
-  @IsString()
-  @MaxLength(100)
-  organization: string;
+  @ApiProperty({ description: 'id of a Category with type=CLIENT' })
+  @IsUUID()
+  categoryId: string;
 
   @ApiProperty({ example: 'https://cdn.example.com/marina.jpg' })
   @IsUrl()

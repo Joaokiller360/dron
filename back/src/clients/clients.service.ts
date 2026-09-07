@@ -12,18 +12,24 @@ export class ClientsService {
     const { links, ...rest } = dto;
     return this.prisma.client.create({
       data: { ...rest, links: (links ?? []) as unknown as Prisma.InputJsonValue },
+      include: { category: true },
     });
   }
 
-  findPublished() {
+  findPublished(categoryId?: string) {
     return this.prisma.client.findMany({
-      where: { published: true },
+      where: { published: true, ...(categoryId ? { categoryId } : {}) },
       orderBy: { sortOrder: 'asc' },
+      include: { category: true },
     });
   }
 
-  findAllForAdmin() {
-    return this.prisma.client.findMany({ orderBy: { sortOrder: 'asc' } });
+  findAllForAdmin(categoryId?: string) {
+    return this.prisma.client.findMany({
+      where: categoryId ? { categoryId } : undefined,
+      orderBy: { sortOrder: 'asc' },
+      include: { category: true },
+    });
   }
 
   async update(id: string, dto: UpdateClientDto) {
@@ -35,6 +41,7 @@ export class ClientsService {
         ...rest,
         ...(links ? { links: links as unknown as Prisma.InputJsonValue } : {}),
       },
+      include: { category: true },
     });
   }
 

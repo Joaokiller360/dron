@@ -1,5 +1,14 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsInt, IsOptional, IsString, IsUrl, Matches, MaxLength } from 'class-validator';
+import {
+  IsBoolean,
+  IsInt,
+  IsOptional,
+  IsString,
+  IsUrl,
+  IsUUID,
+  Matches,
+  MaxLength,
+} from 'class-validator';
 
 export class CreateServiceDto {
   @ApiProperty({ example: 'fotografia-aerea' })
@@ -8,6 +17,10 @@ export class CreateServiceDto {
     message: 'slug must be lowercase, alphanumeric, dash-separated',
   })
   slug: string;
+
+  @ApiProperty({ description: 'id of a Category with type=SERVICE' })
+  @IsUUID()
+  categoryId: string;
 
   @ApiProperty({ example: 'Fotografía aérea' })
   @IsString()

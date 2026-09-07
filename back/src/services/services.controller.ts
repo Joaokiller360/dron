@@ -1,5 +1,15 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ServicesService } from './services.service';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
@@ -11,17 +21,19 @@ export class ServicesController {
   constructor(private readonly servicesService: ServicesService) {}
 
   @Get()
+  @ApiQuery({ name: 'categoryId', required: false })
   @ApiOperation({ summary: 'Public: list published services' })
-  findPublished() {
-    return this.servicesService.findPublished();
+  findPublished(@Query('categoryId') categoryId?: string) {
+    return this.servicesService.findPublished(categoryId);
   }
 
   @Get('admin')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @ApiQuery({ name: 'categoryId', required: false })
   @ApiOperation({ summary: 'Admin: list all services, published or not' })
-  findAllForAdmin() {
-    return this.servicesService.findAllForAdmin();
+  findAllForAdmin(@Query('categoryId') categoryId?: string) {
+    return this.servicesService.findAllForAdmin(categoryId);
   }
 
   @Post()

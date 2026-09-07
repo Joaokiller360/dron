@@ -1,13 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { ProjectCategory } from '@prisma/client';
 import {
   IsArray,
   IsBoolean,
-  IsEnum,
   IsInt,
   IsOptional,
   IsString,
   IsUrl,
+  IsUUID,
   Matches,
   MaxLength,
 } from 'class-validator';
@@ -20,9 +19,9 @@ export class CreateProjectDto {
   })
   slug: string;
 
-  @ApiProperty({ enum: ProjectCategory })
-  @IsEnum(ProjectCategory)
-  category: ProjectCategory;
+  @ApiProperty({ description: 'id of a Category with type=PROJECT' })
+  @IsUUID()
+  categoryId: string;
 
   @ApiProperty({ example: 'Boda de María y Juan' })
   @IsString()
@@ -49,7 +48,10 @@ export class CreateProjectDto {
   @IsUrl()
   coverUrl: string;
 
-  @ApiPropertyOptional({ example: 'https://instagram.com/reel/...', description: 'External link (e.g. Instagram reel) or internal path for the "view" button' })
+  @ApiPropertyOptional({
+    example: 'https://instagram.com/reel/...',
+    description: 'External link (e.g. Instagram reel) or internal path for the "view" button',
+  })
   @IsOptional()
   @IsString()
   href?: string;
