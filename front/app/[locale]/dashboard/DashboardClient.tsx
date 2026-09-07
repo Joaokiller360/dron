@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react';
-import { Activity, Mail, FolderKanban, Users, Handshake, Wrench, LogOut, Radar } from 'lucide-react';
+import { Activity, Mail, FolderKanban, Users, Handshake, Wrench, Tags, LogOut, Radar } from 'lucide-react';
 import LoginForm from './LoginForm';
 import HealthPanel from './HealthPanel';
 import MessagesPanel from './MessagesPanel';
@@ -9,13 +9,15 @@ import ProjectsPanel from './ProjectsPanel';
 import TeamPanel from './TeamPanel';
 import ClientsPanel from './ClientsPanel';
 import ServicesPanel from './ServicesPanel';
+import CategoriesPanel from './CategoriesPanel';
 import { TOKEN_KEY } from './lib/api';
 
-type Tab = 'health' | 'messages' | 'projects' | 'team' | 'clients' | 'services';
+type Tab = 'health' | 'messages' | 'categories' | 'projects' | 'team' | 'clients' | 'services';
 
 const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: 'health', label: 'Estado', icon: <Activity size={16} /> },
   { id: 'messages', label: 'Mensajes', icon: <Mail size={16} /> },
+  { id: 'categories', label: 'Categorías', icon: <Tags size={16} /> },
   { id: 'projects', label: 'Proyectos', icon: <FolderKanban size={16} /> },
   { id: 'team', label: 'Equipo', icon: <Users size={16} /> },
   { id: 'clients', label: 'Clientes', icon: <Handshake size={16} /> },
@@ -94,6 +96,7 @@ export default function DashboardClient() {
 
         {tab === 'health' && <HealthPanel />}
         {tab === 'messages' && <MessagesPanel />}
+        {tab === 'categories' && <CategoriesPanel />}
         {tab === 'projects' && <ProjectsPanel />}
         {tab === 'team' && <TeamPanel />}
         {tab === 'clients' && <ClientsPanel />}

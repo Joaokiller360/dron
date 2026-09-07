@@ -19,7 +19,7 @@ export async function generateMetadata() {
 interface DbProject {
   id: string;
   slug: string;
-  category: string;
+  category: { id: string; name: string; sortOrder: number };
   titleEs: string;
   titleEn?: string | null;
   descriptionEs?: string | null;
@@ -27,18 +27,6 @@ interface DbProject {
   coverUrl: string;
   href?: string | null;
 }
-
-const CATEGORY_ORDER = ['BODAS', 'XV', 'EVENTOS', 'INMOBILIARIA', 'INSPECCION', 'TOURS360', 'PRODUCCION'];
-
-const CATEGORY_LABELS: Record<string, string> = {
-  BODAS: 'Bodas',
-  XV: 'XV años',
-  EVENTOS: 'Eventos',
-  INMOBILIARIA: 'Inmobiliaria',
-  INSPECCION: 'Inspección',
-  TOURS360: 'Tours 360',
-  PRODUCCION: 'Producción',
-};
 
 async function getPublishedProjects(): Promise<DbProject[]> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -63,12 +51,21 @@ export default async function Portfolio() {
   // Solo agregar prefijo de idioma si NO es el idioma por defecto (es)
   const prefix = locale === 'es' ? '' : `/${locale}`;
 
-  const grouped = CATEGORY_ORDER
-    .map((category) => ({
-      category,
-      items: projects.filter((p) => p.category === category),
-    }))
-    .filter((group) => group.items.length > 0);
+  const groups: { categoryId: string; name: string; sortOrder: number; items: DbProject[] }[] = [];
+  for (const project of projects) {
+    const group = groups.find((g) => g.categoryId === project.category.id);
+    if (group) {
+      group.items.push(project);
+    } else {
+      groups.push({
+        categoryId: project.category.id,
+        name: project.category.name,
+        sortOrder: project.category.sortOrder,
+        items: [project],
+      });
+    }
+  }
+  groups.sort((a, b) => a.sortOrder - b.sortOrder);
 
   return (
     <>
@@ -82,12 +79,12 @@ export default async function Portfolio() {
 
         <section className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
           <section className="space-y-6" >
-            {grouped.map(({ category, items }) => (
-              <SectionCard key={category} style="bg-honeydew-900 dark:bg-honeydew-800">
+            {groups.map(({ categoryId, name, items }) => (
+              <SectionCard key={categoryId} style="bg-honeydew-900 dark:bg-honeydew-800">
                 <div>
                   <ScrollBottonEffect>
                     <div className='flex justify-center font-mono text-3xl font-semibold uppercase'>
-                      <span>{CATEGORY_LABELS[category] ?? category}</span>
+                      <span>{name}</span>
                     </div>
                     <hr className="my-3 h-0.5 border-t-0 bg-white" />
                   </ScrollBottonEffect>
@@ -108,7 +105,7 @@ export default async function Portfolio() {
               </SectionCard>
             ))}
 
-            {grouped.length === 0 && (
+            {groups.length === 0 && (
               <p className="text-center text-white/60">
                 {locale === 'en' ? 'No projects published yet.' : 'Todavía no hay proyectos publicados.'}
               </p>

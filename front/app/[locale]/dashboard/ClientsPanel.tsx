@@ -7,6 +7,7 @@ import {
   apiFetch,
   ApiError,
   Client,
+  Category,
   Link,
   LinkPlatform,
   LINK_PLATFORMS,
@@ -15,7 +16,7 @@ import {
 
 const emptyForm = {
   name: '',
-  organization: '',
+  categoryId: '',
   photoUrl: '',
   linkPlatform: LINK_PLATFORMS[0],
   linkUrl: '',
@@ -23,6 +24,7 @@ const emptyForm = {
 
 export default function ClientsPanel() {
   const [clients, setClients] = useState<Client[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [form, setForm] = useState(emptyForm);
@@ -32,8 +34,13 @@ export default function ClientsPanel() {
     setLoading(true);
     setError('');
     try {
-      const data = await apiFetch<Client[]>('/clients/admin');
-      setClients(data);
+      const [clientData, categoryData] = await Promise.all([
+        apiFetch<Client[]>('/clients/admin'),
+        apiFetch<Category[]>('/categories?type=CLIENT'),
+      ]);
+      setClients(clientData);
+      setCategories(categoryData);
+      setForm((prev) => ({ ...prev, categoryId: prev.categoryId || categoryData[0]?.id || '' }));
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Error cargando clientes.');
     } finally {
@@ -58,12 +65,12 @@ export default function ClientsPanel() {
         body: JSON.stringify({
           slug: slugify(form.name),
           name: form.name,
-          organization: form.organization,
+          categoryId: form.categoryId,
           photoUrl: form.photoUrl,
           links,
         }),
       });
-      setForm(emptyForm);
+      setForm({ ...emptyForm, categoryId: form.categoryId });
       await load();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Error creando cliente.');
@@ -113,52 +120,63 @@ export default function ClientsPanel() {
           </div>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          <input
-            required
-            placeholder="Nombre del cliente"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-          />
-          <input
-            required
-            placeholder="Categoría (ej. Marca, Gobierno)"
-            value={form.organization}
-            onChange={(e) => setForm({ ...form, organization: e.target.value })}
-            className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-          />
-          <input
-            required
-            type="url"
-            placeholder="https://.../foto.jpg"
-            value={form.photoUrl}
-            onChange={(e) => setForm({ ...form, photoUrl: e.target.value })}
-            className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-          />
-          <select
-            value={form.linkPlatform}
-            onChange={(e) => setForm({ ...form, linkPlatform: e.target.value as LinkPlatform })}
-            className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-          >
-            {LINK_PLATFORMS.map((p) => (
-              <option key={p} value={p}>
-                {p}
-              </option>
-            ))}
-          </select>
-          <input
-            type="url"
-            placeholder="https://... (opcional)"
-            value={form.linkUrl}
-            onChange={(e) => setForm({ ...form, linkUrl: e.target.value })}
-            className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-          />
-        </div>
+        {categories.length === 0 ? (
+          <p className="text-sm text-red-400">
+            Todavía no hay categorías de clientes — crea una en la pestaña Categorías primero.
+          </p>
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-2">
+            <input
+              required
+              placeholder="Nombre del cliente"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
+            />
+            <select
+              required
+              value={form.categoryId}
+              onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
+              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
+            >
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+            <input
+              required
+              type="url"
+              placeholder="https://.../foto.jpg"
+              value={form.photoUrl}
+              onChange={(e) => setForm({ ...form, photoUrl: e.target.value })}
+              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
+            />
+            <select
+              value={form.linkPlatform}
+              onChange={(e) => setForm({ ...form, linkPlatform: e.target.value as LinkPlatform })}
+              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
+            >
+              {LINK_PLATFORMS.map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
+              ))}
+            </select>
+            <input
+              type="url"
+              placeholder="https://... (opcional)"
+              value={form.linkUrl}
+              onChange={(e) => setForm({ ...form, linkUrl: e.target.value })}
+              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
+            />
+          </div>
+        )}
 
         <button
           type="submit"
-          disabled={creating}
+          disabled={creating || categories.length === 0}
           className="inline-flex items-center gap-2 px-4 py-2 font-bold text-black transition duration-500 rounded-xl bg-honeydew-500 hover:bg-white disabled:opacity-50"
         >
           <PlusCircle size={16} />
@@ -186,7 +204,7 @@ export default function ClientsPanel() {
               <div className="flex flex-col h-full gap-3 p-4 rounded-xl bg-honeydew-900">
                 <div className="flex items-start justify-between gap-2">
                   <span className="px-2 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wide bg-honeydew-800 text-honeydew-400">
-                    {c.organization}
+                    {c.category.name}
                   </span>
                   <span
                     className={`px-2 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wide ${

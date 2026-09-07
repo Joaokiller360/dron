@@ -3,9 +3,10 @@
 import { useEffect, useState, FormEvent } from 'react';
 import { Wrench, Eye, EyeOff, Trash2, PlusCircle, ExternalLink } from 'lucide-react';
 import { ScrollRevealEffect } from '@/app/utils';
-import { apiFetch, ApiError, Service, slugify } from './lib/api';
+import { apiFetch, ApiError, Service, Category, slugify } from './lib/api';
 
 const emptyForm = {
+  categoryId: '',
   titleEs: '',
   coverUrl: '',
   href: '',
@@ -13,6 +14,7 @@ const emptyForm = {
 
 export default function ServicesPanel() {
   const [services, setServices] = useState<Service[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [form, setForm] = useState(emptyForm);
@@ -22,8 +24,13 @@ export default function ServicesPanel() {
     setLoading(true);
     setError('');
     try {
-      const data = await apiFetch<Service[]>('/services/admin');
-      setServices(data);
+      const [serviceData, categoryData] = await Promise.all([
+        apiFetch<Service[]>('/services/admin'),
+        apiFetch<Category[]>('/categories?type=SERVICE'),
+      ]);
+      setServices(serviceData);
+      setCategories(categoryData);
+      setForm((prev) => ({ ...prev, categoryId: prev.categoryId || categoryData[0]?.id || '' }));
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Error cargando servicios.');
     } finally {
@@ -44,12 +51,13 @@ export default function ServicesPanel() {
         method: 'POST',
         body: JSON.stringify({
           slug: slugify(form.titleEs),
+          categoryId: form.categoryId,
           titleEs: form.titleEs,
           coverUrl: form.coverUrl,
           href: form.href || undefined,
         }),
       });
-      setForm(emptyForm);
+      setForm({ ...emptyForm, categoryId: form.categoryId });
       await load();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Error creando servicio.');
@@ -99,33 +107,51 @@ export default function ServicesPanel() {
           </div>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          <input
-            required
-            placeholder="Título"
-            value={form.titleEs}
-            onChange={(e) => setForm({ ...form, titleEs: e.target.value })}
-            className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-          />
-          <input
-            required
-            type="url"
-            placeholder="https://.../cover.jpg"
-            value={form.coverUrl}
-            onChange={(e) => setForm({ ...form, coverUrl: e.target.value })}
-            className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-          />
-          <input
-            placeholder="/contact (opcional)"
-            value={form.href}
-            onChange={(e) => setForm({ ...form, href: e.target.value })}
-            className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-          />
-        </div>
+        {categories.length === 0 ? (
+          <p className="text-sm text-red-400">
+            Todavía no hay categorías de servicios — crea una en la pestaña Categorías primero.
+          </p>
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-2">
+            <select
+              required
+              value={form.categoryId}
+              onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
+              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
+            >
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+            <input
+              required
+              placeholder="Título"
+              value={form.titleEs}
+              onChange={(e) => setForm({ ...form, titleEs: e.target.value })}
+              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
+            />
+            <input
+              required
+              type="url"
+              placeholder="https://.../cover.jpg"
+              value={form.coverUrl}
+              onChange={(e) => setForm({ ...form, coverUrl: e.target.value })}
+              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
+            />
+            <input
+              placeholder="/contact (opcional)"
+              value={form.href}
+              onChange={(e) => setForm({ ...form, href: e.target.value })}
+              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
+            />
+          </div>
+        )}
 
         <button
           type="submit"
-          disabled={creating}
+          disabled={creating || categories.length === 0}
           className="inline-flex items-center gap-2 px-4 py-2 font-bold text-black transition duration-500 rounded-xl bg-honeydew-500 hover:bg-white disabled:opacity-50"
         >
           <PlusCircle size={16} />
@@ -151,7 +177,10 @@ export default function ServicesPanel() {
           {services.map((s, index) => (
             <ScrollRevealEffect key={s.id} index={index}>
               <div className="flex flex-col h-full gap-3 p-4 rounded-xl bg-honeydew-900">
-                <div className="flex items-start justify-end gap-2">
+                <div className="flex items-start justify-between gap-2">
+                  <span className="px-2 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wide bg-honeydew-800 text-honeydew-400">
+                    {s.category.name}
+                  </span>
                   <span
                     className={`px-2 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wide ${
                       s.published ? 'bg-honeydew-500 text-black' : 'bg-white/10 text-white/60'

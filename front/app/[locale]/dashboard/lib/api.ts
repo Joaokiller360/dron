@@ -14,24 +14,17 @@ export function slugify(text: string): string {
 
 export type ContactStatus = 'NEW' | 'READ' | 'ARCHIVED';
 
-export type ProjectCategory =
-  | 'BODAS'
-  | 'XV'
-  | 'EVENTOS'
-  | 'INMOBILIARIA'
-  | 'INSPECCION'
-  | 'TOURS360'
-  | 'PRODUCCION';
+export type CategoryType = 'PROJECT' | 'CLIENT' | 'SERVICE';
 
-export const PROJECT_CATEGORIES: ProjectCategory[] = [
-  'BODAS',
-  'XV',
-  'EVENTOS',
-  'INMOBILIARIA',
-  'INSPECCION',
-  'TOURS360',
-  'PRODUCCION',
-];
+export const CATEGORY_TYPES: CategoryType[] = ['PROJECT', 'CLIENT', 'SERVICE'];
+
+export interface Category {
+  id: string;
+  slug: string;
+  name: string;
+  type: CategoryType;
+  sortOrder: number;
+}
 
 export interface ContactMessage {
   id: string;
@@ -47,7 +40,8 @@ export interface ContactMessage {
 export interface Project {
   id: string;
   slug: string;
-  category: ProjectCategory;
+  categoryId: string;
+  category: Category;
   titleEs: string;
   titleEn?: string | null;
   descriptionEs?: string | null;
@@ -89,7 +83,8 @@ export interface Client {
   id: string;
   slug: string;
   name: string;
-  organization: string;
+  categoryId: string;
+  category: Category;
   photoUrl: string;
   links: Link[];
   published: boolean;
@@ -105,6 +100,8 @@ export interface Service {
   descriptionEn?: string | null;
   coverUrl: string;
   href?: string | null;
+  categoryId: string;
+  category: Category;
   published: boolean;
   sortOrder: number;
 }

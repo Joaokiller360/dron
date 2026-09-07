@@ -7,7 +7,7 @@ interface DbClient {
   id: string;
   slug: string;
   name: string;
-  organization: string;
+  category: { id: string; name: string; sortOrder: number };
   photoUrl: string;
   links: { platform: string; url: string }[];
 }
@@ -49,15 +49,21 @@ export default async function Clients() {
   // Solo agregar prefijo de idioma si NO es el idioma por defecto (es)
   const prefix = locale === 'es' ? '' : `/${locale}`;
 
-  const groups: { organization: string; items: DbClient[] }[] = [];
+  const groups: { categoryId: string; name: string; sortOrder: number; items: DbClient[] }[] = [];
   for (const client of dbClients) {
-    const group = groups.find((g) => g.organization === client.organization);
+    const group = groups.find((g) => g.categoryId === client.category.id);
     if (group) {
       group.items.push(client);
     } else {
-      groups.push({ organization: client.organization, items: [client] });
+      groups.push({
+        categoryId: client.category.id,
+        name: client.category.name,
+        sortOrder: client.category.sortOrder,
+        items: [client],
+      });
     }
   }
+  groups.sort((a, b) => a.sortOrder - b.sortOrder);
 
   return (
     <>
@@ -70,12 +76,12 @@ export default async function Clients() {
         <section className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
 
           <section className="space-y-6">
-            {groups.map(({ organization, items }) => (
-              <SectionCard key={organization} style='bg-honeydew-900 dark:bg-honeydew-800'>
+            {groups.map(({ categoryId, name, items }) => (
+              <SectionCard key={categoryId} style='bg-honeydew-900 dark:bg-honeydew-800'>
                 <div>
                   <ScrollBottonEffect>
                     <div className='flex justify-center font-mono text-3xl font-semibold uppercase'>
-                      <span>{organization}</span>
+                      <span>{name}</span>
                     </div>
                     <hr className="my-3 h-0.5 border-t-0 bg-white" />
                   </ScrollBottonEffect>
@@ -85,7 +91,7 @@ export default async function Clients() {
                         <CardClient
                           index={index}
                           anchorId={c.slug}
-                          clients={[{ client: c.name, organizacion: c.organization }]}
+                          clients={[{ client: c.name, organizacion: c.category.name }]}
                           content={[{ coverUrl: c.photoUrl }]}
                           buttons={linksToButtons(c.links)}
                         />

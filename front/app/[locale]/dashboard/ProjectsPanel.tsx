@@ -3,10 +3,10 @@
 import { useEffect, useState, FormEvent } from 'react';
 import { FolderKanban, Eye, EyeOff, Trash2, PlusCircle, ExternalLink } from 'lucide-react';
 import { ScrollRevealEffect } from '@/app/utils';
-import { apiFetch, ApiError, Project, PROJECT_CATEGORIES, ProjectCategory, slugify } from './lib/api';
+import { apiFetch, ApiError, Project, Category, slugify } from './lib/api';
 
 const emptyForm = {
-  category: PROJECT_CATEGORIES[0],
+  categoryId: '',
   titleEs: '',
   coverUrl: '',
   href: '',
@@ -14,22 +14,23 @@ const emptyForm = {
 
 export default function ProjectsPanel() {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [form, setForm] = useState<{
-    category: ProjectCategory;
-    titleEs: string;
-    coverUrl: string;
-    href: string;
-  }>(emptyForm);
+  const [form, setForm] = useState(emptyForm);
   const [creating, setCreating] = useState(false);
 
   const load = async () => {
     setLoading(true);
     setError('');
     try {
-      const data = await apiFetch<Project[]>('/projects/admin');
-      setProjects(data);
+      const [projectData, categoryData] = await Promise.all([
+        apiFetch<Project[]>('/projects/admin'),
+        apiFetch<Category[]>('/categories?type=PROJECT'),
+      ]);
+      setProjects(projectData);
+      setCategories(categoryData);
+      setForm((prev) => ({ ...prev, categoryId: prev.categoryId || categoryData[0]?.id || '' }));
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Error cargando proyectos.');
     } finally {
@@ -50,7 +51,7 @@ export default function ProjectsPanel() {
         method: 'POST',
         body: JSON.stringify({ ...form, slug: slugify(form.titleEs), href: form.href || undefined }),
       });
-      setForm(emptyForm);
+      setForm({ ...emptyForm, categoryId: form.categoryId });
       await load();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Error creando proyecto.');
@@ -100,45 +101,52 @@ export default function ProjectsPanel() {
           </div>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          <select
-            value={form.category}
-            onChange={(e) => setForm({ ...form, category: e.target.value as ProjectCategory })}
-            className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-          >
-            {PROJECT_CATEGORIES.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-          <input
-            required
-            placeholder="Título (es)"
-            value={form.titleEs}
-            onChange={(e) => setForm({ ...form, titleEs: e.target.value })}
-            className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-          />
-          <input
-            required
-            type="url"
-            placeholder="https://.../cover.jpg"
-            value={form.coverUrl}
-            onChange={(e) => setForm({ ...form, coverUrl: e.target.value })}
-            className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-          />
-          <input
-            type="url"
-            placeholder="https://instagram.com/... (opcional)"
-            value={form.href}
-            onChange={(e) => setForm({ ...form, href: e.target.value })}
-            className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-          />
-        </div>
+        {categories.length === 0 ? (
+          <p className="text-sm text-red-400">
+            Todavía no hay categorías de proyectos — crea una en la pestaña Categorías primero.
+          </p>
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-2">
+            <select
+              required
+              value={form.categoryId}
+              onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
+              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
+            >
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+            <input
+              required
+              placeholder="Título (es)"
+              value={form.titleEs}
+              onChange={(e) => setForm({ ...form, titleEs: e.target.value })}
+              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
+            />
+            <input
+              required
+              type="url"
+              placeholder="https://.../cover.jpg"
+              value={form.coverUrl}
+              onChange={(e) => setForm({ ...form, coverUrl: e.target.value })}
+              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
+            />
+            <input
+              type="url"
+              placeholder="https://instagram.com/... (opcional)"
+              value={form.href}
+              onChange={(e) => setForm({ ...form, href: e.target.value })}
+              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
+            />
+          </div>
+        )}
 
         <button
           type="submit"
-          disabled={creating}
+          disabled={creating || categories.length === 0}
           className="inline-flex items-center gap-2 px-4 py-2 font-bold text-black transition duration-500 rounded-xl bg-honeydew-500 hover:bg-white disabled:opacity-50"
         >
           <PlusCircle size={16} />
@@ -168,7 +176,7 @@ export default function ProjectsPanel() {
               <div className="flex flex-col h-full gap-3 p-4 rounded-xl bg-honeydew-900">
                 <div className="flex items-start justify-between gap-2">
                   <span className="px-2 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wide bg-honeydew-800 text-honeydew-400">
-                    {p.category}
+                    {p.category.name}
                   </span>
                   <span
                     className={`px-2 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wide ${
