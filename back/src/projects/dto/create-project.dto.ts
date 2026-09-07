@@ -49,6 +49,11 @@ export class CreateProjectDto {
   @IsUrl()
   coverUrl: string;
 
+  @ApiPropertyOptional({ example: 'https://instagram.com/reel/...', description: 'External link (e.g. Instagram reel) or internal path for the "view" button' })
+  @IsOptional()
+  @IsString()
+  href?: string;
+
   @ApiPropertyOptional({ type: [String] })
   @IsOptional()
   @IsArray()

@@ -58,6 +58,7 @@ model Project {
   descriptionEs  String?         @map("description_es")
   descriptionEn  String?         @map("description_en")
   coverUrl       String          @map("cover_url")
+  href           String?
   mediaUrls      String[]        @default([]) @map("media_urls")
   published      Boolean         @default(true)
   sortOrder      Int             @default(0) @map("sort_order")
