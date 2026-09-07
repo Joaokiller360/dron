@@ -31,6 +31,8 @@ export default function DashboardClient() {
   useEffect(() => {
     try {
       const token = window.localStorage.getItem(TOKEN_KEY);
+      // one-time read of browser storage on mount, not an external subscription
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (token) setEmail('sesión guardada');
     } catch {
       // localStorage blocked (private browsing, disabled storage) -> just show login

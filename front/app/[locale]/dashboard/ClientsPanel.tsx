@@ -7,12 +7,13 @@ import {
   apiFetch,
   ApiError,
   Client,
-  Category,
   Link,
   LinkPlatform,
   LINK_PLATFORMS,
   slugify,
 } from './lib/api';
+import CategoryPicker from './CategoryPicker';
+import ImagePreview from './ImagePreview';
 
 const emptyForm = {
   name: '',
@@ -24,7 +25,6 @@ const emptyForm = {
 
 export default function ClientsPanel() {
   const [clients, setClients] = useState<Client[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [form, setForm] = useState(emptyForm);
@@ -34,13 +34,8 @@ export default function ClientsPanel() {
     setLoading(true);
     setError('');
     try {
-      const [clientData, categoryData] = await Promise.all([
-        apiFetch<Client[]>('/clients/admin'),
-        apiFetch<Category[]>('/categories?type=CLIENT'),
-      ]);
+      const clientData = await apiFetch<Client[]>('/clients/admin');
       setClients(clientData);
-      setCategories(categoryData);
-      setForm((prev) => ({ ...prev, categoryId: prev.categoryId || categoryData[0]?.id || '' }));
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Error cargando clientes.');
     } finally {
@@ -120,12 +115,15 @@ export default function ClientsPanel() {
           </div>
         </div>
 
-        {categories.length === 0 ? (
-          <p className="text-sm text-red-400">
-            Todavía no hay categorías de clientes — crea una en la pestaña Categorías primero.
-          </p>
-        ) : (
-          <div className="grid gap-3 sm:grid-cols-2">
+        <CategoryPicker
+          type="CLIENT"
+          value={form.categoryId}
+          onChange={(categoryId) => setForm({ ...form, categoryId })}
+        />
+
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <ImagePreview url={form.photoUrl} />
+          <div className="grid flex-1 gap-3 sm:grid-cols-2">
             <input
               required
               placeholder="Nombre del cliente"
@@ -133,18 +131,6 @@ export default function ClientsPanel() {
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
             />
-            <select
-              required
-              value={form.categoryId}
-              onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
-              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-            >
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
             <input
               required
               type="url"
@@ -172,11 +158,11 @@ export default function ClientsPanel() {
               className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
             />
           </div>
-        )}
+        </div>
 
         <button
           type="submit"
-          disabled={creating || categories.length === 0}
+          disabled={creating || !form.categoryId}
           className="inline-flex items-center gap-2 px-4 py-2 font-bold text-black transition duration-500 rounded-xl bg-honeydew-500 hover:bg-white disabled:opacity-50"
         >
           <PlusCircle size={16} />
@@ -214,6 +200,15 @@ export default function ClientsPanel() {
                     {c.published ? 'publicado' : 'oculto'}
                   </span>
                 </div>
+
+                <img
+                  src={c.photoUrl}
+                  alt={c.name}
+                  className="object-cover w-full rounded-lg h-28"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
 
                 <div>
                   <p className="font-semibold">{c.name}</p>

@@ -3,7 +3,9 @@
 import { useEffect, useState, FormEvent } from 'react';
 import { Wrench, Eye, EyeOff, Trash2, PlusCircle, ExternalLink } from 'lucide-react';
 import { ScrollRevealEffect } from '@/app/utils';
-import { apiFetch, ApiError, Service, Category, slugify } from './lib/api';
+import { apiFetch, ApiError, Service, slugify } from './lib/api';
+import CategoryPicker from './CategoryPicker';
+import ImagePreview from './ImagePreview';
 
 const emptyForm = {
   categoryId: '',
@@ -14,7 +16,6 @@ const emptyForm = {
 
 export default function ServicesPanel() {
   const [services, setServices] = useState<Service[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [form, setForm] = useState(emptyForm);
@@ -24,13 +25,8 @@ export default function ServicesPanel() {
     setLoading(true);
     setError('');
     try {
-      const [serviceData, categoryData] = await Promise.all([
-        apiFetch<Service[]>('/services/admin'),
-        apiFetch<Category[]>('/categories?type=SERVICE'),
-      ]);
+      const serviceData = await apiFetch<Service[]>('/services/admin');
       setServices(serviceData);
-      setCategories(categoryData);
-      setForm((prev) => ({ ...prev, categoryId: prev.categoryId || categoryData[0]?.id || '' }));
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Error cargando servicios.');
     } finally {
@@ -107,24 +103,15 @@ export default function ServicesPanel() {
           </div>
         </div>
 
-        {categories.length === 0 ? (
-          <p className="text-sm text-red-400">
-            Todavía no hay categorías de servicios — crea una en la pestaña Categorías primero.
-          </p>
-        ) : (
-          <div className="grid gap-3 sm:grid-cols-2">
-            <select
-              required
-              value={form.categoryId}
-              onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
-              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-            >
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
+        <CategoryPicker
+          type="SERVICE"
+          value={form.categoryId}
+          onChange={(categoryId) => setForm({ ...form, categoryId })}
+        />
+
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <ImagePreview url={form.coverUrl} />
+          <div className="grid flex-1 gap-3 sm:grid-cols-2">
             <input
               required
               placeholder="Título"
@@ -144,14 +131,14 @@ export default function ServicesPanel() {
               placeholder="/contact (opcional)"
               value={form.href}
               onChange={(e) => setForm({ ...form, href: e.target.value })}
-              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
+              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500 sm:col-span-2"
             />
           </div>
-        )}
+        </div>
 
         <button
           type="submit"
-          disabled={creating || categories.length === 0}
+          disabled={creating || !form.categoryId}
           className="inline-flex items-center gap-2 px-4 py-2 font-bold text-black transition duration-500 rounded-xl bg-honeydew-500 hover:bg-white disabled:opacity-50"
         >
           <PlusCircle size={16} />
@@ -189,6 +176,15 @@ export default function ServicesPanel() {
                     {s.published ? 'publicado' : 'oculto'}
                   </span>
                 </div>
+
+                <img
+                  src={s.coverUrl}
+                  alt={s.titleEs}
+                  className="object-cover w-full rounded-lg h-28"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
 
                 <div>
                   <p className="font-semibold">{s.titleEs}</p>

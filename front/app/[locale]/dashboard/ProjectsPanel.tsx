@@ -3,7 +3,9 @@
 import { useEffect, useState, FormEvent } from 'react';
 import { FolderKanban, Eye, EyeOff, Trash2, PlusCircle, ExternalLink } from 'lucide-react';
 import { ScrollRevealEffect } from '@/app/utils';
-import { apiFetch, ApiError, Project, Category, slugify } from './lib/api';
+import { apiFetch, ApiError, Project, slugify } from './lib/api';
+import CategoryPicker from './CategoryPicker';
+import ImagePreview from './ImagePreview';
 
 const emptyForm = {
   categoryId: '',
@@ -14,7 +16,6 @@ const emptyForm = {
 
 export default function ProjectsPanel() {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [form, setForm] = useState(emptyForm);
@@ -24,13 +25,8 @@ export default function ProjectsPanel() {
     setLoading(true);
     setError('');
     try {
-      const [projectData, categoryData] = await Promise.all([
-        apiFetch<Project[]>('/projects/admin'),
-        apiFetch<Category[]>('/categories?type=PROJECT'),
-      ]);
+      const projectData = await apiFetch<Project[]>('/projects/admin');
       setProjects(projectData);
-      setCategories(categoryData);
-      setForm((prev) => ({ ...prev, categoryId: prev.categoryId || categoryData[0]?.id || '' }));
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Error cargando proyectos.');
     } finally {
@@ -101,24 +97,15 @@ export default function ProjectsPanel() {
           </div>
         </div>
 
-        {categories.length === 0 ? (
-          <p className="text-sm text-red-400">
-            Todavía no hay categorías de proyectos — crea una en la pestaña Categorías primero.
-          </p>
-        ) : (
-          <div className="grid gap-3 sm:grid-cols-2">
-            <select
-              required
-              value={form.categoryId}
-              onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
-              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-            >
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
+        <CategoryPicker
+          type="PROJECT"
+          value={form.categoryId}
+          onChange={(categoryId) => setForm({ ...form, categoryId })}
+        />
+
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <ImagePreview url={form.coverUrl} />
+          <div className="grid flex-1 gap-3 sm:grid-cols-2">
             <input
               required
               placeholder="Título (es)"
@@ -139,14 +126,14 @@ export default function ProjectsPanel() {
               placeholder="https://instagram.com/... (opcional)"
               value={form.href}
               onChange={(e) => setForm({ ...form, href: e.target.value })}
-              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
+              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500 sm:col-span-2"
             />
           </div>
-        )}
+        </div>
 
         <button
           type="submit"
-          disabled={creating || categories.length === 0}
+          disabled={creating || !form.categoryId}
           className="inline-flex items-center gap-2 px-4 py-2 font-bold text-black transition duration-500 rounded-xl bg-honeydew-500 hover:bg-white disabled:opacity-50"
         >
           <PlusCircle size={16} />
@@ -186,6 +173,15 @@ export default function ProjectsPanel() {
                     {p.published ? 'publicado' : 'oculto'}
                   </span>
                 </div>
+
+                <img
+                  src={p.coverUrl}
+                  alt={p.titleEs}
+                  className="object-cover w-full rounded-lg h-28"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
 
                 <div>
                   <p className="font-semibold">{p.titleEs}</p>

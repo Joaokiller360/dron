@@ -12,6 +12,7 @@ import {
   LINK_PLATFORMS,
   slugify,
 } from './lib/api';
+import ImagePreview from './ImagePreview';
 
 const emptyForm = {
   name: '',
@@ -113,47 +114,50 @@ export default function TeamPanel() {
           </div>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          <input
-            required
-            placeholder="Nombre"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-          />
-          <input
-            required
-            placeholder="Rol (ej. Piloto)"
-            value={form.role}
-            onChange={(e) => setForm({ ...form, role: e.target.value })}
-            className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-          />
-          <input
-            required
-            type="url"
-            placeholder="https://.../foto.jpg"
-            value={form.photoUrl}
-            onChange={(e) => setForm({ ...form, photoUrl: e.target.value })}
-            className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-          />
-          <select
-            value={form.linkPlatform}
-            onChange={(e) => setForm({ ...form, linkPlatform: e.target.value as LinkPlatform })}
-            className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-          >
-            {LINK_PLATFORMS.map((p) => (
-              <option key={p} value={p}>
-                {p}
-              </option>
-            ))}
-          </select>
-          <input
-            type="url"
-            placeholder="https://instagram.com/... (opcional)"
-            value={form.linkUrl}
-            onChange={(e) => setForm({ ...form, linkUrl: e.target.value })}
-            className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-          />
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <ImagePreview url={form.photoUrl} />
+          <div className="grid flex-1 gap-3 sm:grid-cols-2">
+            <input
+              required
+              placeholder="Nombre"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
+            />
+            <input
+              required
+              placeholder="Rol (ej. Piloto)"
+              value={form.role}
+              onChange={(e) => setForm({ ...form, role: e.target.value })}
+              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
+            />
+            <input
+              required
+              type="url"
+              placeholder="https://.../foto.jpg"
+              value={form.photoUrl}
+              onChange={(e) => setForm({ ...form, photoUrl: e.target.value })}
+              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
+            />
+            <select
+              value={form.linkPlatform}
+              onChange={(e) => setForm({ ...form, linkPlatform: e.target.value as LinkPlatform })}
+              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
+            >
+              {LINK_PLATFORMS.map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
+              ))}
+            </select>
+            <input
+              type="url"
+              placeholder="https://instagram.com/... (opcional)"
+              value={form.linkUrl}
+              onChange={(e) => setForm({ ...form, linkUrl: e.target.value })}
+              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500 sm:col-span-2"
+            />
+          </div>
         </div>
 
         <button
@@ -196,6 +200,15 @@ export default function TeamPanel() {
                     {m.published ? 'publicado' : 'oculto'}
                   </span>
                 </div>
+
+                <img
+                  src={m.photoUrl}
+                  alt={m.name}
+                  className="object-cover w-full rounded-lg h-28"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
 
                 <div>
                   <p className="font-semibold">{m.name}</p>
