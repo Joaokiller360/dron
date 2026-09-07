@@ -24,7 +24,11 @@ export default function LoginForm({ onSuccess }: { onSuccess: (email: string) =>
         method: 'POST',
         body: JSON.stringify({ email, password }),
       });
-      window.localStorage.setItem(TOKEN_KEY, data.accessToken);
+      try {
+        window.localStorage.setItem(TOKEN_KEY, data.accessToken);
+      } catch {
+        // localStorage blocked -> still let this session through, just won't persist on reload
+      }
       onSuccess(data.user.email);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'No se pudo conectar con el backend.');
@@ -65,7 +69,7 @@ export default function LoginForm({ onSuccess }: { onSuccess: (email: string) =>
           />
         </div>
 
-        {error && <p className="text-sm text-customRed">{error}</p>}
+        {error && <p className="text-sm text-red-400">{error}</p>}
 
         <button
           type="submit"

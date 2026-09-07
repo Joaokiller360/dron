@@ -135,7 +135,7 @@ export default function ProjectsPanel() {
         <h2 className="text-lg font-bold">Proyectos ({projects.length})</h2>
 
         {loading && <p className="text-white/60">Cargando...</p>}
-        {error && <p className="text-customRed">{error}</p>}
+        {error && <p className="text-red-400">{error}</p>}
         {!loading && projects.length === 0 && !error && (
           <p className="text-white/60">No hay proyectos todavía.</p>
         )}
@@ -162,7 +162,7 @@ export default function ProjectsPanel() {
               </button>
               <button
                 onClick={() => remove(p.id)}
-                className="px-3 py-1 text-sm rounded text-customRed bg-honeydew-800 hover:bg-customRed hover:text-white"
+                className="px-3 py-1 text-sm rounded text-red-400 bg-honeydew-800 hover:bg-red-500 hover:text-white"
               >
                 Eliminar
               </button>

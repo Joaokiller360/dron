@@ -47,7 +47,7 @@ export default function HealthPanel() {
           ✓ Backend vivo — status: {result.status}, timestamp: {result.timestamp}
         </p>
       )}
-      {error && <p className="text-customRed">✗ {error}</p>}
+      {error && <p className="text-red-400">✗ {error}</p>}
     </div>
   );
 }

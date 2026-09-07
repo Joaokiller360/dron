@@ -18,20 +18,24 @@ const TABS: { id: Tab; label: string }[] = [
 export default function DashboardClient() {
   const [email, setEmail] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>('health');
-  const [checked, setChecked] = useState(false);
 
   useEffect(() => {
-    const token = window.localStorage.getItem(TOKEN_KEY);
-    setEmail(token ? 'sesión guardada' : null);
-    setChecked(true);
+    try {
+      const token = window.localStorage.getItem(TOKEN_KEY);
+      if (token) setEmail('sesión guardada');
+    } catch {
+      // localStorage blocked (private browsing, disabled storage) -> just show login
+    }
   }, []);
 
   const logout = () => {
-    window.localStorage.removeItem(TOKEN_KEY);
+    try {
+      window.localStorage.removeItem(TOKEN_KEY);
+    } catch {
+      // ignore
+    }
     setEmail(null);
   };
-
-  if (!checked) return null;
 
   if (!email) {
     return <LoginForm onSuccess={(loggedInEmail) => setEmail(loggedInEmail)} />;

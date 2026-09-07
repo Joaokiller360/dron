@@ -61,7 +61,7 @@ export default function MessagesPanel() {
       </div>
 
       {loading && <p className="text-white/60">Cargando...</p>}
-      {error && <p className="text-customRed">{error}</p>}
+      {error && <p className="text-red-400">{error}</p>}
 
       {!loading && messages.length === 0 && !error && (
         <p className="text-white/60">No hay mensajes.</p>
