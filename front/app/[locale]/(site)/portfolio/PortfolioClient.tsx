@@ -13,6 +13,7 @@ import {
   videoSource,
   projectVideoUrl,
   projectCover,
+  ProjectShot,
   type PublicProject,
 } from '@/app/component';
 
@@ -47,7 +48,7 @@ function Media({ project, title }: { project: PublicProject; title: string }) {
     );
   }
   if (video?.kind === 'file') {
-    return <video src={video.src} poster={cover ?? undefined} controls autoPlay playsInline className="w-full bg-black aspect-video" />;
+    return <video src={video.src} poster={cover ?? undefined} controls autoPlay playsInline className="block w-full max-h-[75vh] bg-black" />;
   }
   return <Shot src={cover} alt={title} label={title} labelPosition="center" className="aspect-video" />;
 }
@@ -155,7 +156,7 @@ export default function PortfolioClient({ projects }: { projects: PublicProject[
                   className="p-0 text-left rounded-[14px] overflow-hidden border border-white/[.09] bg-jb-card cursor-pointer hover:border-[rgba(52,209,122,.5)] transition"
                 >
                   <span className="relative block">
-                    <Shot src={projectCover(p)} alt={title} label={title} labelPosition="center" className="aspect-[16/10]" />
+                    <ProjectShot project={p} title={title} className="aspect-[16/10]" />
                     {projectVideoUrl(p) && <PlayBadge />}
                   </span>
                   <div className="flex items-center justify-between gap-3 px-4 py-3.5">

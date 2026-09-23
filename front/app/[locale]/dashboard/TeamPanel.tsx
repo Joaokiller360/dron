@@ -6,6 +6,7 @@ import { errorMessage, Link, slugify, TeamMember } from './lib/api';
 import { useCollection } from './lib/useCollection';
 import LinksEditor from './LinksEditor';
 import Modal from './Modal';
+import MediaInput from './MediaInput';
 import {
   ConfirmDelete,
   EmptyState,
@@ -203,8 +204,8 @@ export default function TeamPanel() {
               <Field label="Rol">
                 <input required value={form.role} onChange={(e) => set('role', e.target.value)} placeholder="Piloto principal" className={inputCls} />
               </Field>
-              <Field label="Foto (URL)" className="sm:col-span-2">
-                <input required type="url" value={form.photoUrl} onChange={(e) => set('photoUrl', e.target.value)} className={inputCls} />
+              <Field label="Foto" className="sm:col-span-2">
+                <MediaInput required folder="team" value={form.photoUrl} onChange={(url) => set('photoUrl', url)} />
               </Field>
             </div>
           </div>

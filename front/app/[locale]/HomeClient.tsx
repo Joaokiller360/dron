@@ -15,7 +15,7 @@ import {
   btnPrimary,
   btnGhost,
   useContactInfo,
-  projectCover,
+  ProjectShot,
   type PublicService,
   type PublicProject,
   type PublicPromotions,
@@ -274,7 +274,7 @@ export default function HomeClient({
                     href={`${prefix}/portfolio#${p.slug}`}
                     className="overflow-hidden border rounded-[14px] border-white/[.09] hover:border-[rgba(52,209,122,.5)] transition"
                   >
-                    <Shot src={projectCover(p)} alt={title} label={title} labelPosition="center" className="aspect-[16/10]" />
+                    <ProjectShot project={p} title={title} className="aspect-[16/10]" />
                     <div className="px-4 py-3.5 bg-jb-card">
                       <div className="text-[15px] font-semibold text-white">{title}</div>
                       {p.category && <div className="font-mono text-[11.5px] text-jb-muted mt-1">{p.category.name}</div>}

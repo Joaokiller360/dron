@@ -6,6 +6,7 @@ import { errorMessage, Service, ServicePageData, slugify } from './lib/api';
 import { useCollection } from './lib/useCollection';
 import ServicePageEditor from './ServicePageEditor';
 import Modal from './Modal';
+import MediaInput from './MediaInput';
 import {
   ConfirmDelete,
   EmptyState,
@@ -264,8 +265,8 @@ export default function ServicesPanel() {
               <Field label="Título (EN)">
                 <input value={form.titleEn} onChange={(e) => set('titleEn', e.target.value)} className={inputCls} />
               </Field>
-              <Field label="Portada (URL)" className="sm:col-span-2">
-                <input required type="url" value={form.coverUrl} onChange={(e) => set('coverUrl', e.target.value)} className={inputCls} />
+              <Field label="Portada" className="sm:col-span-2">
+                <MediaInput required folder="services" value={form.coverUrl} onChange={(url) => set('coverUrl', url)} />
               </Field>
             </div>
           </div>

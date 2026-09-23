@@ -24,6 +24,7 @@ import { TestimonialsModule } from './testimonials/testimonials.module';
 import { StatsModule } from './stats/stats.module';
 import { VenuesModule } from './venues/venues.module';
 import { SettingsModule } from './settings/settings.module';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { SettingsModule } from './settings/settings.module';
     StatsModule,
     VenuesModule,
     SettingsModule,
+    UploadsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

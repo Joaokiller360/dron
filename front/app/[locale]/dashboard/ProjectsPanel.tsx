@@ -7,6 +7,7 @@ import { useCollection } from './lib/useCollection';
 import { projectCover, videoSource } from '@/app/component/site/video';
 import CategoryPicker from './CategoryPicker';
 import Modal from './Modal';
+import MediaInput from './MediaInput';
 import {
   ConfirmDelete,
   EmptyState,
@@ -214,8 +215,8 @@ export default function ProjectsPanel() {
             <Thumb src={projectCover(form) ?? ''} className="w-full aspect-[16/10] sm:w-[180px]" />
             <div className="flex flex-col gap-4">
               <CategoryPicker type="PROJECT" value={form.categoryId} onChange={(id) => set('categoryId', id)} />
-              <Field label="Portada (URL de imagen)" hint="Opcional si el video es de YouTube o Cloudinary: se usa su miniatura.">
-                <input type="url" value={form.coverUrl} onChange={(e) => set('coverUrl', e.target.value)} placeholder="https://res.cloudinary.com/…/cover.jpg" className={inputCls} />
+              <Field label="Portada" hint="Opcional si el video es de YouTube o Cloudinary: se usa su miniatura.">
+                <MediaInput folder="projects" value={form.coverUrl} onChange={(url) => set('coverUrl', url)} placeholder="Sube una imagen o pega su URL" />
               </Field>
             </div>
           </div>
@@ -232,8 +233,8 @@ export default function ProjectsPanel() {
             <Field label="Subtítulo / cliente (EN)">
               <input value={form.descriptionEn} onChange={(e) => set('descriptionEn', e.target.value)} className={inputCls} />
             </Field>
-            <Field label="Enlace del video" hint="YouTube, Instagram, TikTok, Vimeo, Facebook o .mp4 se reproducen en el sitio." className="sm:col-span-2">
-              <input type="url" value={form.href} onChange={(e) => set('href', e.target.value)} placeholder="https://www.instagram.com/reel/…" className={inputCls} />
+            <Field label="Video" hint="Subido aquí se reproduce limpio, sin marcos. También acepta YouTube, Instagram, TikTok, Vimeo o Facebook." className="sm:col-span-2">
+              <MediaInput folder="projects" accept="video" value={form.href} onChange={(url) => set('href', url)} placeholder="Sube el video o pega un enlace de YouTube, Instagram…" />
               {form.href.trim() && !videoSource(form.href) && (
                 <span className="text-[12px] text-amber-300">No reconocemos este enlace como video: se mostrará como botón “Ver video”.</span>
               )}

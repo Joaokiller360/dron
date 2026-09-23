@@ -23,6 +23,7 @@ import type { ContactInfo, PublicService, PublicProject, PublicClient, PublicPro
 import { btnPrimary, btnGhost, inputClass } from './site/styles';
 import { videoSource, videoThumbnail, projectVideoUrl, projectCover } from './site/video';
 import type { VideoSource } from './site/video';
+import ProjectShot from './site/ProjectShot';
 
 export {
   Footer,
@@ -55,6 +56,7 @@ export {
   videoThumbnail,
   projectVideoUrl,
   projectCover,
+  ProjectShot,
 };
 
 export type { VideoSource, ContactInfo, PublicService, PublicProject, PublicClient, PublicPromotions, PublicTestimonial };

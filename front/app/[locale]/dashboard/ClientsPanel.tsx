@@ -7,6 +7,7 @@ import { useCollection } from './lib/useCollection';
 import CategoryPicker from './CategoryPicker';
 import LinksEditor from './LinksEditor';
 import Modal from './Modal';
+import MediaInput from './MediaInput';
 import {
   ConfirmDelete,
   EmptyState,
@@ -181,8 +182,8 @@ export default function ClientsPanel() {
               <CategoryPicker type="CLIENT" value={form.categoryId} onChange={(id) => set('categoryId', id)} />
             </div>
           </div>
-          <Field label="Logo o foto (URL)">
-            <input required type="url" value={form.photoUrl} onChange={(e) => set('photoUrl', e.target.value)} className={inputCls} />
+          <Field label="Logo o foto">
+            <MediaInput required folder="clients" value={form.photoUrl} onChange={(url) => set('photoUrl', url)} />
           </Field>
           <LinksEditor value={form.links} onChange={(links) => set('links', links)} />
           <Toggle checked={form.published} onChange={(v) => set('published', v)} label="Publicado" description="Visible en /clients." />

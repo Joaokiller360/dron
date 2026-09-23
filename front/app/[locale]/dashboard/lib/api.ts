@@ -306,3 +306,43 @@ export function reorder(resource: ReorderResource, ids: string[]) {
 export function errorMessage(err: unknown, fallback: string) {
   return err instanceof ApiError ? err.message : fallback;
 }
+
+export type UploadFolder = 'projects' | 'services' | 'team' | 'clients' | 'misc';
+
+interface PresignedUpload {
+  url: string;
+  fields: Record<string, string>;
+  publicUrl: string;
+}
+
+/**
+ * Uploads a file straight from the browser to the S3 bucket: the API only
+ * signs the request, so large videos never pass through it. Resolves with the
+ * file's public URL.
+ */
+export async function uploadFile(file: File, folder: UploadFolder, onProgress?: (pct: number) => void): Promise<string> {
+  const signed = await apiFetch<PresignedUpload>('/uploads/presign', {
+    method: 'POST',
+    body: JSON.stringify({ filename: file.name, contentType: file.type, size: file.size, folder }),
+  });
+
+  const form = new FormData();
+  Object.entries(signed.fields).forEach(([k, v]) => form.append(k, v));
+  form.append('file', file); // must be the last field
+
+  await new Promise<void>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', signed.url);
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) onProgress?.(Math.round((e.loaded / e.total) * 100));
+    };
+    xhr.onload = () =>
+      xhr.status >= 200 && xhr.status < 300
+        ? resolve()
+        : reject(new Error(`El almacenamiento rechazó el archivo (${xhr.status})`));
+    xhr.onerror = () => reject(new Error('No se pudo conectar con el almacenamiento (revisa el CORS del bucket)'));
+    xhr.send(form);
+  });
+
+  return signed.publicUrl;
+}
