@@ -109,5 +109,27 @@ export function useCollection<T extends { id: string }>(listPath: string, opts: 
     [opts.reorderAs, setItems],
   );
 
-  return { items, setItems, loading, error, reload, create, update, remove, move };
+  /** Moves an item to any position (drag & drop); same optimistic save as move() */
+  const moveTo = useCallback(
+    async (id: string, toIndex: number) => {
+      if (!opts.reorderAs) return;
+      const previous = current.current;
+      const from = previous.findIndex((it) => it.id === id);
+      const to = Math.max(0, Math.min(previous.length - 1, toIndex));
+      if (from < 0 || from === to) return;
+      const next = [...previous];
+      const [item] = next.splice(from, 1);
+      next.splice(to, 0, item);
+      setItems(next);
+      try {
+        await reorder(opts.reorderAs, next.map((it) => it.id));
+      } catch (err) {
+        setItems(previous);
+        throw err;
+      }
+    },
+    [opts.reorderAs, setItems],
+  );
+
+  return { items, setItems, loading, error, reload, create, update, remove, move, moveTo };
 }
