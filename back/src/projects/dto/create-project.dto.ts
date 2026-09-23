@@ -9,6 +9,7 @@ import {
   IsUUID,
   Matches,
   MaxLength,
+  ValidateIf,
 } from 'class-validator';
 
 export class CreateProjectDto {
@@ -44,9 +45,14 @@ export class CreateProjectDto {
   @IsString()
   descriptionEn?: string;
 
-  @ApiProperty({ example: 'https://cdn.example.com/cover.jpg' })
+  @ApiPropertyOptional({
+    example: 'https://cdn.example.com/cover.jpg',
+    description: 'Optional: the site falls back to the video thumbnail (YouTube / Cloudinary)',
+  })
+  @IsOptional()
+  @ValidateIf((o: CreateProjectDto) => o.coverUrl !== '')
   @IsUrl()
-  coverUrl: string;
+  coverUrl?: string;
 
   @ApiPropertyOptional({
     example: 'https://instagram.com/reel/...',

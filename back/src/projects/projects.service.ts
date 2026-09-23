@@ -8,7 +8,7 @@ export class ProjectsService {
   constructor(private readonly prisma: PrismaService) {}
 
   create(dto: CreateProjectDto) {
-    return this.prisma.project.create({ data: dto, include: { category: true } });
+    return this.prisma.project.create({ data: { ...dto, coverUrl: dto.coverUrl ?? '' }, include: { category: true } });
   }
 
   findPublished(categoryId?: string) {

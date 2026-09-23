@@ -4,6 +4,7 @@ import { useState, FormEvent } from 'react';
 import { FolderKanban, Plus, Pencil, ExternalLink } from 'lucide-react';
 import { errorMessage, Project, slugify } from './lib/api';
 import { useCollection } from './lib/useCollection';
+import { projectCover, videoSource } from '@/app/component/site/video';
 import CategoryPicker from './CategoryPicker';
 import Modal from './Modal';
 import {
@@ -210,11 +211,11 @@ export default function ProjectsPanel() {
       >
         <form onSubmit={submit} className="flex flex-col gap-5">
           <div className="grid gap-5 sm:grid-cols-[180px_minmax(0,1fr)]">
-            <Thumb src={form.coverUrl} className="w-full aspect-[16/10] sm:w-[180px]" />
+            <Thumb src={projectCover(form) ?? ''} className="w-full aspect-[16/10] sm:w-[180px]" />
             <div className="flex flex-col gap-4">
               <CategoryPicker type="PROJECT" value={form.categoryId} onChange={(id) => set('categoryId', id)} />
-              <Field label="Portada (URL de imagen)">
-                <input required type="url" value={form.coverUrl} onChange={(e) => set('coverUrl', e.target.value)} placeholder="https://res.cloudinary.com/…/cover.jpg" className={inputCls} />
+              <Field label="Portada (URL de imagen)" hint="Opcional si el video es de YouTube o Cloudinary: se usa su miniatura.">
+                <input type="url" value={form.coverUrl} onChange={(e) => set('coverUrl', e.target.value)} placeholder="https://res.cloudinary.com/…/cover.jpg" className={inputCls} />
               </Field>
             </div>
           </div>
@@ -231,8 +232,11 @@ export default function ProjectsPanel() {
             <Field label="Subtítulo / cliente (EN)">
               <input value={form.descriptionEn} onChange={(e) => set('descriptionEn', e.target.value)} className={inputCls} />
             </Field>
-            <Field label="Enlace del video" hint="YouTube o .mp4 se reproducen en el sitio; otros enlaces abren aparte." className="sm:col-span-2">
+            <Field label="Enlace del video" hint="YouTube, Instagram, TikTok, Vimeo, Facebook o .mp4 se reproducen en el sitio." className="sm:col-span-2">
               <input type="url" value={form.href} onChange={(e) => set('href', e.target.value)} placeholder="https://www.instagram.com/reel/…" className={inputCls} />
+              {form.href.trim() && !videoSource(form.href) && (
+                <span className="text-[12px] text-amber-300">No reconocemos este enlace como video: se mostrará como botón “Ver video”.</span>
+              )}
             </Field>
           </div>
           {formError && <ErrorNote>{formError}</ErrorNote>}

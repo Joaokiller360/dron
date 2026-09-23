@@ -21,6 +21,8 @@ import { fetchPublic, localized, getContactInfo, whatsappUrl } from './site/api'
 import { ContactInfoProvider, useContactInfo } from './site/ContactInfo';
 import type { ContactInfo, PublicService, PublicProject, PublicClient, PublicPromotions, PublicTestimonial } from './site/api';
 import { btnPrimary, btnGhost, inputClass } from './site/styles';
+import { videoSource, videoThumbnail, projectVideoUrl, projectCover } from './site/video';
+import type { VideoSource } from './site/video';
 
 export {
   Footer,
@@ -49,6 +51,10 @@ export {
   whatsappUrl,
   ContactInfoProvider,
   useContactInfo,
+  videoSource,
+  videoThumbnail,
+  projectVideoUrl,
+  projectCover,
 };
 
-export type { ContactInfo, PublicService, PublicProject, PublicClient, PublicPromotions, PublicTestimonial };
+export type { VideoSource, ContactInfo, PublicService, PublicProject, PublicClient, PublicPromotions, PublicTestimonial };

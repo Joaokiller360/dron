@@ -3,37 +3,63 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
-import { PageHero, Shot, usePrefix, localized, btnPrimary, type PublicProject } from '@/app/component';
+import { Play } from 'lucide-react';
+import {
+  PageHero,
+  Shot,
+  usePrefix,
+  localized,
+  btnPrimary,
+  videoSource,
+  projectVideoUrl,
+  projectCover,
+  type PublicProject,
+} from '@/app/component';
 
 const UNCATEGORIZED = '__uncat__';
 
-function youtubeEmbed(url: string) {
-  const m = url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([\w-]{11})/);
-  return m ? `https://www.youtube.com/embed/${m[1]}?autoplay=1` : null;
-}
-
-function isVideoFile(url: string) {
-  return /\.(mp4|webm|mov)(\?|$)/i.test(url) || /\/video\/upload\//.test(url);
-}
+// Vertical players (reels, shorts, TikTok) keep a 9:16 box that fits the viewport
+const VERTICAL_H = 'min(72vh, 680px)';
 
 function Media({ project, title }: { project: PublicProject; title: string }) {
-  const href = project.href ?? '';
-  const embed = href ? youtubeEmbed(href) : null;
-  if (embed) {
-    return (
+  const url = projectVideoUrl(project);
+  const video = videoSource(url);
+  const cover = projectCover(project);
+  if (video?.kind === 'iframe') {
+    const frame = (
       <iframe
-        src={embed}
+        src={video.src}
         title={title}
-        allow="autoplay; encrypted-media; picture-in-picture"
+        allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
         allowFullScreen
-        className="w-full border-0 aspect-video"
+        loading="lazy"
+        className={`border-0 ${video.vertical ? 'w-full h-full' : 'w-full aspect-video'}`}
       />
     );
+    return video.vertical ? (
+      <div className="flex justify-center bg-black">
+        <div style={{ height: VERTICAL_H, width: `calc(${VERTICAL_H} * 9 / 16)` }} className="max-w-full">
+          {frame}
+        </div>
+      </div>
+    ) : (
+      frame
+    );
   }
-  if (href && isVideoFile(href)) {
-    return <video src={href} poster={project.coverUrl} controls autoPlay playsInline className="w-full bg-black aspect-video" />;
+  if (video?.kind === 'file') {
+    return <video src={video.src} poster={cover ?? undefined} controls autoPlay playsInline className="w-full bg-black aspect-video" />;
   }
-  return <Shot src={project.coverUrl} alt={title} label={title} labelPosition="center" className="aspect-video" />;
+  return <Shot src={cover} alt={title} label={title} labelPosition="center" className="aspect-video" />;
+}
+
+function PlayBadge() {
+  return (
+    <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
+      <span className="flex items-center justify-center w-12 h-12 rounded-full bg-black/55 border border-white/30 text-white backdrop-blur-sm">
+        <Play size={20} fill="currentColor" className="ml-0.5" />
+      </span>
+    </span>
+  );
 }
 
 export default function PortfolioClient({ projects }: { projects: PublicProject[] }) {
@@ -128,7 +154,10 @@ export default function PortfolioClient({ projects }: { projects: PublicProject[
                   onClick={() => setOpen(p)}
                   className="p-0 text-left rounded-[14px] overflow-hidden border border-white/[.09] bg-jb-card cursor-pointer hover:border-[rgba(52,209,122,.5)] transition"
                 >
-                  <Shot src={p.coverUrl} alt={title} label={title} labelPosition="center" className="aspect-[16/10]" />
+                  <span className="relative block">
+                    <Shot src={projectCover(p)} alt={title} label={title} labelPosition="center" className="aspect-[16/10]" />
+                    {projectVideoUrl(p) && <PlayBadge />}
+                  </span>
                   <div className="flex items-center justify-between gap-3 px-4 py-3.5">
                     <span className="flex flex-col min-w-0 gap-1">
                       <span className="text-[15px] font-semibold text-white">{title}</span>
@@ -172,7 +201,7 @@ export default function PortfolioClient({ projects }: { projects: PublicProject[
                 </div>
               </div>
               <div className="flex flex-wrap gap-2.5">
-                {open.href && !youtubeEmbed(open.href) && !isVideoFile(open.href) && (
+                {open.href && videoSource(open.href)?.kind !== 'file' && (
                   <a
                     href={open.href}
                     target="_blank"
