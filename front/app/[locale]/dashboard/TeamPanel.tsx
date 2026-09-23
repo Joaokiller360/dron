@@ -1,253 +1,239 @@
 'use client'
 
-import { useEffect, useState, FormEvent } from 'react';
-import { Users, Eye, EyeOff, Trash2, PlusCircle, ExternalLink } from 'lucide-react';
-import { ScrollRevealEffect } from '@/app/utils';
+import { useState, FormEvent } from 'react';
+import { Users, Plus, Pencil, ExternalLink } from 'lucide-react';
+import { errorMessage, Link, slugify, TeamMember } from './lib/api';
+import { useCollection } from './lib/useCollection';
+import LinksEditor from './LinksEditor';
+import Modal from './Modal';
 import {
-  apiFetch,
-  ApiError,
-  TeamMember,
-  Link,
-  LinkPlatform,
-  LINK_PLATFORMS,
-  slugify,
-} from './lib/api';
-import ImagePreview from './ImagePreview';
+  ConfirmDelete,
+  EmptyState,
+  ErrorNote,
+  Field,
+  FormActions,
+  ListRow,
+  MoveButtons,
+  PanelHeader,
+  Pill,
+  PublishToggle,
+  StatusPill,
+  SkeletonList,
+  Thumb,
+  Toggle,
+  btn,
+  iconBtnCls,
+  inputCls,
+  useToast,
+} from './ui';
 
 const emptyForm = {
   name: '',
   role: '',
   photoUrl: '',
-  linkPlatform: LINK_PLATFORMS[0],
-  linkUrl: '',
+  bio: '',
+  story: '',
+  stat: '',
+  statLabel: '',
+  base: '',
+  skills: '',
+  links: [] as Link[],
+  published: true,
 };
+type Form = typeof emptyForm;
+
+const orNull = (v: string) => (v.trim() ? v.trim() : null);
 
 export default function TeamPanel() {
-  const [members, setMembers] = useState<TeamMember[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [form, setForm] = useState(emptyForm);
-  const [creating, setCreating] = useState(false);
+  const toast = useToast();
+  const { items, loading, error, create, update, remove, move } = useCollection<TeamMember>('/team-members/admin', {
+    live: 'team-members',
+    reorderAs: 'team-members',
+  });
+  const [editing, setEditing] = useState<TeamMember | 'new' | null>(null);
+  const [form, setForm] = useState<Form>(emptyForm);
+  const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState('');
 
-  const load = async () => {
-    setLoading(true);
-    setError('');
-    try {
-      const data = await apiFetch<TeamMember[]>('/team-members/admin');
-      setMembers(data);
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Error cargando el equipo.');
-    } finally {
-      setLoading(false);
-    }
+  const openNew = () => {
+    setForm(emptyForm);
+    setFormError('');
+    setEditing('new');
+  };
+  const openEdit = (m: TeamMember) => {
+    setForm({
+      name: m.name,
+      role: m.role,
+      photoUrl: m.photoUrl,
+      bio: m.bio ?? '',
+      story: m.story ?? '',
+      stat: m.stat ?? '',
+      statLabel: m.statLabel ?? '',
+      base: m.base ?? '',
+      skills: (m.skills ?? []).join(', '),
+      links: m.links ?? [],
+      published: m.published,
+    });
+    setFormError('');
+    setEditing(m);
   };
 
-  useEffect(() => {
-    load();
-  }, []);
-
-  const handleCreate = async (e: FormEvent) => {
+  const submit = async (e: FormEvent) => {
     e.preventDefault();
-    setCreating(true);
-    setError('');
+    setSaving(true);
+    setFormError('');
+    const body = {
+      name: form.name.trim(),
+      role: form.role.trim(),
+      photoUrl: form.photoUrl.trim(),
+      bio: orNull(form.bio),
+      story: orNull(form.story),
+      stat: orNull(form.stat),
+      statLabel: orNull(form.statLabel),
+      base: orNull(form.base),
+      skills: form.skills.split(',').map((s) => s.trim()).filter(Boolean),
+      links: form.links.filter((l) => l.url.trim()),
+      published: form.published,
+    };
     try {
-      const links: Link[] = form.linkUrl
-        ? [{ platform: form.linkPlatform as LinkPlatform, url: form.linkUrl }]
-        : [];
-      await apiFetch<TeamMember>('/team-members', {
-        method: 'POST',
-        body: JSON.stringify({
-          slug: slugify(form.name),
-          name: form.name,
-          role: form.role,
-          photoUrl: form.photoUrl,
-          links,
-        }),
-      });
-      setForm(emptyForm);
-      await load();
+      if (editing === 'new') {
+        await create({ ...body, slug: slugify(body.name), sortOrder: items.length });
+        toast.success('Miembro añadido');
+      } else if (editing) {
+        await update(editing.id, body);
+        toast.success('Cambios guardados');
+      }
+      setEditing(null);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Error creando miembro.');
+      setFormError(errorMessage(err, 'No se pudo guardar.'));
     } finally {
-      setCreating(false);
+      setSaving(false);
     }
   };
 
-  const togglePublished = async (member: TeamMember) => {
+  const run = async (fn: () => Promise<unknown>, ok: string, fail: string) => {
     try {
-      await apiFetch(`/team-members/${member.id}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ published: !member.published }),
-      });
-      setMembers((prev) =>
-        prev.map((m) => (m.id === member.id ? { ...m, published: !m.published } : m)),
-      );
+      await fn();
+      if (ok) toast.success(ok);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Error actualizando miembro.');
+      toast.error(errorMessage(err, fail));
     }
   };
-
-  const remove = async (id: string) => {
-    try {
-      await apiFetch(`/team-members/${id}`, { method: 'DELETE' });
-      setMembers((prev) => prev.filter((m) => m.id !== id));
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Error eliminando miembro.');
-    }
-  };
+  const set = <K extends keyof Form>(k: K, v: Form[K]) => setForm((f) => ({ ...f, [k]: v }));
 
   return (
-    <div className="space-y-5">
-      <form
-        onSubmit={handleCreate}
-        className="p-6 space-y-4 shadow-lg rounded-2xl bg-honeydew-800 sm:p-8"
-      >
-        <div className="flex items-center gap-4">
-          <div className="flex items-center justify-center rounded-full w-11 h-11 bg-honeydew-900 shrink-0">
-            <PlusCircle size={20} strokeWidth={1.5} />
-          </div>
-          <div>
-            <span className="font-mono text-xs font-light tracking-widest uppercase text-honeydew-400">
-              - Equipo -
-            </span>
-            <h2 className="font-mono text-lg font-bold uppercase">Nuevo miembro</h2>
-          </div>
-        </div>
+    <div>
+      <PanelHeader
+        title="Equipo"
+        count={items.length}
+        subtitle="Personas de /teams. Al abrir una tarjeta en el sitio se ven bio, dato, base y habilidades."
+        actions={
+          <button type="button" onClick={openNew} className={btn.primary}>
+            <Plus size={16} /> Nuevo miembro
+          </button>
+        }
+      />
 
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <ImagePreview url={form.photoUrl} />
-          <div className="grid flex-1 gap-3 sm:grid-cols-2">
-            <input
-              required
-              placeholder="Nombre"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-            />
-            <input
-              required
-              placeholder="Rol (ej. Piloto)"
-              value={form.role}
-              onChange={(e) => setForm({ ...form, role: e.target.value })}
-              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-            />
-            <input
-              required
-              type="url"
-              placeholder="https://.../foto.jpg"
-              value={form.photoUrl}
-              onChange={(e) => setForm({ ...form, photoUrl: e.target.value })}
-              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-            />
-            <select
-              value={form.linkPlatform}
-              onChange={(e) => setForm({ ...form, linkPlatform: e.target.value as LinkPlatform })}
-              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-            >
-              {LINK_PLATFORMS.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
-            <input
-              type="url"
-              placeholder="https://instagram.com/... (opcional)"
-              value={form.linkUrl}
-              onChange={(e) => setForm({ ...form, linkUrl: e.target.value })}
-              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500 sm:col-span-2"
-            />
-          </div>
-        </div>
+      {error && <ErrorNote>{error}</ErrorNote>}
 
-        <button
-          type="submit"
-          disabled={creating}
-          className="inline-flex items-center gap-2 px-4 py-2 font-bold text-black transition duration-500 rounded-xl bg-honeydew-500 hover:bg-white disabled:opacity-50"
-        >
-          <PlusCircle size={16} />
-          {creating ? 'Creando...' : 'Crear miembro'}
-        </button>
-      </form>
-
-      <div className="p-6 space-y-4 shadow-lg rounded-2xl bg-honeydew-800 sm:p-8">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center justify-center rounded-full w-11 h-11 bg-honeydew-900 shrink-0">
-            <Users size={20} strokeWidth={1.5} />
-          </div>
-          <h2 className="font-mono text-lg font-bold uppercase">Equipo ({members.length})</h2>
-        </div>
-
-        {loading && <p className="text-white/60">Cargando...</p>}
-        {error && <p className="text-red-400">{error}</p>}
-        {!loading && members.length === 0 && !error && (
-          <p className="text-white/60">No hay miembros todavía.</p>
-        )}
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          {members.map((m, index) => (
-            <ScrollRevealEffect key={m.id} index={index}>
-              <div className="flex flex-col h-full gap-3 p-4 rounded-xl bg-honeydew-900">
-                <div className="flex items-start justify-between gap-2">
-                  <span className="px-2 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wide bg-honeydew-800 text-honeydew-400">
-                    {m.role}
-                  </span>
-                  <span
-                    className={`px-2 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wide ${
-                      m.published ? 'bg-honeydew-500 text-black' : 'bg-white/10 text-white/60'
-                    }`}
-                  >
-                    {m.published ? 'publicado' : 'oculto'}
-                  </span>
-                </div>
-
-                <img
-                  src={m.photoUrl}
-                  alt={m.name}
-                  className="object-cover w-full rounded-lg h-28"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                  }}
-                />
-
-                <div>
-                  <p className="font-semibold">{m.name}</p>
-                  <p className="text-sm text-white/50">/{m.slug}</p>
-                </div>
-
-                {m.published && (
-                  <a
-                    href={`/teams#${m.slug}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-3 py-2 text-xs font-bold text-black transition rounded-xl bg-honeydew-500 hover:bg-white w-fit"
-                  >
-                    <ExternalLink size={14} />
-                    Ver publicación
-                  </a>
-                )}
-
-                <div className="flex gap-2 mt-auto">
-                  <button
-                    onClick={() => togglePublished(m)}
-                    title={m.published ? 'Ocultar' : 'Publicar'}
-                    className="inline-flex items-center justify-center w-9 h-9 transition rounded-full bg-honeydew-800 hover:bg-white hover:text-black"
-                  >
-                    {m.published ? <EyeOff size={16} /> : <Eye size={16} />}
+      {loading ? (
+        <SkeletonList rows={3} />
+      ) : items.length === 0 ? (
+        <EmptyState icon={<Users size={20} />} title="Sin miembros" text="Añade a las personas del equipo." />
+      ) : (
+        <ul className="flex flex-col gap-2 p-0 m-0 list-none">
+          {items.map((m, index) => (
+            <ListRow
+              key={m.id}
+              dimmed={!m.published}
+              onOpen={() => openEdit(m)}
+              thumb={<Thumb src={m.photoUrl} alt={m.name} className="w-12 h-12 !rounded-full" />}
+              title={m.name}
+              meta={[m.role, m.base].filter(Boolean).join(' · ')}
+              pills={
+                <>
+                  <StatusPill published={m.published} />
+                  {!m.bio && !m.story && <Pill tone="warn">Sin bio</Pill>}
+                </>
+              }
+              actions={
+                <>
+                  <PublishToggle
+                    published={m.published}
+                    onToggle={() =>
+                      run(() => update(m.id, { published: !m.published }), m.published ? 'Oculto del sitio' : 'Publicado', 'No se pudo cambiar la visibilidad.')
+                    }
+                  />
+                  <MoveButtons
+                    first={index === 0}
+                    last={index === items.length - 1}
+                    onUp={() => run(() => move(m.id, -1), '', 'No se pudo reordenar.')}
+                    onDown={() => run(() => move(m.id, 1), '', 'No se pudo reordenar.')}
+                  />
+                  {m.published && (
+                    <a href={`/teams#${m.slug}`} target="_blank" rel="noopener noreferrer" title="Ver en el sitio" className={iconBtnCls}>
+                      <ExternalLink size={15} />
+                    </a>
+                  )}
+                  <button type="button" title="Editar" aria-label="Editar" onClick={() => openEdit(m)} className={iconBtnCls}>
+                    <Pencil size={15} />
                   </button>
-                  <button
-                    onClick={() => remove(m.id)}
-                    title="Eliminar"
-                    className="inline-flex items-center justify-center w-9 h-9 transition text-red-400 rounded-full bg-honeydew-800 hover:bg-red-500 hover:text-white"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              </div>
-            </ScrollRevealEffect>
+                  <ConfirmDelete onConfirm={() => run(() => remove(m.id), 'Miembro eliminado', 'No se pudo eliminar.')} />
+                </>
+              }
+            />
           ))}
-        </div>
-      </div>
+        </ul>
+      )}
+
+      <Modal
+        open={editing !== null}
+        onClose={() => setEditing(null)}
+        title={editing === 'new' ? 'Nuevo miembro' : 'Editar miembro'}
+        subtitle="Equipo"
+        icon={<Users size={19} />}
+      >
+        <form onSubmit={submit} className="flex flex-col gap-5">
+          <div className="grid gap-5 sm:grid-cols-[140px_minmax(0,1fr)]">
+            <Thumb src={form.photoUrl} className="w-full aspect-[4/5] sm:w-[140px]" />
+            <div className="grid content-start gap-4 sm:grid-cols-2">
+              <Field label="Nombre">
+                <input required value={form.name} onChange={(e) => set('name', e.target.value)} className={inputCls} />
+              </Field>
+              <Field label="Rol">
+                <input required value={form.role} onChange={(e) => set('role', e.target.value)} placeholder="Piloto principal" className={inputCls} />
+              </Field>
+              <Field label="Foto (URL)" className="sm:col-span-2">
+                <input required type="url" value={form.photoUrl} onChange={(e) => set('photoUrl', e.target.value)} className={inputCls} />
+              </Field>
+            </div>
+          </div>
+          <Field label="Bio corta" hint="Se ve en la tarjeta (máx. 300).">
+            <input maxLength={300} value={form.bio} onChange={(e) => set('bio', e.target.value)} className={inputCls} />
+          </Field>
+          <Field label="Historia" hint="Se ve al abrir la tarjeta.">
+            <textarea rows={4} maxLength={2000} value={form.story} onChange={(e) => set('story', e.target.value)} className={`${inputCls} resize-y`} />
+          </Field>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <Field label="Dato destacado">
+              <input maxLength={20} value={form.stat} onChange={(e) => set('stat', e.target.value)} placeholder="+40 h" className={inputCls} />
+            </Field>
+            <Field label="Etiqueta del dato">
+              <input maxLength={60} value={form.statLabel} onChange={(e) => set('statLabel', e.target.value)} placeholder="de vuelo certificadas" className={inputCls} />
+            </Field>
+            <Field label="Base">
+              <input maxLength={60} value={form.base} onChange={(e) => set('base', e.target.value)} placeholder="Esmeraldas" className={inputCls} />
+            </Field>
+          </div>
+          <Field label="Habilidades" hint="Separadas por coma.">
+            <input value={form.skills} onChange={(e) => set('skills', e.target.value)} placeholder="Piloto RPAS, Dirección, Vuelo FPV" className={inputCls} />
+          </Field>
+          <LinksEditor value={form.links} onChange={(links) => set('links', links)} />
+          <Toggle checked={form.published} onChange={(v) => set('published', v)} label="Publicado" description="Visible en /teams." />
+          {formError && <ErrorNote>{formError}</ErrorNote>}
+          <FormActions saving={saving} onCancel={() => setEditing(null)} submitLabel={editing === 'new' ? 'Añadir miembro' : 'Guardar cambios'} />
+        </form>
+      </Modal>
     </div>
   );
 }

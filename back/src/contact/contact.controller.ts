@@ -1,10 +1,21 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { ContactStatus } from '@prisma/client';
 import { ContactService } from './contact.service';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactStatusDto } from './dto/update-contact.dto';
+import { ReplyContactDto } from './dto/reply-contact.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('contact')
@@ -42,5 +53,21 @@ export class ContactController {
   @ApiOperation({ summary: 'Admin: update a message status (new/read/archived)' })
   updateStatus(@Param('id') id: string, @Body() dto: UpdateContactStatusDto) {
     return this.contactService.updateStatus(id, dto.status);
+  }
+
+  @Post(':id/reply')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Admin: email a reply to the sender through Resend' })
+  reply(@Param('id') id: string, @Body() dto: ReplyContactDto) {
+    return this.contactService.reply(id, dto);
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Admin: delete a contact message' })
+  remove(@Param('id') id: string) {
+    return this.contactService.remove(id);
   }
 }

@@ -10,8 +10,21 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-space-grotesk);
+  --font-mono: var(--font-jetbrains-mono);
+
+  /* JB.SKYLENS site palette (claude.ai/design) */
+  --color-jb-bg: #0a1c12;
+  --color-jb-band: #0d2417;
+  --color-jb-card: #10291b;
+  --color-jb-well: #143122;
+  --color-jb-accent: #34d17a;
+  --color-jb-accent-hi: #4ade80;
+  --color-jb-mint: #6fe3a3;
+  --color-jb-text: #eaf3ec;
+  --color-jb-soft: #b9cfc1;
+  --color-jb-muted: #8fae9c;
+  --color-jb-ink: #05180d;
 
   --color-honeydew-50: #ecf8f1;
   --color-honeydew-100: #d9f2e3;
@@ -28,6 +41,35 @@
 
 @theme {
   --animate-logo-cloud: logo-cloud 45s linear infinite;
+  --animate-jb-float: jb-float 5s ease-in-out infinite;
+  --animate-jb-hover: jb-float-sm 4s ease-in-out infinite;
+  --animate-jb-fade: jb-fade .35s ease;
+}
+
+@keyframes jb-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes jb-float-sm {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes jb-fade {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Striped placeholder behind images that are missing or still loading */
+@utility jb-stripes {
+  background-color: var(--color-jb-well);
+  background-image: repeating-linear-gradient(135deg, rgba(255,255,255,.05) 0 10px, transparent 10px 20px);
+}
+
+/* Soft green glow at the top of page heroes */
+@utility jb-glow {
+  background-image: radial-gradient(900px 380px at 50% -10%, rgba(52,209,122,.14), transparent 70%);
 }
 
 @keyframes logo-cloud {
@@ -47,10 +89,14 @@
   }
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-jb-bg);
+  color: var(--color-jb-text);
+  font-family: var(--font-sans), system-ui, sans-serif;
 }
 
 /* global.css */

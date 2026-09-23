@@ -33,26 +33,30 @@ export default function LoginForm({ onSuccess }: { onSuccess: (email: string) =>
       }
       onSuccess(data.user.email);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'No se pudo conectar con el backend.');
+      if (err instanceof ApiError) {
+        setError(err.status === 401 ? 'Email o contraseña incorrectos.' : err.message);
+      } else {
+        setError('No se pudo conectar con el backend.');
+      }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen px-4 pt-28 pb-10 bg-honeydew-900">
+    <div className="flex items-center justify-center min-h-screen px-4 py-10 bg-jb-bg jb-glow">
       <motion.form
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.17, 0.55, 0.55, 1] }}
         onSubmit={handleSubmit}
-        className="w-full max-w-sm p-6 space-y-5 text-white shadow-lg rounded-3xl bg-honeydew-800 sm:p-8"
+        className="w-full max-w-sm p-6 space-y-5 text-white border border-white/[.08] rounded-3xl bg-jb-card sm:p-8"
       >
         <div className="flex flex-col items-center text-center">
-          <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-honeydew-900">
+          <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-jb-bg">
             <LockKeyhole size={28} strokeWidth={1.5} />
           </div>
-          <span className="font-mono text-xs font-light tracking-widest uppercase text-honeydew-400">
+          <span className="font-mono text-xs font-light tracking-widest uppercase text-jb-mint">
             - Acceso admin -
           </span>
           <h1 className="mt-2 font-mono text-xl font-bold uppercase">Dashboard</h1>
@@ -68,7 +72,7 @@ export default function LoginForm({ onSuccess }: { onSuccess: (email: string) =>
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-3 py-2 transition rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
+            className="w-full px-3 py-2 transition rounded-xl bg-jb-bg focus:outline-none focus:ring-2 focus:ring-jb-accent/60"
             placeholder="admin@joaobarres.dev"
           />
         </div>
@@ -82,7 +86,7 @@ export default function LoginForm({ onSuccess }: { onSuccess: (email: string) =>
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-3 py-2 transition rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
+            className="w-full px-3 py-2 transition rounded-xl bg-jb-bg focus:outline-none focus:ring-2 focus:ring-jb-accent/60"
           />
         </div>
 
@@ -91,7 +95,7 @@ export default function LoginForm({ onSuccess }: { onSuccess: (email: string) =>
         <button
           type="submit"
           disabled={loading}
-          className="inline-flex items-center justify-center w-full gap-2 py-2 font-bold text-black transition duration-500 rounded-xl bg-honeydew-500 hover:bg-white disabled:opacity-50"
+          className="inline-flex items-center justify-center w-full gap-2 py-2 font-bold text-black transition duration-500 rounded-xl bg-jb-accent hover:bg-white disabled:opacity-50"
         >
           {loading ? 'Entrando...' : 'Entrar'}
           {!loading && <LogIn size={18} />}

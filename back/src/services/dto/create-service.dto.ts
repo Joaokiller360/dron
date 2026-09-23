@@ -1,7 +1,9 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  IsArray,
   IsBoolean,
   IsInt,
+  IsObject,
   IsOptional,
   IsString,
   IsUrl,
@@ -18,9 +20,10 @@ export class CreateServiceDto {
   })
   slug: string;
 
-  @ApiProperty({ description: 'id of a Category with type=SERVICE' })
+  @ApiPropertyOptional({ description: 'id of a Category with type=SERVICE' })
+  @IsOptional()
   @IsUUID()
-  categoryId: string;
+  categoryId?: string;
 
   @ApiProperty({ example: 'Fotografía aérea' })
   @IsString()
@@ -64,4 +67,39 @@ export class CreateServiceDto {
   @IsOptional()
   @IsInt()
   sortOrder?: number;
+
+  @ApiPropertyOptional({
+    default: false,
+    description: 'If true, /services/<slug> renders a full page from `page`',
+  })
+  @IsOptional()
+  @IsBoolean()
+  isPage?: boolean;
+
+  @ApiPropertyOptional({
+    description: 'Full PageServices prop tree (D, Content, CalltoAction, ...)',
+    type: 'object',
+    additionalProperties: true,
+  })
+  @IsOptional()
+  @IsObject()
+  page?: Record<string, unknown>;
+
+  @ApiPropertyOptional({ example: 'Film and TV Production | JB.SKYLENS' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  metaTitle?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  metaDescription?: string;
+
+  @ApiPropertyOptional({ type: [String] })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  keywords?: string[];
 }

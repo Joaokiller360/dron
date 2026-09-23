@@ -2,6 +2,9 @@ export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001
 
 export const TOKEN_KEY = 'jbskylens_dashboard_token';
 
+/** Fired on window when an authenticated request comes back 401 */
+export const UNAUTHORIZED_EVENT = 'jbskylens:unauthorized';
+
 export function slugify(text: string): string {
   return text
     .normalize('NFD')
@@ -74,6 +77,12 @@ export interface TeamMember {
   name: string;
   role: string;
   photoUrl: string;
+  bio: string | null;
+  story: string | null;
+  stat: string | null;
+  statLabel: string | null;
+  base: string | null;
+  skills: string[];
   links: Link[];
   published: boolean;
   sortOrder: number;
@@ -91,6 +100,42 @@ export interface Client {
   sortOrder: number;
 }
 
+/** The whole PageServices prop tree, stored as JSON on a full service page. */
+export interface ServicePageData {
+  D?: { imagen?: string; title?: string; label?: string }[];
+  Content?: {
+    label?: string;
+    subTitle?: string;
+    text?: string[];
+    list?: { label?: string; text?: string[] }[];
+  }[];
+  keyword?: string[];
+  keywordLink?: Record<string, string>;
+  galery?: { imagen?: string; video?: string; label?: string; ref?: string }[];
+  P?: { text?: string; buttons?: { label: string; href: string }[] }[];
+  CalltoAction?: {
+    callToAction?: string;
+    SubTitle?: string;
+    text?: string[];
+    text2?: string[];
+    buttons?: { label: string; href: string }[];
+    list?: { label?: string; text?: string[] }[];
+  }[];
+  Animations?: { src?: string }[];
+  Example?: {
+    label?: string;
+    subTitle?: string;
+    text?: string[];
+    buttons?: { label: string; href: string }[];
+    Galeria?: {
+      video?: string;
+      urlImg?: string;
+      label?: string;
+      href?: string;
+    }[];
+  }[];
+}
+
 export interface Service {
   id: string;
   slug: string;
@@ -100,11 +145,102 @@ export interface Service {
   descriptionEn?: string | null;
   coverUrl: string;
   href?: string | null;
-  categoryId: string;
-  category: Category;
+  categoryId?: string | null;
+  category?: Category | null;
+  published: boolean;
+  sortOrder: number;
+  isPage: boolean;
+  page?: ServicePageData | null;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  keywords: string[];
+}
+
+export interface LegalSection {
+  heading?: string;
+  text?: string[];
+  lists?: { header?: string; description?: string[]; items: string[] }[];
+}
+
+export interface LegalPage {
+  id: string;
+  slug: string;
+  titleEs: string;
+  titleEn?: string | null;
+  label?: string | null;
+  lastUpdate?: string | null;
+  keywords: string[];
+  content: LegalSection[];
+  metaTitle?: string | null;
+  metaDescription?: string | null;
   published: boolean;
   sortOrder: number;
 }
+
+export interface Testimonial {
+  id: string;
+  quote: string;
+  author: string;
+  org?: string | null;
+  published: boolean;
+  sortOrder: number;
+}
+
+export interface ContactInfo {
+  phone: string;
+  email: string;
+}
+
+export interface Venue {
+  id: string;
+  name: string;
+  city: string;
+  published: boolean;
+  sortOrder: number;
+}
+
+export interface Promotion {
+  id: string;
+  title: string;
+  detail?: string | null;
+  badge?: string | null;
+  untilLabel?: string | null;
+  price?: string | null;
+  oldPrice?: string | null;
+  serviceSlug?: string | null;
+  endsAt?: string | null;
+  active: boolean;
+  sortOrder: number;
+}
+
+export interface PromotionSettings {
+  enabled: boolean;
+  bar: boolean;
+  section: boolean;
+  badges: boolean;
+}
+
+export interface Stats {
+  messages: { total: number; new: number };
+  projects: { total: number; published: number };
+  services: { total: number; published: number };
+  team: { total: number; published: number };
+  clients: { total: number; published: number };
+  testimonials: { total: number; published: number };
+  promotions: { total: number; published: number };
+}
+
+/** Resources that support PATCH /reorder/:resource */
+export type ReorderResource =
+  | 'projects'
+  | 'services'
+  | 'team-members'
+  | 'clients'
+  | 'categories'
+  | 'legal-pages'
+  | 'promotions'
+  | 'testimonials'
+  | 'venues';
 
 export class ApiError extends Error {
   constructor(
@@ -134,12 +270,22 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
 
   if (!res.ok) {
     const body = await res.json().catch(() => null);
+    // The API's exception filter wraps Nest's error body, so the text can be
+    // body.message (string), body.message.message (string) or an array of
+    // validation messages.
+    const inner = body?.message?.message;
     const message =
       typeof body?.message === 'string'
         ? body.message
-        : Array.isArray(body?.message?.message)
-          ? body.message.message.join(', ')
-          : `Request failed with status ${res.status}`;
+        : typeof inner === 'string'
+          ? inner
+          : Array.isArray(inner)
+            ? inner.join(', ')
+            : `Request failed with status ${res.status}`;
+    // Expired/invalid session: let the dashboard shell drop back to the login
+    if (res.status === 401 && token && !path.startsWith('/auth/login')) {
+      window.dispatchEvent(new Event(UNAUTHORIZED_EVENT));
+    }
     throw new ApiError(message, res.status);
   }
 
@@ -148,4 +294,15 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
   }
 
   return res.json() as Promise<T>;
+}
+
+export function reorder(resource: ReorderResource, ids: string[]) {
+  return apiFetch<{ count: number }>(`/reorder/${resource}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ ids }),
+  });
+}
+
+export function errorMessage(err: unknown, fallback: string) {
+  return err instanceof ApiError ? err.message : fallback;
 }

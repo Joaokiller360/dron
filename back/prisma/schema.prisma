@@ -91,6 +91,12 @@ model TeamMember {
   name      String
   role      String
   photoUrl  String   @map("photo_url")
+  bio       String?
+  story     String?
+  stat      String?
+  statLabel String?  @map("stat_label")
+  base      String?
+  skills    String[] @default([])
   links     Json     @default("[]")
   published Boolean  @default(true)
   sortOrder Int      @default(0) @map("sort_order")
@@ -128,14 +134,108 @@ model Service {
   descriptionEn String?  @map("description_en")
   coverUrl      String   @map("cover_url")
   href          String?
-  categoryId    String   @map("category_id")
-  category      Category @relation(fields: [categoryId], references: [id])
-  published     Boolean  @default(true)
+  categoryId    String?   @map("category_id")
+  category      Category? @relation(fields: [categoryId], references: [id])
+  published     Boolean   @default(true)
   sortOrder     Int      @default(0) @map("sort_order")
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  // Full service page (like /services/film-and-tv-production). When isPage is
+  // true the public site renders a rich page at /services/<slug> from `page`,
+  // which holds the whole PageServices prop tree (D, Content, keyword,
+  // keywordLink, galery, P, CalltoAction, Animations, Example).
+  isPage          Boolean  @default(false) @map("is_page")
+  page            Json?
+  metaTitle       String?  @map("meta_title")
+  metaDescription String?  @map("meta_description")
+  keywords        String[] @default([])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("services")
   @@index([categoryId])
+  @@index([published])
+}
+
+model LegalPage {
+  id              String   @id @default(uuid())
+  slug            String   @unique
+  titleEs         String   @map("title_es")
+  titleEn         String?  @map("title_en")
+  label           String?
+  lastUpdate      String?  @map("last_update")
+  keywords        String[] @default([])
+  // Array of sections: { heading?, text?: string[], lists?: { header?, description?: string[], items: string[] }[] }
+  content         Json
+  metaTitle       String?  @map("meta_title")
+  metaDescription String?  @map("meta_description")
+  published       Boolean  @default(true)
+  sortOrder       Int      @default(0) @map("sort_order")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("legal_pages")
+  @@index([published])
+}
+
+// Seasonal offers shown on the landing (bar, section and badges on services)
+model Promotion {
+  id          String    @id @default(uuid())
+  title       String
+  detail      String?
+  badge       String?
+  untilLabel  String?   @map("until_label")
+  price       String?
+  oldPrice    String?   @map("old_price")
+  // Service whose card gets the badge (Service.slug), optional
+  serviceSlug String?   @map("service_slug")
+  // Hidden automatically once this date passes
+  endsAt      DateTime? @map("ends_at")
+  active      Boolean   @default(true)
+  sortOrder   Int       @default(0) @map("sort_order")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@map("promotions")
+  @@index([active])
+}
+
+// Small key/value store for site-wide switches (e.g. key "promotions")
+model SiteSetting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("site_settings")
+}
+
+// Client quotes for the clients page ("Lo que dicen")
+model Testimonial {
+  id        String   @id @default(uuid())
+  quote     String
+  author    String
+  org       String?
+  published Boolean  @default(true)
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("testimonials")
+  @@index([published])
+}
+
+// Places offered in the contact form's "lugar" select (e.g. "Marina Ecovida"),
+// grouped by city
+model Venue {
+  id        String   @id @default(uuid())
+  name      String
+  city      String
+  published Boolean  @default(true)
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("venues")
+  @@index([city])
   @@index([published])
 }

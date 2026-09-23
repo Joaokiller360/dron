@@ -8,12 +8,16 @@ import { CopyText, SeparatorUp, Logo, LanguageSwitcher, Year } from '@/app/utils
 
 // Importación de hooks de internacionalización
 import { useLocale, useTranslations } from 'next-intl';
+import { usePathname } from 'next/navigation';
 
 export default function Footer() {
   // Hook para traducciones del footer
   const t = useTranslations('footer');
   // Hook para obtener el idioma actual
   const locale = useLocale();
+  // El dashboard tiene su propio layout: sin footer del sitio
+  const pathname = usePathname();
+  if (/(^|\/)dashboard(\/|$)/.test(pathname ?? '')) return null;
   // Prefijo de idioma solo si NO es español
   const prefix = locale === 'es' ? '' : `/${locale}`;
 

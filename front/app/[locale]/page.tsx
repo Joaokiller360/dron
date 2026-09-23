@@ -1,30 +1,30 @@
-import { Inicio, Logos, About, WhatDeDo, WhyChooseUs, Galery } from '@/app/component'
-import { getMessages } from 'next-intl/server';
-
-import { getLocale } from 'next-intl/server';
-
-const locale = getLocale();
+import { getLocale, getMessages } from 'next-intl/server';
+import { fetchPublic, type PublicService, type PublicProject, type PublicPromotions } from '@/app/component';
+import HomeClient from './HomeClient';
 
 export async function generateMetadata() {
   const messages = await getMessages();
+  const locale = await getLocale();
   return {
     title: messages.home?.metadeta?.TitleMeta || 'JB.SKYLENS',
     description:
       messages.home?.metadeta?.DescriptionMeta || 'JB.SKYLENS ofrece servicios profesionales con drones en Ecuador: inspecciones, fotografía aérea, video, eventos y soluciones técnicas con drones.',
     keywords: messages.home?.metadeta?.keywords || [],
-    canonical: { href: `https://jbskylens.com/${await locale === 'es' ? '' : locale}` },
+    canonical: { href: `https://jbskylens.com/${locale === 'es' ? '' : locale}` },
   };
 }
 
-export default function Page() {
+export default async function Page() {
+  const [services, projects, promotions] = await Promise.all([
+    fetchPublic<PublicService[]>('/services'),
+    fetchPublic<PublicProject[]>('/projects'),
+    fetchPublic<PublicPromotions>('/promotions'),
+  ]);
   return (
-    <>
-      <Inicio />
-      <Galery />
-      <WhyChooseUs />
-      <Logos />
-      <WhatDeDo />
-      <About />
-    </>
+    <HomeClient
+      services={(services ?? []).slice(0, 6)}
+      projects={(projects ?? []).slice(0, 4)}
+      promotions={promotions}
+    />
   );
 }

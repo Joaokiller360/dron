@@ -33,23 +33,23 @@ export default function HealthPanel() {
     }
   };
 
-  const dotColor = state === 'ok' ? 'bg-honeydew-500' : state === 'error' ? 'bg-red-400' : 'bg-white/30';
+  const dotColor = state === 'ok' ? 'bg-jb-accent' : state === 'error' ? 'bg-red-400' : 'bg-white/30';
 
   return (
-    <div className="p-6 space-y-5 shadow-lg rounded-2xl bg-honeydew-800 sm:p-8">
+    <div className="p-6 space-y-5 border border-white/[.08] rounded-2xl bg-jb-card sm:p-8">
       <div className="flex items-center gap-4">
-        <div className="flex items-center justify-center rounded-full w-14 h-14 bg-honeydew-900 shrink-0">
+        <div className="flex items-center justify-center rounded-full w-14 h-14 bg-jb-bg shrink-0">
           <ServerCog size={26} strokeWidth={1.5} />
         </div>
         <div>
-          <span className="font-mono text-xs font-light tracking-widest uppercase text-honeydew-400">
+          <span className="font-mono text-xs font-light tracking-widest uppercase text-jb-mint">
             - Backend -
           </span>
           <h2 className="font-mono text-lg font-bold uppercase">Estado</h2>
         </div>
       </div>
 
-      <div className="flex items-center gap-2 p-3 font-mono text-xs rounded-xl bg-honeydew-900 text-white/60">
+      <div className="flex items-center gap-2 p-3 font-mono text-xs rounded-xl bg-jb-bg text-white/60">
         <span className={`w-2.5 h-2.5 rounded-full ${dotColor} shrink-0`} />
         <span className="break-all">{API_URL}</span>
       </div>
@@ -57,15 +57,15 @@ export default function HealthPanel() {
       <button
         onClick={check}
         disabled={loading}
-        className="inline-flex items-center gap-2 px-4 py-2 font-bold text-black transition duration-500 rounded-xl bg-honeydew-500 hover:bg-white disabled:opacity-50"
+        className="inline-flex items-center gap-2 px-4 py-2 font-bold text-black transition duration-500 rounded-xl bg-jb-accent hover:bg-white disabled:opacity-50"
       >
         <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
         {loading ? 'Probando...' : 'Probar conexión'}
       </button>
 
       {result && (
-        <div className="flex items-center gap-2 text-honeydew-400">
-          <span className="w-2 h-2 rounded-full bg-honeydew-500" />
+        <div className="flex items-center gap-2 text-jb-mint">
+          <span className="w-2 h-2 rounded-full bg-jb-accent" />
           <p>
             Backend vivo — status: {result.status}, timestamp: {result.timestamp}
           </p>

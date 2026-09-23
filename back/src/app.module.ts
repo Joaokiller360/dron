@@ -14,7 +14,16 @@ import { ProjectsModule } from './projects/projects.module';
 import { TeamMembersModule } from './team-members/team-members.module';
 import { ClientsModule } from './clients/clients.module';
 import { ServicesModule } from './services/services.module';
+import { LegalPagesModule } from './legal-pages/legal-pages.module';
 import { HealthModule } from './health/health.module';
+import { EventsModule } from './events/events.module';
+import { ChangeEventsInterceptor } from './events/change-events.interceptor';
+import { ReorderModule } from './reorder/reorder.module';
+import { PromotionsModule } from './promotions/promotions.module';
+import { TestimonialsModule } from './testimonials/testimonials.module';
+import { StatsModule } from './stats/stats.module';
+import { VenuesModule } from './venues/venues.module';
+import { SettingsModule } from './settings/settings.module';
 
 @Module({
   imports: [
@@ -35,11 +44,20 @@ import { HealthModule } from './health/health.module';
     TeamMembersModule,
     ClientsModule,
     ServicesModule,
+    LegalPagesModule,
     HealthModule,
+    EventsModule,
+    ReorderModule,
+    PromotionsModule,
+    TestimonialsModule,
+    StatsModule,
+    VenuesModule,
+    SettingsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
     { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor },
+    { provide: APP_INTERCEPTOR, useClass: ChangeEventsInterceptor },
   ],
 })
 export class AppModule {}

@@ -6,6 +6,21 @@ import WhatDeDo from './whatDeDo';
 import WhyChooseUs from './whyChooseUs';
 import Galery from './galery';
 import CallAction from './call-action';
+import {
+  SiteHeader,
+  SiteFooter,
+  PageHero,
+  Eyebrow,
+  SectionTitle,
+  Shot,
+  usePrefix,
+} from './site';
+import ContactForm from './site/ContactForm';
+import LiveRefresh from './site/LiveRefresh';
+import { fetchPublic, localized, getContactInfo, whatsappUrl } from './site/api';
+import { ContactInfoProvider, useContactInfo } from './site/ContactInfo';
+import type { ContactInfo, PublicService, PublicProject, PublicClient, PublicPromotions, PublicTestimonial } from './site/api';
+import { btnPrimary, btnGhost, inputClass } from './site/styles';
 
 export {
   Footer,
@@ -15,5 +30,25 @@ export {
   WhatDeDo,
   WhyChooseUs,
   Galery,
-  CallAction
+  CallAction,
+  SiteHeader,
+  SiteFooter,
+  PageHero,
+  Eyebrow,
+  SectionTitle,
+  Shot,
+  usePrefix,
+  ContactForm,
+  LiveRefresh,
+  fetchPublic,
+  localized,
+  btnPrimary,
+  btnGhost,
+  inputClass,
+  getContactInfo,
+  whatsappUrl,
+  ContactInfoProvider,
+  useContactInfo,
 };
+
+export type { ContactInfo, PublicService, PublicProject, PublicClient, PublicPromotions, PublicTestimonial };

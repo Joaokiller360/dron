@@ -1,28 +1,6 @@
-
-import { CallAction } from '@/app/component'
-import { Banner, SectionCard, CardClient, ScrollRevealEffect, ScrollBottonEffect, linksToButtons } from '@/app/utils'
+import Link from 'next/link';
 import { getLocale, getMessages, getTranslations } from 'next-intl/server';
-
-interface DbClient {
-  id: string;
-  slug: string;
-  name: string;
-  category: { id: string; name: string; sortOrder: number };
-  photoUrl: string;
-  links: { platform: string; url: string }[];
-}
-
-async function getPublishedClients(): Promise<DbClient[]> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  if (!apiUrl) return [];
-  try {
-    const res = await fetch(`${apiUrl}/clients`, { cache: 'no-store' });
-    if (!res.ok) return [];
-    return await res.json();
-  } catch {
-    return [];
-  }
-}
+import { PageHero, Shot, fetchPublic, btnPrimary, type PublicClient, type PublicTestimonial } from '@/app/component';
 
 export async function generateMetadata() {
   const messages = await getMessages();
@@ -38,91 +16,90 @@ export async function generateMetadata() {
 }
 
 export default async function Clients() {
-
-  const dbClients = await getPublishedClients();
-
-  const _ = await getTranslations('clients');
-  const callToAction = await getTranslations('clients.collToAction');
-
+  const [clientsRes, testimonialsRes] = await Promise.all([
+    fetchPublic<PublicClient[]>('/clients'),
+    fetchPublic<PublicTestimonial[]>('/testimonials'),
+  ]);
+  const clients = clientsRes ?? [];
+  const testimonials = testimonialsRes ?? [];
+  const t = await getTranslations('site.clients');
   const locale = await getLocale();
 
   // Solo agregar prefijo de idioma si NO es el idioma por defecto (es)
   const prefix = locale === 'es' ? '' : `/${locale}`;
 
-  const groups: { categoryId: string; name: string; sortOrder: number; items: DbClient[] }[] = [];
-  for (const client of dbClients) {
-    const group = groups.find((g) => g.categoryId === client.category.id);
-    if (group) {
-      group.items.push(client);
-    } else {
-      groups.push({
-        categoryId: client.category.id,
-        name: client.category.name,
-        sortOrder: client.category.sortOrder,
-        items: [client],
-      });
-    }
-  }
-  groups.sort((a, b) => a.sortOrder - b.sortOrder);
-
   return (
-    <>
-      <div className="pb-10 bg-honeydew-800 dark:bg-honeydew-900 pt-28">
-        <Banner
-          label={`${_('label')}`}
-          title={`${_('title')}`}
-          description={`${_('description')}`}
-        />
-        <section className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+    <div className="bg-jb-bg">
+      <PageHero eyebrow={t('eyebrow')} title={t('title')} intro={t('intro')} />
 
-          <section className="space-y-6">
-            {groups.map(({ categoryId, name, items }) => (
-              <SectionCard key={categoryId} style='bg-honeydew-900 dark:bg-honeydew-800'>
-                <div>
-                  <ScrollBottonEffect>
-                    <div className='flex justify-center font-mono text-3xl font-semibold uppercase'>
-                      <span>{name}</span>
-                    </div>
-                    <hr className="my-3 h-0.5 border-t-0 bg-white" />
-                  </ScrollBottonEffect>
-                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {items.map((c, index) => (
-                      <ScrollRevealEffect key={c.id} index={index}>
-                        <CardClient
-                          index={index}
-                          anchorId={c.slug}
-                          clients={[{ client: c.name, organizacion: c.category.name }]}
-                          content={[{ coverUrl: c.photoUrl }]}
-                          buttons={linksToButtons(c.links)}
-                        />
-                      </ScrollRevealEffect>
-                    ))}
-                  </div>
+      <section className="px-6 pt-4 pb-20">
+        {clients.length > 0 ? (
+          <div className="max-w-[1180px] mx-auto grid grid-cols-[repeat(auto-fill,minmax(170px,1fr))] gap-px bg-white/[.08] border border-white/[.08] rounded-2xl overflow-hidden">
+            {clients.map((c) => {
+              const link = c.links?.[0]?.url;
+              const cell = (
+                <>
+                  <Shot src={c.photoUrl} alt={c.name} label={c.name} labelPosition="center" className="absolute inset-0" />
+                  <span className="absolute inset-x-0 bottom-0 px-3 pt-6 pb-2.5 bg-gradient-to-t from-[rgba(10,28,18,.9)] to-transparent">
+                    <span className="block text-[13px] font-semibold text-white truncate">{c.name}</span>
+                    {c.category && (
+                      <span className="block font-mono text-[10.5px] tracking-[.08em] uppercase text-jb-muted truncate">
+                        {c.category.name}
+                      </span>
+                    )}
+                  </span>
+                </>
+              );
+              const cls = 'relative block aspect-[3/2] bg-jb-band overflow-hidden';
+              return link ? (
+                <a
+                  key={c.id}
+                  id={c.slug}
+                  href={link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`${cls} group hover:opacity-90`}
+                >
+                  {cell}
+                </a>
+              ) : (
+                <div key={c.id} id={c.slug} className={cls}>
+                  {cell}
                 </div>
-              </SectionCard>
-            ))}
+              );
+            })}
+          </div>
+        ) : (
+          <p className="text-center text-white/60">{t('empty')}</p>
+        )}
+      </section>
 
-            {groups.length === 0 && (
-              <p className="text-center text-white/60">
-                {locale === 'en' ? 'No clients published yet.' : 'Todavía no hay clientes publicados.'}
-              </p>
-            )}
-          </section>
-        </section>
-
-      </div>
-
-      <CallAction
-        styleSPrimary='bg-honeydew-800 dark:bg-honeydew-900'
-        styleSSecundary='text-honeydew-900 dark:text-honeydew-800'
-        style='bg-honeydew-900 dark:bg-honeydew-800'
-        background='bg-honeydew-800 dark:bg-honeydew-900'
-        textColor='font-semibold text-3xl uppercase font-mono'
-        text={callToAction('text')}
-        buttonText={callToAction('buttonText')}
-        buttonhref={`${prefix}/contact`}
-        buttonColor='cursor-pointer text-center transition duration-500 bg-white text-black hover:bg-honeydew-900 hover:text-white dark:bg-honeydew-800 dark:hover:bg-white dark:hover:text-black dark:text-white flex justify-center'
-      />
-    </>
-  )
+      <section className="px-6 py-20 bg-jb-band border-t border-white/[.06]">
+        {testimonials.length > 0 && (
+          <div className="max-w-[1180px] mx-auto mb-10">
+            <h2 className="m-0 mb-8 font-mono text-[clamp(26px,3.4vw,36px)] font-bold tracking-[-.02em] text-white">
+              {t('says')}
+            </h2>
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(min(290px,100%),1fr))] gap-4">
+              {testimonials.map((q) => (
+                <figure key={q.id} className="flex flex-col gap-5 p-[26px] m-0 rounded-2xl bg-jb-card border border-white/[.08]">
+                  <blockquote className="m-0 text-[16.5px] leading-[1.6] text-jb-text text-pretty">“{q.quote}”</blockquote>
+                  <figcaption className="flex flex-col gap-[3px] mt-auto">
+                    <span className="text-[14.5px] font-bold text-white">{q.author}</span>
+                    {q.org && <span className="font-mono text-[11.5px] text-jb-muted">{q.org}</span>}
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          </div>
+        )}
+        <div className="max-w-[1180px] mx-auto flex flex-wrap items-center justify-between gap-[18px] px-7 py-[26px] rounded-2xl border border-[rgba(52,209,122,.25)]">
+          <span className="text-lg font-semibold text-white">{t('next')}</span>
+          <Link href={`${prefix}/contact`} className={`${btnPrimary} text-sm px-5 py-3`}>
+            {t('cta')}
+          </Link>
+        </div>
+      </section>
+    </div>
+  );
 }

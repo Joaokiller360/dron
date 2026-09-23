@@ -31,7 +31,6 @@ yarn-error.log*
 
 # env files
 .env*
-!.env.example
 
 # vercel
 .vercel
@@ -49,3 +48,6 @@ front/public/video/
 front/public/img/
 vercel.svg
 window.svg
+
+# local admin credentials (never commit)
+ADMIN_CREDENTIALS.md

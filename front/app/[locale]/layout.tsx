@@ -1,21 +1,21 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
 import Script from "next/script";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getLocale } from 'next-intl/server';
 
-import { createMetadata, NavPast } from '@/app/utils'
+import { createMetadata } from '@/app/utils'
 import FlowbiteInit from "../flowbait-init";
-import { Footer } from '@/app/component';
+import { SiteHeader, SiteFooter, LiveRefresh, ContactInfoProvider, getContactInfo } from '@/app/component';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
   subsets: ["latin"],
 });
 
@@ -30,6 +30,7 @@ export default async function LocaleLayout({
 }) {
   const locale = await getLocale();
   const messages = await getMessages();
+  const contact = await getContactInfo();
 
   return (
     <>
@@ -44,17 +45,20 @@ export default async function LocaleLayout({
       </Script>
       <meta name="google-site-verification" content={process.env.GOOGLE_VERIFICATION} />
       <meta name="facebook-domain-verification" content={process.env.FACEBOOK_VERIFICATION} />
-      <div className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <div className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
         <NextIntlClientProvider messages={messages}>
-          <FlowbiteInit />
-          <div className="flex flex-col min-h-screen">
-            <NavPast />
-            {/* CONTENIDO */}
-            <main className="flex-1 text-white">
-              {children}
-            </main>
-            <Footer />
-          </div>
+          <ContactInfoProvider value={contact}>
+            <FlowbiteInit />
+            <div className="flex flex-col min-h-screen bg-jb-bg">
+              <LiveRefresh />
+              <SiteHeader />
+              {/* CONTENIDO */}
+              <main className="flex-1 text-jb-text">
+                {children}
+              </main>
+              <SiteFooter />
+            </div>
+          </ContactInfoProvider>
         </NextIntlClientProvider>
       </div>
     </>

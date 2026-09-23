@@ -36,6 +36,12 @@ export class ServicesController {
     return this.servicesService.findAllForAdmin(categoryId);
   }
 
+  @Get('slug/:slug')
+  @ApiOperation({ summary: 'Public: read one published service by slug' })
+  findBySlug(@Param('slug') slug: string) {
+    return this.servicesService.findBySlug(slug);
+  }
+
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

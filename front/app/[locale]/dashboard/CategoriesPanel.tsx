@@ -1,171 +1,175 @@
 'use client'
 
-import { useEffect, useState, FormEvent } from 'react';
-import { Tags, Trash2, PlusCircle } from 'lucide-react';
-import { apiFetch, ApiError, Category, CategoryType, CATEGORY_TYPES } from './lib/api';
+import { useState, FormEvent } from 'react';
+import { Tags, Plus, Check, X, Pencil } from 'lucide-react';
+import { Category, CategoryType, CATEGORY_TYPES, errorMessage, reorder } from './lib/api';
+import { useCollection } from './lib/useCollection';
+import { Card, ConfirmDelete, ErrorNote, MoveButtons, PanelHeader, SkeletonList, btn, iconBtnCls, inputCls, useToast } from './ui';
 
-const TYPE_LABELS: Record<CategoryType, string> = {
-  PROJECT: 'Proyectos',
-  CLIENT: 'Clientes',
-  SERVICE: 'Servicios',
+const TYPE_LABELS: Record<CategoryType, { title: string; hint: string }> = {
+  PROJECT: { title: 'Proyectos', hint: 'Filtros del portafolio' },
+  CLIENT: { title: 'Clientes', hint: 'Grupos de /clients' },
+  SERVICE: { title: 'Servicios', hint: 'Opcional para servicios simples' },
 };
 
-const emptyForm = {
-  name: '',
-  type: CATEGORY_TYPES[0],
-};
+function Column({
+  type,
+  items,
+  onCreate,
+  onRename,
+  onDelete,
+  onMove,
+}: {
+  type: CategoryType;
+  items: Category[];
+  onCreate: (type: CategoryType, name: string) => Promise<boolean>;
+  onRename: (c: Category, name: string) => Promise<boolean>;
+  onDelete: (c: Category) => void;
+  onMove: (type: CategoryType, id: string, dir: -1 | 1) => void;
+}) {
+  const [name, setName] = useState('');
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+
+  const add = async (e: FormEvent) => {
+    e.preventDefault();
+    if (name.trim() && (await onCreate(type, name.trim()))) setName('');
+  };
+  const saveEdit = async (e: FormEvent, c: Category) => {
+    e.preventDefault();
+    if (editName.trim() && (await onRename(c, editName.trim()))) setEditId(null);
+  };
+
+  return (
+    <Card className="flex flex-col">
+      <div className="px-5 pt-5 pb-3">
+        <h2 className="m-0 text-[15px] font-bold text-white">
+          {TYPE_LABELS[type].title} <span className="ml-1 font-medium text-jb-muted">{items.length}</span>
+        </h2>
+        <p className="mt-0.5 mb-0 text-[12.5px] text-jb-muted">{TYPE_LABELS[type].hint}</p>
+      </div>
+      <ul className="flex-1 p-0 px-2 m-0 list-none">
+        {items.map((c, i) => (
+          <li key={c.id} className="flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-white/[.03]">
+            {editId === c.id ? (
+              <form onSubmit={(e) => saveEdit(e, c)} className="flex flex-1 gap-1">
+                <input autoFocus value={editName} onChange={(e) => setEditName(e.target.value)} aria-label="Nuevo nombre" className={`${inputCls} py-1.5`} />
+                <button type="submit" aria-label="Guardar" className={iconBtnCls}>
+                  <Check size={15} />
+                </button>
+                <button type="button" aria-label="Cancelar" onClick={() => setEditId(null)} className={iconBtnCls}>
+                  <X size={15} />
+                </button>
+              </form>
+            ) : (
+              <>
+                <span className="flex-1 text-[14px] text-jb-text truncate">{c.name}</span>
+                <MoveButtons first={i === 0} last={i === items.length - 1} onUp={() => onMove(type, c.id, -1)} onDown={() => onMove(type, c.id, 1)} />
+                <button
+                  type="button"
+                  title="Renombrar"
+                  aria-label="Renombrar"
+                  onClick={() => {
+                    setEditId(c.id);
+                    setEditName(c.name);
+                  }}
+                  className={iconBtnCls}
+                >
+                  <Pencil size={14} />
+                </button>
+                <ConfirmDelete onConfirm={() => onDelete(c)} />
+              </>
+            )}
+          </li>
+        ))}
+        {items.length === 0 && <li className="px-2 py-3 text-[13px] text-jb-muted">Sin categorías.</li>}
+      </ul>
+      <form onSubmit={add} className="flex gap-2 p-3 mt-2 border-t border-white/[.07]">
+        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nueva categoría" aria-label={`Nueva categoría de ${TYPE_LABELS[type].title}`} className={`${inputCls} py-2`} />
+        <button type="submit" disabled={!name.trim()} className={`${btn.primary} px-3`} aria-label="Crear">
+          <Plus size={16} />
+        </button>
+      </form>
+    </Card>
+  );
+}
 
 export default function CategoriesPanel() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [form, setForm] = useState(emptyForm);
-  const [creating, setCreating] = useState(false);
+  const toast = useToast();
+  const { items, setItems, loading, error, create, update, remove } = useCollection<Category>('/categories', {
+    live: 'categories',
+  });
 
-  const load = async () => {
-    setLoading(true);
-    setError('');
+  const byType = (type: CategoryType) => items.filter((c) => c.type === type).sort((a, b) => a.sortOrder - b.sortOrder);
+
+  const onCreate = async (type: CategoryType, name: string) => {
     try {
-      const data = await apiFetch<Category[]>('/categories');
-      setCategories(data);
+      await create({ type, name });
+      toast.success('Categoría creada');
+      return true;
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Error cargando categorías.');
-    } finally {
-      setLoading(false);
+      toast.error(errorMessage(err, 'No se pudo crear la categoría.'));
+      return false;
     }
   };
-
-  useEffect(() => {
-    load();
-  }, []);
-
-  const handleCreate = async (e: FormEvent) => {
-    e.preventDefault();
-    setCreating(true);
-    setError('');
+  const onRename = async (c: Category, name: string) => {
     try {
-      await apiFetch<Category>('/categories', {
-        method: 'POST',
-        body: JSON.stringify(form),
-      });
-      setForm(emptyForm);
-      await load();
+      await update(c.id, { name });
+      toast.success('Categoría renombrada');
+      return true;
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Error creando categoría.');
-    } finally {
-      setCreating(false);
+      toast.error(errorMessage(err, 'No se pudo renombrar.'));
+      return false;
     }
   };
-
-  const remove = async (id: string) => {
+  const onDelete = async (c: Category) => {
     try {
-      await apiFetch(`/categories/${id}`, { method: 'DELETE' });
-      setCategories((prev) => prev.filter((c) => c.id !== id));
+      await remove(c.id);
+      toast.success('Categoría eliminada');
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Error eliminando categoría.');
+      toast.error(errorMessage(err, 'No se pudo eliminar: puede que tenga elementos asignados.'));
+    }
+  };
+  // Reorders within one type; sortOrder is only compared between same-type categories
+  const onMove = async (type: CategoryType, id: string, dir: -1 | 1) => {
+    const list = byType(type);
+    const i = list.findIndex((c) => c.id === id);
+    const j = i + dir;
+    if (i < 0 || j < 0 || j >= list.length) return;
+    [list[i], list[j]] = [list[j], list[i]];
+    const previous = items;
+    const order = new Map(list.map((c, k) => [c.id, k]));
+    setItems(items.map((c) => (order.has(c.id) ? { ...c, sortOrder: order.get(c.id)! } : c)));
+    try {
+      await reorder('categories', list.map((c) => c.id));
+    } catch (err) {
+      setItems(previous);
+      toast.error(errorMessage(err, 'No se pudo reordenar.'));
     }
   };
 
   return (
-    <div className="space-y-5">
-      <form
-        onSubmit={handleCreate}
-        className="p-6 space-y-4 shadow-lg rounded-2xl bg-honeydew-800 sm:p-8"
-      >
-        <div className="flex items-center gap-4">
-          <div className="flex items-center justify-center rounded-full w-11 h-11 bg-honeydew-900 shrink-0">
-            <PlusCircle size={20} strokeWidth={1.5} />
-          </div>
-          <div>
-            <span className="font-mono text-xs font-light tracking-widest uppercase text-honeydew-400">
-              - Organización -
-            </span>
-            <h2 className="font-mono text-lg font-bold uppercase">Nueva categoría</h2>
-          </div>
+    <div>
+      <PanelHeader
+        title="Categorías"
+        count={items.length}
+        subtitle="Agrupan proyectos, clientes y servicios. También puedes crearlas desde cada formulario."
+      />
+      {error && <ErrorNote>{error}</ErrorNote>}
+      {loading ? (
+        <SkeletonList rows={3} />
+      ) : (
+        <div className="grid gap-4 md:grid-cols-3">
+          {CATEGORY_TYPES.map((type) => (
+            <Column key={type} type={type} items={byType(type)} onCreate={onCreate} onRename={onRename} onDelete={onDelete} onMove={onMove} />
+          ))}
         </div>
-
-        <p className="text-sm text-white/60">
-          Crea categorías aquí antes de crear proyectos, clientes o servicios — cada uno necesita
-          elegir una.
+      )}
+      {!loading && items.length === 0 && (
+        <p className="mt-4 text-[13px] text-jb-muted inline-flex items-center gap-2">
+          <Tags size={14} /> Crea al menos una categoría antes de añadir proyectos o clientes.
         </p>
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          <input
-            required
-            placeholder="Nombre (ej. Bodas, Gobierno)"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-          />
-          <select
-            value={form.type}
-            onChange={(e) => setForm({ ...form, type: e.target.value as CategoryType })}
-            className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-          >
-            {CATEGORY_TYPES.map((t) => (
-              <option key={t} value={t}>
-                {TYPE_LABELS[t]}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <button
-          type="submit"
-          disabled={creating}
-          className="inline-flex items-center gap-2 px-4 py-2 font-bold text-black transition duration-500 rounded-xl bg-honeydew-500 hover:bg-white disabled:opacity-50"
-        >
-          <PlusCircle size={16} />
-          {creating ? 'Creando...' : 'Crear categoría'}
-        </button>
-      </form>
-
-      <div className="p-6 space-y-4 shadow-lg rounded-2xl bg-honeydew-800 sm:p-8">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center justify-center rounded-full w-11 h-11 bg-honeydew-900 shrink-0">
-            <Tags size={20} strokeWidth={1.5} />
-          </div>
-          <h2 className="font-mono text-lg font-bold uppercase">
-            Categorías ({categories.length})
-          </h2>
-        </div>
-
-        {loading && <p className="text-white/60">Cargando...</p>}
-        {error && <p className="text-red-400">{error}</p>}
-
-        {CATEGORY_TYPES.map((type) => {
-          const items = categories.filter((c) => c.type === type);
-          if (items.length === 0) return null;
-          return (
-            <div key={type} className="space-y-2">
-              <p className="font-mono text-xs font-bold uppercase tracking-wide text-honeydew-400">
-                {TYPE_LABELS[type]}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {items.map((c) => (
-                  <div
-                    key={c.id}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 text-sm rounded-full bg-honeydew-900"
-                  >
-                    <span>{c.name}</span>
-                    <button
-                      onClick={() => remove(c.id)}
-                      title="Eliminar"
-                      className="text-white/50 hover:text-red-400"
-                    >
-                      <Trash2 size={13} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })}
-
-        {!loading && categories.length === 0 && !error && (
-          <p className="text-white/60">No hay categorías todavía.</p>
-        )}
-      </div>
+      )}
     </div>
   );
 }

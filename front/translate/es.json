@@ -608,6 +608,26 @@
     "collToAction": {
       "text": "¡Somos la solución que buscas!",
       "buttonText": "Contáctanos"
+    },
+    "page": {
+      "eyebrow": "Equipo",
+      "title": "Las personas detrás de cada vuelo",
+      "intro": "Un equipo pequeño y especializado: pilotos certificados, operación de cámara y postproducción bajo el mismo techo.",
+      "portrait": "retrato",
+      "more": "Conocer más →",
+      "base": "base de operación",
+      "cta": "Trabajar con nosotros",
+      "close": "Cerrar",
+      "empty": "Todavía no hay miembros publicados."
+    },
+    "certs": {
+      "title": "Certificaciones",
+      "text": "Operamos bajo la normativa de aviación civil vigente en Ecuador, con seguro de responsabilidad civil para cada operación.",
+      "items": [
+        "Piloto RPAS certificado",
+        "Seguro de responsabilidad civil",
+        "Autorización para espacio aéreo controlado"
+      ]
     }
   },
   "contact": {
@@ -1039,5 +1059,285 @@
       "lastUpdate": "Última actualización"
     },
     "p": "d"
+  },
+  "site": {
+    "header": {
+      "cta": "Pedir presupuesto",
+      "openMenu": "Abrir menú",
+      "closeMenu": "Cerrar menú"
+    },
+    "footer": {
+      "about": "Empresa audiovisual de drones en Esmeraldas. Operamos en todo Ecuador.",
+      "site": "Sitio",
+      "write": "Escríbenos",
+      "legal": "Legal",
+      "terms": "Términos y condiciones",
+      "privacy": "Política de privacidad",
+      "rights": "Todos los derechos reservados."
+    },
+    "common": {
+      "close": "Cerrar",
+      "viewMore": "Ver más",
+      "quote": "Cotizar",
+      "empty": "Todavía no hay contenido publicado."
+    },
+    "home": {
+      "location": "Ecuador · Esmeraldas",
+      "title": "Empresa audiovisual de drones en Esmeraldas",
+      "intro": "Gracias a nuestros drones profesionales, es posible conseguir secuencias aéreas agresivas, veloces y de alta calidad para producciones audiovisuales, eventos y empresas en Ecuador.",
+      "ctaQuote": "Pide presupuesto sin compromiso",
+      "ctaReel": "Ver portafolio",
+      "stats": [
+        {
+          "value": "+50",
+          "label": "producciones entregadas"
+        },
+        {
+          "value": "+40 h",
+          "label": "de vuelo certificadas"
+        },
+        {
+          "value": "48 h",
+          "label": "entrega del material editado"
+        }
+      ],
+      "frame": "demoreel",
+      "badge": "Permisos gestionados",
+      "servicesEyebrow": "A qué nos dedicamos",
+      "servicesTitle": "Nuestros servicios",
+      "servicesIntro": "Cada servicio incluye piloto y operador de cámara, drone de respaldo en sitio y el material entregado con color aplicado.",
+      "whyTitle": "¿Por qué elegir JB.SKYLENS como empresa de drones en Ecuador?",
+      "whyIntro": "Ofrecemos servicios profesionales con drones en Ecuador bajo un modelo llave en mano: altos estándares de calidad, cumplimiento normativo y eficiencia operativa.",
+      "reasons": [
+        {
+          "title": "El valor de la experiencia",
+          "body": "Nos avalan más de 50 producciones nacionales e internacionales."
+        },
+        {
+          "title": "La flota más completa",
+          "body": "Con las mejores cámaras y lentes del mercado para cine y televisión."
+        },
+        {
+          "title": "Tramitación de permisos",
+          "body": "Método agilizado y coordinación con las autoridades incluida en los servicios."
+        },
+        {
+          "title": "Volamos en cualquier lugar",
+          "body": "Ciudad, espacio aéreo controlado (CTR/ATZ), de noche y sin importar las condiciones."
+        },
+        {
+          "title": "Compromiso de calidad",
+          "body": "Y de eficacia: trabajamos en tiempo récord, ahorrando costos operativos."
+        },
+        {
+          "title": "Drones ready to go",
+          "body": "Incluidos piloto y operador de cámara, backup drone, monitor y material esencial."
+        }
+      ],
+      "worksEyebrow": "Trabajos RPAS/UAS",
+      "worksTitle": "Conoce lo que hacemos",
+      "worksAll": "Ver todo el portafolio →",
+      "contactTitle": "Cuéntanos tu proyecto",
+      "contactIntro": "Respondemos en menos de 24 horas con disponibilidad, permisos necesarios y presupuesto cerrado.",
+      "contactArea": "Esmeraldas · operamos en todo Ecuador",
+      "promo": {
+        "tag": "Promo",
+        "see": "Ver ofertas",
+        "eyebrow": "Campaña activa",
+        "title": "Promociones de temporada",
+        "count": "{count, plural, one {# oferta vigente} other {# ofertas vigentes}}",
+        "book": "Reservar esta promo",
+        "before": "antes",
+        "close": "Cerrar aviso"
+      }
+    },
+    "services": {
+      "eyebrow": "Servicios",
+      "title": "Qué podemos grabar para ti",
+      "intro": "Todos los servicios incluyen piloto y operador de cámara, drone de respaldo en sitio, gestión de permisos y material entregado con color aplicado.",
+      "more": "Más servicios",
+      "stepsTitle": "Cómo trabajamos",
+      "steps": [
+        {
+          "t": "Consulta",
+          "b": "Nos cuentas fecha, lugar y objetivo. Respondemos en menos de 24 horas."
+        },
+        {
+          "t": "Permisos",
+          "b": "Evaluamos la zona y tramitamos las autorizaciones de vuelo necesarias."
+        },
+        {
+          "t": "Vuelo",
+          "b": "Piloto y operador en sitio, con drone de respaldo y monitor para ti."
+        },
+        {
+          "t": "Entrega",
+          "b": "Material editado con color aplicado, listo para publicar o presentar."
+        }
+      ],
+      "includedTitle": "Incluido en todos los servicios",
+      "included": [
+        {
+          "t": "Piloto + operador de cámara",
+          "b": "Dos personas en sitio: una vuela, otra encuadra."
+        },
+        {
+          "t": "Drone de respaldo",
+          "b": "Si algo falla, el rodaje sigue."
+        },
+        {
+          "t": "Permisos DGAC",
+          "b": "Gestionamos las autorizaciones de vuelo."
+        },
+        {
+          "t": "Color aplicado",
+          "b": "Material listo para publicar o presentar."
+        }
+      ],
+      "open": "Ver servicio",
+      "ctaTitle": "¿No sabes qué servicio necesitas?",
+      "ctaText": "Cuéntanos tu idea y te recomendamos el tipo de vuelo, equipo y permisos adecuados. Respondemos en menos de 24 horas.",
+      "ctaButton": "Hablemos de tu proyecto",
+      "whatsapp": "Escribir por WhatsApp",
+      "detail": {
+        "breadcrumb": "Servicios",
+        "quoteTitle": "Cotiza este servicio",
+        "quotePoints": [
+          "Respuesta en menos de 24 horas",
+          "Permisos de vuelo incluidos",
+          "Presupuesto cerrado, sin sorpresas"
+        ],
+        "quoteButton": "Pedir presupuesto",
+        "portfolio": "Ver portafolio",
+        "about": "Sobre el servicio",
+        "benefits": "Ventajas",
+        "media": "En acción",
+        "examples": "Casos y ejemplos",
+        "others": "Otros servicios",
+        "allServices": "Todos los servicios →",
+        "credit": "Ver en Instagram"
+      }
+    },
+    "portfolio": {
+      "eyebrow": "Trabajos RPAS/UAS",
+      "title": "Portafolio",
+      "all": "Todos",
+      "other": "Otros",
+      "empty": "Todavía no hay proyectos publicados.",
+      "watch": "Ver video ↗",
+      "want": "Quiero algo así"
+    },
+    "clients": {
+      "eyebrow": "Clientes",
+      "title": "Quienes ya volaron con nosotros",
+      "intro": "Hoteles, productoras, constructoras, instituciones y parejas en todo Ecuador.",
+      "empty": "Todavía no hay clientes publicados.",
+      "next": "¿Quieres ser el próximo?",
+      "cta": "Pedir presupuesto",
+      "says": "Lo que dicen"
+    },
+    "contact": {
+      "eyebrow": "Contacto",
+      "title": "Cuéntanos tu proyecto",
+      "intro": "Respondemos en menos de 24 horas con disponibilidad, permisos necesarios y presupuesto cerrado.",
+      "whatsapp": "WhatsApp",
+      "email": "Correo",
+      "base": "Base",
+      "baseValue": "Esmeraldas · todo Ecuador",
+      "form": {
+        "type": "Tipo de proyecto",
+        "types": [
+          "Boda",
+          "XV años",
+          "Reel",
+          "Evento",
+          "Inspección",
+          "Otro"
+        ],
+        "name": "Nombre",
+        "email": "Correo",
+        "phone": "WhatsApp / teléfono",
+        "date": "Fecha",
+        "place": "Ciudad o lugar",
+        "message": "Qué necesitas grabar",
+        "optional": "opcional",
+        "placeholders": {
+          "name": "Ej. María López",
+          "email": "Ej. maria@correo.com",
+          "phone": "Ej. 099 123 4567",
+          "place": "Ej. Esmeraldas, Atacames",
+          "message": "Qué quieres grabar, duración aproximada, horario y cualquier detalle importante.",
+          "venue": "Ej. Marina Ecovida"
+        },
+        "hints": {
+          "phone": "Te contactamos por aquí.",
+          "date": "Día del evento o de la grabación."
+        },
+        "submit": "Enviar solicitud",
+        "sending": "Enviando...",
+        "error": "No pudimos enviar tu solicitud. Escríbenos por WhatsApp.",
+        "city": "Ciudad",
+        "venue": "Lugar",
+        "otherCity": "Otra ciudad",
+        "otherVenue": "Otro lugar",
+        "noVenue": "Aún no lo sé",
+        "chooseCity": "Elige una ciudad",
+        "cityCustom": "Escribe tu ciudad",
+        "venueCustom": "Escribe el lugar",
+        "messageType": "Mensaje",
+        "customMessage": "Escribir mi propio mensaje",
+        "templates": [
+          "Quiero cotizar la grabación completa de mi evento con dron (fotos y video).",
+          "Necesito fotos y video aéreo para promocionar mi negocio o propiedad.",
+          "Quiero un reel corto con tomas aéreas para redes sociales.",
+          "Necesito una inspección o levantamiento con dron.",
+          "Quiero saber disponibilidad y precio para la fecha indicada."
+        ],
+        "errors": {
+          "name": "Usa solo letras, espacios, apóstrofes o guiones.",
+          "email": "Escribe un correo válido, por ejemplo maria@correo.com.",
+          "phone": "Usa solo números, espacios, paréntesis, guiones y + al inicio.",
+          "place": "Usa solo letras, números, espacios y . , ' - ( )",
+          "message": "Quita los caracteres especiales (< > { } [ ] * # @ & = emojis, etc.).",
+          "date": "Elige una fecha desde hoy en adelante."
+        }
+      },
+      "sent": {
+        "title": "Solicitud recibida",
+        "text": "Te escribimos en menos de 24 horas. Si es urgente, escríbenos por WhatsApp.",
+        "again": "Enviar otra solicitud"
+      },
+      "faqTitle": "Preguntas frecuentes",
+      "faqs": [
+        {
+          "q": "¿Con cuánta anticipación debo reservar?",
+          "a": "Recomendamos al menos una semana. En zonas con espacio aéreo controlado, dos semanas para tramitar permisos."
+        },
+        {
+          "q": "¿Qué pasa si llueve el día del vuelo?",
+          "a": "Reprogramamos sin costo. El piloto decide el día anterior según el pronóstico."
+        },
+        {
+          "q": "¿Viajan fuera de Esmeraldas?",
+          "a": "Sí, operamos en todo Ecuador. Los viáticos se incluyen en el presupuesto."
+        },
+        {
+          "q": "¿En qué formato entregan el material?",
+          "a": "Video en 4K y 1080p, fotos en alta resolución y versiones verticales para redes si las necesitas."
+        }
+      ]
+    },
+    "construction": {
+      "eyebrow": "En construcción",
+      "title": "Esta sección todavía está en vuelo de prueba",
+      "text": "Estamos preparando esta página. Mientras tanto, puedes ver nuestros servicios o escribirnos directamente.",
+      "home": "Volver al inicio",
+      "contact": "Contactar"
+    },
+    "legal": {
+      "eyebrow": "Legal",
+      "updated": "Última actualización",
+      "contents": "Contenido"
+    }
   }
 }

@@ -1,226 +1,244 @@
 'use client'
 
-import { useEffect, useState, FormEvent } from 'react';
-import { FolderKanban, Eye, EyeOff, Trash2, PlusCircle, ExternalLink } from 'lucide-react';
-import { ScrollRevealEffect } from '@/app/utils';
-import { apiFetch, ApiError, Project, slugify } from './lib/api';
+import { useState, FormEvent } from 'react';
+import { FolderKanban, Plus, Pencil, ExternalLink } from 'lucide-react';
+import { errorMessage, Project, slugify } from './lib/api';
+import { useCollection } from './lib/useCollection';
 import CategoryPicker from './CategoryPicker';
-import ImagePreview from './ImagePreview';
+import Modal from './Modal';
+import {
+  ConfirmDelete,
+  EmptyState,
+  ErrorNote,
+  Field,
+  FormActions,
+  ListRow,
+  MoveButtons,
+  PanelHeader,
+  PublishToggle,
+  StatusPill,
+  SearchInput,
+  SkeletonList,
+  Thumb,
+  btn,
+  iconBtnCls,
+  inputCls,
+  useToast,
+} from './ui';
 
 const emptyForm = {
   categoryId: '',
   titleEs: '',
+  titleEn: '',
+  descriptionEs: '',
+  descriptionEn: '',
   coverUrl: '',
   href: '',
+  published: true,
 };
+type Form = typeof emptyForm;
+
+const orNull = (v: string) => (v.trim() ? v.trim() : null);
 
 export default function ProjectsPanel() {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [form, setForm] = useState(emptyForm);
-  const [creating, setCreating] = useState(false);
+  const toast = useToast();
+  const { items, loading, error, create, update, remove, move } = useCollection<Project>('/projects/admin', {
+    live: ['projects', 'categories'],
+    base: '/projects',
+    reorderAs: 'projects',
+  });
+  const [query, setQuery] = useState('');
+  const [editing, setEditing] = useState<Project | 'new' | null>(null);
+  const [form, setForm] = useState<Form>(emptyForm);
+  const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState('');
 
-  const load = async () => {
-    setLoading(true);
-    setError('');
-    try {
-      const projectData = await apiFetch<Project[]>('/projects/admin');
-      setProjects(projectData);
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Error cargando proyectos.');
-    } finally {
-      setLoading(false);
-    }
+  const q = query.trim().toLowerCase();
+  const visible = q
+    ? items.filter((p) => [p.titleEs, p.titleEn ?? '', p.category?.name ?? ''].some((f) => f.toLowerCase().includes(q)))
+    : items;
+
+  const openNew = () => {
+    setForm({ ...emptyForm, categoryId: form.categoryId });
+    setFormError('');
+    setEditing('new');
+  };
+  const openEdit = (p: Project) => {
+    setForm({
+      categoryId: p.categoryId,
+      titleEs: p.titleEs,
+      titleEn: p.titleEn ?? '',
+      descriptionEs: p.descriptionEs ?? '',
+      descriptionEn: p.descriptionEn ?? '',
+      coverUrl: p.coverUrl,
+      href: p.href ?? '',
+      published: p.published,
+    });
+    setFormError('');
+    setEditing(p);
   };
 
-  useEffect(() => {
-    load();
-  }, []);
-
-  const handleCreate = async (e: FormEvent) => {
+  const submit = async (e: FormEvent) => {
     e.preventDefault();
-    setCreating(true);
-    setError('');
+    setSaving(true);
+    setFormError('');
+    const body = {
+      categoryId: form.categoryId,
+      titleEs: form.titleEs.trim(),
+      titleEn: orNull(form.titleEn),
+      descriptionEs: orNull(form.descriptionEs),
+      descriptionEn: orNull(form.descriptionEn),
+      coverUrl: form.coverUrl.trim(),
+      href: orNull(form.href),
+      published: form.published,
+    };
     try {
-      await apiFetch<Project>('/projects', {
-        method: 'POST',
-        body: JSON.stringify({ ...form, slug: slugify(form.titleEs), href: form.href || undefined }),
-      });
-      setForm({ ...emptyForm, categoryId: form.categoryId });
-      await load();
+      if (editing === 'new') {
+        await create({ ...body, slug: slugify(body.titleEs), sortOrder: items.length });
+        toast.success(form.published ? 'Proyecto publicado' : 'Proyecto guardado como oculto');
+      } else if (editing) {
+        await update(editing.id, body);
+        toast.success('Cambios guardados');
+      }
+      setEditing(null);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Error creando proyecto.');
+      setFormError(errorMessage(err, 'No se pudo guardar el proyecto.'));
     } finally {
-      setCreating(false);
+      setSaving(false);
     }
   };
 
-  const togglePublished = async (project: Project) => {
+  const run = async (fn: () => Promise<unknown>, ok: string, fail: string) => {
     try {
-      await apiFetch(`/projects/${project.id}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ published: !project.published }),
-      });
-      setProjects((prev) =>
-        prev.map((p) => (p.id === project.id ? { ...p, published: !p.published } : p)),
-      );
+      await fn();
+      if (ok) toast.success(ok);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Error actualizando proyecto.');
+      toast.error(errorMessage(err, fail));
     }
   };
 
-  const remove = async (id: string) => {
-    try {
-      await apiFetch(`/projects/${id}`, { method: 'DELETE' });
-      setProjects((prev) => prev.filter((p) => p.id !== id));
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Error eliminando proyecto.');
-    }
-  };
+  const set = <K extends keyof Form>(k: K, v: Form[K]) => setForm((f) => ({ ...f, [k]: v }));
 
   return (
-    <div className="space-y-5">
-      <form
-        onSubmit={handleCreate}
-        className="p-6 space-y-4 shadow-lg rounded-2xl bg-honeydew-800 sm:p-8"
-      >
-        <div className="flex items-center gap-4">
-          <div className="flex items-center justify-center rounded-full w-11 h-11 bg-honeydew-900 shrink-0">
-            <PlusCircle size={20} strokeWidth={1.5} />
-          </div>
-          <div>
-            <span className="font-mono text-xs font-light tracking-widest uppercase text-honeydew-400">
-              - Portafolio -
-            </span>
-            <h2 className="font-mono text-lg font-bold uppercase">Nuevo proyecto</h2>
-          </div>
-        </div>
+    <div>
+      <PanelHeader
+        title="Proyectos"
+        count={items.length}
+        subtitle="Trabajos del portafolio. El orden de la lista es el orden en el sitio."
+        actions={
+          <>
+            <SearchInput value={query} onChange={setQuery} />
+            <button type="button" onClick={openNew} className={btn.primary}>
+              <Plus size={16} /> Nuevo proyecto
+            </button>
+          </>
+        }
+      />
 
-        <CategoryPicker
-          type="PROJECT"
-          value={form.categoryId}
-          onChange={(categoryId) => setForm({ ...form, categoryId })}
+      {error && <ErrorNote>{error}</ErrorNote>}
+
+      {loading ? (
+        <SkeletonList />
+      ) : items.length === 0 ? (
+        <EmptyState
+          icon={<FolderKanban size={20} />}
+          title="Sin proyectos"
+          text="Añade tu primer trabajo; aparecerá en /portfolio al publicarlo."
+          action={
+            <button type="button" onClick={openNew} className={btn.primary}>
+              <Plus size={16} /> Nuevo proyecto
+            </button>
+          }
         />
+      ) : (
+        <ul className="flex flex-col gap-2 p-0 m-0 list-none">
+          {visible.map((p) => {
+            const index = items.indexOf(p);
+            return (
+              <ListRow
+                key={p.id}
+                dimmed={!p.published}
+                onOpen={() => openEdit(p)}
+                thumb={<Thumb src={p.coverUrl} alt={p.titleEs} className="w-16 h-12" />}
+                title={p.titleEs}
+                meta={[p.category?.name, p.descriptionEs].filter(Boolean).join(' · ')}
+                pills={<StatusPill published={p.published} />}
+                actions={
+                  <>
+                    <PublishToggle
+                      published={p.published}
+                      onToggle={() =>
+                        run(
+                          () => update(p.id, { published: !p.published }),
+                          p.published ? 'Oculto del sitio' : 'Publicado en el sitio',
+                          'No se pudo cambiar la visibilidad.',
+                        )
+                      }
+                    />
+                    {!q && (
+                      <MoveButtons
+                        first={index === 0}
+                        last={index === items.length - 1}
+                        onUp={() => run(() => move(p.id, -1), '', 'No se pudo reordenar.')}
+                        onDown={() => run(() => move(p.id, 1), '', 'No se pudo reordenar.')}
+                      />
+                    )}
+                    {p.published && (
+                      <a href={`/portfolio#${p.slug}`} target="_blank" rel="noopener noreferrer" title="Ver en el sitio" className={iconBtnCls}>
+                        <ExternalLink size={15} />
+                      </a>
+                    )}
+                    <button type="button" title="Editar" aria-label="Editar" onClick={() => openEdit(p)} className={iconBtnCls}>
+                      <Pencil size={15} />
+                    </button>
+                    <ConfirmDelete onConfirm={() => run(() => remove(p.id), 'Proyecto eliminado', 'No se pudo eliminar.')} />
+                  </>
+                }
+              />
+            );
+          })}
+          {visible.length === 0 && <p className="py-8 m-0 text-center text-[13.5px] text-jb-muted">Sin resultados para “{query}”.</p>}
+        </ul>
+      )}
 
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <ImagePreview url={form.coverUrl} />
-          <div className="grid flex-1 gap-3 sm:grid-cols-2">
-            <input
-              required
-              placeholder="Título (es)"
-              value={form.titleEs}
-              onChange={(e) => setForm({ ...form, titleEs: e.target.value })}
-              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-            />
-            <input
-              required
-              type="url"
-              placeholder="https://.../cover.jpg"
-              value={form.coverUrl}
-              onChange={(e) => setForm({ ...form, coverUrl: e.target.value })}
-              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-            />
-            <input
-              type="url"
-              placeholder="https://instagram.com/... (opcional)"
-              value={form.href}
-              onChange={(e) => setForm({ ...form, href: e.target.value })}
-              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500 sm:col-span-2"
-            />
+      <Modal
+        open={editing !== null}
+        onClose={() => setEditing(null)}
+        title={editing === 'new' ? 'Nuevo proyecto' : 'Editar proyecto'}
+        subtitle="Portafolio"
+        icon={<FolderKanban size={19} />}
+      >
+        <form onSubmit={submit} className="flex flex-col gap-5">
+          <div className="grid gap-5 sm:grid-cols-[180px_minmax(0,1fr)]">
+            <Thumb src={form.coverUrl} className="w-full aspect-[16/10] sm:w-[180px]" />
+            <div className="flex flex-col gap-4">
+              <CategoryPicker type="PROJECT" value={form.categoryId} onChange={(id) => set('categoryId', id)} />
+              <Field label="Portada (URL de imagen)">
+                <input required type="url" value={form.coverUrl} onChange={(e) => set('coverUrl', e.target.value)} placeholder="https://res.cloudinary.com/…/cover.jpg" className={inputCls} />
+              </Field>
+            </div>
           </div>
-        </div>
-
-        <button
-          type="submit"
-          disabled={creating || !form.categoryId}
-          className="inline-flex items-center gap-2 px-4 py-2 font-bold text-black transition duration-500 rounded-xl bg-honeydew-500 hover:bg-white disabled:opacity-50"
-        >
-          <PlusCircle size={16} />
-          {creating ? 'Creando...' : 'Crear proyecto'}
-        </button>
-      </form>
-
-      <div className="p-6 space-y-4 shadow-lg rounded-2xl bg-honeydew-800 sm:p-8">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center justify-center rounded-full w-11 h-11 bg-honeydew-900 shrink-0">
-            <FolderKanban size={20} strokeWidth={1.5} />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Título (ES)">
+              <input required value={form.titleEs} onChange={(e) => set('titleEs', e.target.value)} className={inputCls} />
+            </Field>
+            <Field label="Título (EN)" hint="Opcional; si falta se usa el español.">
+              <input value={form.titleEn} onChange={(e) => set('titleEn', e.target.value)} className={inputCls} />
+            </Field>
+            <Field label="Subtítulo / cliente (ES)">
+              <input value={form.descriptionEs} onChange={(e) => set('descriptionEs', e.target.value)} className={inputCls} />
+            </Field>
+            <Field label="Subtítulo / cliente (EN)">
+              <input value={form.descriptionEn} onChange={(e) => set('descriptionEn', e.target.value)} className={inputCls} />
+            </Field>
+            <Field label="Enlace del video" hint="YouTube o .mp4 se reproducen en el sitio; otros enlaces abren aparte." className="sm:col-span-2">
+              <input type="url" value={form.href} onChange={(e) => set('href', e.target.value)} placeholder="https://www.instagram.com/reel/…" className={inputCls} />
+            </Field>
           </div>
-          <h2 className="font-mono text-lg font-bold uppercase">
-            Proyectos ({projects.length})
-          </h2>
-        </div>
-
-        {loading && <p className="text-white/60">Cargando...</p>}
-        {error && <p className="text-red-400">{error}</p>}
-        {!loading && projects.length === 0 && !error && (
-          <p className="text-white/60">No hay proyectos todavía.</p>
-        )}
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          {projects.map((p, index) => (
-            <ScrollRevealEffect key={p.id} index={index}>
-              <div className="flex flex-col h-full gap-3 p-4 rounded-xl bg-honeydew-900">
-                <div className="flex items-start justify-between gap-2">
-                  <span className="px-2 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wide bg-honeydew-800 text-honeydew-400">
-                    {p.category.name}
-                  </span>
-                  <span
-                    className={`px-2 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wide ${
-                      p.published ? 'bg-honeydew-500 text-black' : 'bg-white/10 text-white/60'
-                    }`}
-                  >
-                    {p.published ? 'publicado' : 'oculto'}
-                  </span>
-                </div>
-
-                <img
-                  src={p.coverUrl}
-                  alt={p.titleEs}
-                  className="object-cover w-full rounded-lg h-28"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                  }}
-                />
-
-                <div>
-                  <p className="font-semibold">{p.titleEs}</p>
-                  <p className="text-sm text-white/50">/{p.slug}</p>
-                </div>
-
-                {p.published && (
-                  <a
-                    href={`/portfolio#${p.slug}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-3 py-2 text-xs font-bold text-black transition rounded-xl bg-honeydew-500 hover:bg-white"
-                  >
-                    <ExternalLink size={14} />
-                    Ver publicación
-                  </a>
-                )}
-
-                <div className="flex gap-2 mt-auto">
-                  <button
-                    onClick={() => togglePublished(p)}
-                    title={p.published ? 'Ocultar' : 'Publicar'}
-                    className="inline-flex items-center justify-center w-9 h-9 transition rounded-full bg-honeydew-800 hover:bg-white hover:text-black"
-                  >
-                    {p.published ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                  <button
-                    onClick={() => remove(p.id)}
-                    title="Eliminar"
-                    className="inline-flex items-center justify-center w-9 h-9 transition text-red-400 rounded-full bg-honeydew-800 hover:bg-red-500 hover:text-white"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              </div>
-            </ScrollRevealEffect>
-          ))}
-        </div>
-      </div>
+          {formError && <ErrorNote>{formError}</ErrorNote>}
+          <FormActions saving={saving} disabled={!form.categoryId} onCancel={() => setEditing(null)} submitLabel={editing === 'new' ? 'Crear proyecto' : 'Guardar cambios'} />
+        </form>
+      </Modal>
     </div>
   );
 }

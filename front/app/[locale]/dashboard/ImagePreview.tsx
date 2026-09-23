@@ -9,7 +9,7 @@ export default function ImagePreview({ url }: { url: string }) {
 
   if (!url.trim() || broken) {
     return (
-      <div className="flex items-center justify-center w-full h-32 shrink-0 rounded-xl bg-honeydew-900 text-white/30 sm:w-32">
+      <div className="flex items-center justify-center w-full h-32 shrink-0 rounded-xl bg-jb-bg text-white/30 sm:w-32">
         <ImageOff size={22} />
       </div>
     );
@@ -20,7 +20,7 @@ export default function ImagePreview({ url }: { url: string }) {
       src={url}
       alt="preview"
       onError={() => setFailedUrl(url)}
-      className="object-cover w-full h-32 shrink-0 rounded-xl bg-honeydew-900 sm:w-32"
+      className="object-cover w-full h-32 shrink-0 rounded-xl bg-jb-bg sm:w-32"
     />
   );
 }

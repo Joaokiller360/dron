@@ -1,253 +1,195 @@
 'use client'
 
-import { useEffect, useState, FormEvent } from 'react';
-import { Handshake, Eye, EyeOff, Trash2, PlusCircle, ExternalLink } from 'lucide-react';
-import { ScrollRevealEffect } from '@/app/utils';
-import {
-  apiFetch,
-  ApiError,
-  Client,
-  Link,
-  LinkPlatform,
-  LINK_PLATFORMS,
-  slugify,
-} from './lib/api';
+import { useState, FormEvent } from 'react';
+import { Handshake, Plus, Pencil, ExternalLink } from 'lucide-react';
+import { Client, errorMessage, Link, slugify } from './lib/api';
+import { useCollection } from './lib/useCollection';
 import CategoryPicker from './CategoryPicker';
-import ImagePreview from './ImagePreview';
+import LinksEditor from './LinksEditor';
+import Modal from './Modal';
+import {
+  ConfirmDelete,
+  EmptyState,
+  ErrorNote,
+  Field,
+  FormActions,
+  ListRow,
+  MoveButtons,
+  PanelHeader,
+  PublishToggle,
+  StatusPill,
+  SearchInput,
+  SkeletonList,
+  Thumb,
+  Toggle,
+  btn,
+  iconBtnCls,
+  inputCls,
+  useToast,
+} from './ui';
 
-const emptyForm = {
-  name: '',
-  categoryId: '',
-  photoUrl: '',
-  linkPlatform: LINK_PLATFORMS[0],
-  linkUrl: '',
-};
+const emptyForm = { name: '', categoryId: '', photoUrl: '', links: [] as Link[], published: true };
+type Form = typeof emptyForm;
 
 export default function ClientsPanel() {
-  const [clients, setClients] = useState<Client[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [form, setForm] = useState(emptyForm);
-  const [creating, setCreating] = useState(false);
+  const toast = useToast();
+  const { items, loading, error, create, update, remove, move } = useCollection<Client>('/clients/admin', {
+    live: ['clients', 'categories'],
+    base: '/clients',
+    reorderAs: 'clients',
+  });
+  const [query, setQuery] = useState('');
+  const [editing, setEditing] = useState<Client | 'new' | null>(null);
+  const [form, setForm] = useState<Form>(emptyForm);
+  const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState('');
 
-  const load = async () => {
-    setLoading(true);
-    setError('');
-    try {
-      const clientData = await apiFetch<Client[]>('/clients/admin');
-      setClients(clientData);
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Error cargando clientes.');
-    } finally {
-      setLoading(false);
-    }
+  const q = query.trim().toLowerCase();
+  const visible = q ? items.filter((c) => [c.name, c.category?.name ?? ''].some((f) => f.toLowerCase().includes(q))) : items;
+
+  const openNew = () => {
+    setForm({ ...emptyForm, categoryId: form.categoryId });
+    setFormError('');
+    setEditing('new');
+  };
+  const openEdit = (c: Client) => {
+    setForm({ name: c.name, categoryId: c.categoryId, photoUrl: c.photoUrl, links: c.links ?? [], published: c.published });
+    setFormError('');
+    setEditing(c);
   };
 
-  useEffect(() => {
-    load();
-  }, []);
-
-  const handleCreate = async (e: FormEvent) => {
+  const submit = async (e: FormEvent) => {
     e.preventDefault();
-    setCreating(true);
-    setError('');
+    setSaving(true);
+    setFormError('');
+    const body = {
+      name: form.name.trim(),
+      categoryId: form.categoryId,
+      photoUrl: form.photoUrl.trim(),
+      links: form.links.filter((l) => l.url.trim()),
+      published: form.published,
+    };
     try {
-      const links: Link[] = form.linkUrl
-        ? [{ platform: form.linkPlatform as LinkPlatform, url: form.linkUrl }]
-        : [];
-      await apiFetch<Client>('/clients', {
-        method: 'POST',
-        body: JSON.stringify({
-          slug: slugify(form.name),
-          name: form.name,
-          categoryId: form.categoryId,
-          photoUrl: form.photoUrl,
-          links,
-        }),
-      });
-      setForm({ ...emptyForm, categoryId: form.categoryId });
-      await load();
+      if (editing === 'new') {
+        await create({ ...body, slug: slugify(body.name), sortOrder: items.length });
+        toast.success('Cliente añadido');
+      } else if (editing) {
+        await update(editing.id, body);
+        toast.success('Cambios guardados');
+      }
+      setEditing(null);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Error creando cliente.');
+      setFormError(errorMessage(err, 'No se pudo guardar el cliente.'));
     } finally {
-      setCreating(false);
+      setSaving(false);
     }
   };
 
-  const togglePublished = async (client: Client) => {
+  const run = async (fn: () => Promise<unknown>, ok: string, fail: string) => {
     try {
-      await apiFetch(`/clients/${client.id}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ published: !client.published }),
-      });
-      setClients((prev) =>
-        prev.map((c) => (c.id === client.id ? { ...c, published: !c.published } : c)),
-      );
+      await fn();
+      if (ok) toast.success(ok);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Error actualizando cliente.');
+      toast.error(errorMessage(err, fail));
     }
   };
-
-  const remove = async (id: string) => {
-    try {
-      await apiFetch(`/clients/${id}`, { method: 'DELETE' });
-      setClients((prev) => prev.filter((c) => c.id !== id));
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Error eliminando cliente.');
-    }
-  };
+  const set = <K extends keyof Form>(k: K, v: Form[K]) => setForm((f) => ({ ...f, [k]: v }));
 
   return (
-    <div className="space-y-5">
-      <form
-        onSubmit={handleCreate}
-        className="p-6 space-y-4 shadow-lg rounded-2xl bg-honeydew-800 sm:p-8"
+    <div>
+      <PanelHeader
+        title="Clientes"
+        count={items.length}
+        subtitle="Marcas e instituciones de /clients. El primer enlace abre al hacer clic en su logo."
+        actions={
+          <>
+            <SearchInput value={query} onChange={setQuery} />
+            <button type="button" onClick={openNew} className={btn.primary}>
+              <Plus size={16} /> Nuevo cliente
+            </button>
+          </>
+        }
+      />
+
+      {error && <ErrorNote>{error}</ErrorNote>}
+
+      {loading ? (
+        <SkeletonList />
+      ) : items.length === 0 ? (
+        <EmptyState icon={<Handshake size={20} />} title="Sin clientes" text="Añade las marcas con las que has trabajado." />
+      ) : (
+        <ul className="flex flex-col gap-2 p-0 m-0 list-none">
+          {visible.map((c) => {
+            const index = items.indexOf(c);
+            return (
+              <ListRow
+                key={c.id}
+                dimmed={!c.published}
+                onOpen={() => openEdit(c)}
+                thumb={<Thumb src={c.photoUrl} alt={c.name} className="w-14 h-10" />}
+                title={c.name}
+                meta={[c.category?.name, c.links?.[0]?.platform].filter(Boolean).join(' · ')}
+                pills={<StatusPill published={c.published} />}
+                actions={
+                  <>
+                    <PublishToggle
+                      published={c.published}
+                      onToggle={() =>
+                        run(() => update(c.id, { published: !c.published }), c.published ? 'Oculto del sitio' : 'Publicado', 'No se pudo cambiar la visibilidad.')
+                      }
+                    />
+                    {!q && (
+                      <MoveButtons
+                        first={index === 0}
+                        last={index === items.length - 1}
+                        onUp={() => run(() => move(c.id, -1), '', 'No se pudo reordenar.')}
+                        onDown={() => run(() => move(c.id, 1), '', 'No se pudo reordenar.')}
+                      />
+                    )}
+                    {c.links?.[0]?.url && (
+                      <a href={c.links[0].url} target="_blank" rel="noopener noreferrer" title="Abrir enlace" className={iconBtnCls}>
+                        <ExternalLink size={15} />
+                      </a>
+                    )}
+                    <button type="button" title="Editar" aria-label="Editar" onClick={() => openEdit(c)} className={iconBtnCls}>
+                      <Pencil size={15} />
+                    </button>
+                    <ConfirmDelete onConfirm={() => run(() => remove(c.id), 'Cliente eliminado', 'No se pudo eliminar.')} />
+                  </>
+                }
+              />
+            );
+          })}
+          {visible.length === 0 && <p className="py-8 m-0 text-center text-[13.5px] text-jb-muted">Sin resultados para “{query}”.</p>}
+        </ul>
+      )}
+
+      <Modal
+        open={editing !== null}
+        onClose={() => setEditing(null)}
+        title={editing === 'new' ? 'Nuevo cliente' : 'Editar cliente'}
+        subtitle="Clientes"
+        icon={<Handshake size={19} />}
       >
-        <div className="flex items-center gap-4">
-          <div className="flex items-center justify-center rounded-full w-11 h-11 bg-honeydew-900 shrink-0">
-            <PlusCircle size={20} strokeWidth={1.5} />
+        <form onSubmit={submit} className="flex flex-col gap-5">
+          <div className="grid gap-5 sm:grid-cols-[180px_minmax(0,1fr)]">
+            <Thumb src={form.photoUrl} className="w-full aspect-[3/2] sm:w-[180px]" />
+            <div className="flex flex-col gap-4">
+              <Field label="Nombre">
+                <input required value={form.name} onChange={(e) => set('name', e.target.value)} className={inputCls} />
+              </Field>
+              <CategoryPicker type="CLIENT" value={form.categoryId} onChange={(id) => set('categoryId', id)} />
+            </div>
           </div>
-          <div>
-            <span className="font-mono text-xs font-light tracking-widest uppercase text-honeydew-400">
-              - Clientes -
-            </span>
-            <h2 className="font-mono text-lg font-bold uppercase">Nuevo cliente</h2>
-          </div>
-        </div>
-
-        <CategoryPicker
-          type="CLIENT"
-          value={form.categoryId}
-          onChange={(categoryId) => setForm({ ...form, categoryId })}
-        />
-
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <ImagePreview url={form.photoUrl} />
-          <div className="grid flex-1 gap-3 sm:grid-cols-2">
-            <input
-              required
-              placeholder="Nombre del cliente"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-            />
-            <input
-              required
-              type="url"
-              placeholder="https://.../foto.jpg"
-              value={form.photoUrl}
-              onChange={(e) => setForm({ ...form, photoUrl: e.target.value })}
-              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-            />
-            <select
-              value={form.linkPlatform}
-              onChange={(e) => setForm({ ...form, linkPlatform: e.target.value as LinkPlatform })}
-              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-            >
-              {LINK_PLATFORMS.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
-            <input
-              type="url"
-              placeholder="https://... (opcional)"
-              value={form.linkUrl}
-              onChange={(e) => setForm({ ...form, linkUrl: e.target.value })}
-              className="px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
-            />
-          </div>
-        </div>
-
-        <button
-          type="submit"
-          disabled={creating || !form.categoryId}
-          className="inline-flex items-center gap-2 px-4 py-2 font-bold text-black transition duration-500 rounded-xl bg-honeydew-500 hover:bg-white disabled:opacity-50"
-        >
-          <PlusCircle size={16} />
-          {creating ? 'Creando...' : 'Crear cliente'}
-        </button>
-      </form>
-
-      <div className="p-6 space-y-4 shadow-lg rounded-2xl bg-honeydew-800 sm:p-8">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center justify-center rounded-full w-11 h-11 bg-honeydew-900 shrink-0">
-            <Handshake size={20} strokeWidth={1.5} />
-          </div>
-          <h2 className="font-mono text-lg font-bold uppercase">Clientes ({clients.length})</h2>
-        </div>
-
-        {loading && <p className="text-white/60">Cargando...</p>}
-        {error && <p className="text-red-400">{error}</p>}
-        {!loading && clients.length === 0 && !error && (
-          <p className="text-white/60">No hay clientes todavía.</p>
-        )}
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          {clients.map((c, index) => (
-            <ScrollRevealEffect key={c.id} index={index}>
-              <div className="flex flex-col h-full gap-3 p-4 rounded-xl bg-honeydew-900">
-                <div className="flex items-start justify-between gap-2">
-                  <span className="px-2 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wide bg-honeydew-800 text-honeydew-400">
-                    {c.category.name}
-                  </span>
-                  <span
-                    className={`px-2 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase tracking-wide ${
-                      c.published ? 'bg-honeydew-500 text-black' : 'bg-white/10 text-white/60'
-                    }`}
-                  >
-                    {c.published ? 'publicado' : 'oculto'}
-                  </span>
-                </div>
-
-                <img
-                  src={c.photoUrl}
-                  alt={c.name}
-                  className="object-cover w-full rounded-lg h-28"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                  }}
-                />
-
-                <div>
-                  <p className="font-semibold">{c.name}</p>
-                  <p className="text-sm text-white/50">/{c.slug}</p>
-                </div>
-
-                {c.published && (
-                  <a
-                    href={`/clients#${c.slug}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-3 py-2 text-xs font-bold text-black transition rounded-xl bg-honeydew-500 hover:bg-white w-fit"
-                  >
-                    <ExternalLink size={14} />
-                    Ver publicación
-                  </a>
-                )}
-
-                <div className="flex gap-2 mt-auto">
-                  <button
-                    onClick={() => togglePublished(c)}
-                    title={c.published ? 'Ocultar' : 'Publicar'}
-                    className="inline-flex items-center justify-center w-9 h-9 transition rounded-full bg-honeydew-800 hover:bg-white hover:text-black"
-                  >
-                    {c.published ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                  <button
-                    onClick={() => remove(c.id)}
-                    title="Eliminar"
-                    className="inline-flex items-center justify-center w-9 h-9 transition text-red-400 rounded-full bg-honeydew-800 hover:bg-red-500 hover:text-white"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              </div>
-            </ScrollRevealEffect>
-          ))}
-        </div>
-      </div>
+          <Field label="Logo o foto (URL)">
+            <input required type="url" value={form.photoUrl} onChange={(e) => set('photoUrl', e.target.value)} className={inputCls} />
+          </Field>
+          <LinksEditor value={form.links} onChange={(links) => set('links', links)} />
+          <Toggle checked={form.published} onChange={(v) => set('published', v)} label="Publicado" description="Visible en /clients." />
+          {formError && <ErrorNote>{formError}</ErrorNote>}
+          <FormActions saving={saving} disabled={!form.categoryId} onCancel={() => setEditing(null)} submitLabel={editing === 'new' ? 'Añadir cliente' : 'Guardar cambios'} />
+        </form>
+      </Modal>
     </div>
   );
 }

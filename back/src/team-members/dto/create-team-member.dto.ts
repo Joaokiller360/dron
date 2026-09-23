@@ -35,6 +35,45 @@ export class CreateTeamMemberDto {
   @IsUrl()
   photoUrl: string;
 
+  @ApiPropertyOptional({
+    example: 'Dirige cada producción y vuela las secuencias de alta velocidad.',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(300)
+  bio?: string;
+
+  @ApiPropertyOptional({ example: 'Fundó JB.SKYLENS en Esmeraldas...' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(2000)
+  story?: string;
+
+  @ApiPropertyOptional({ example: '+40 h' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(20)
+  stat?: string;
+
+  @ApiPropertyOptional({ example: 'de vuelo certificadas' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(60)
+  statLabel?: string;
+
+  @ApiPropertyOptional({ example: 'Esmeraldas' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(60)
+  base?: string;
+
+  @ApiPropertyOptional({ type: [String], example: ['Piloto RPAS', 'Dirección'] })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @MaxLength(40, { each: true })
+  skills?: string[];
+
   @ApiPropertyOptional({ type: [LinkDto] })
   @IsOptional()
   @IsArray()

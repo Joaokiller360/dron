@@ -10,5 +10,10 @@ export default () => ({
     secret: process.env.JWT_SECRET,
     expiresIn: process.env.JWT_EXPIRES_IN ?? '1d',
   },
+  resend: {
+    apiKey: process.env.RESEND_API_KEY,
+    // Sender on a domain verified in Resend, e.g. "JB.SKYLENS <contacto@joaobarres.dev>"
+    from: process.env.RESEND_FROM,
+  },
   logLevel: process.env.LOG_LEVEL ?? 'info',
 });

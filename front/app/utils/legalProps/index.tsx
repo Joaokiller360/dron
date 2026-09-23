@@ -53,10 +53,10 @@ export default function LegalPage({
                     </div>
                   )}
 
-                  {/* Text */}
+                  {/* Text — tolera string suelto o array */}
                   {section.text && (
                     <div className="space-y-3 text-muted">
-                      {section.text.map((paragraph, i) => (
+                      {(Array.isArray(section.text) ? section.text : [section.text]).map((paragraph, i) => (
                         <p className="text-xl" key={i}>
                           {highlightText(paragraph, keyword)}
                         </p>
@@ -66,7 +66,7 @@ export default function LegalPage({
                 </ScrollRevealEffect>
 
                 {/* Lists */}
-                {section.lists && (
+                {Array.isArray(section.lists) && (
                   <div className="pt-2 pl-5 space-y-4">
                     {section.lists.map((list, i) => (
                       <ScrollRevealEffect key={i}>
@@ -86,7 +86,7 @@ export default function LegalPage({
                             ))}
 
                             <ul className="pl-6 space-y-2 list-disc text-muted">
-                              {list.items.map((item, j) => (
+                              {(Array.isArray(list.items) ? list.items : []).map((item, j) => (
                                 <li key={j}>
                                   {highlightText(item, keyword)}
                                 </li>

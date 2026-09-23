@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, FormEvent } from 'react';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, Pencil, Trash2, Check } from 'lucide-react';
 import { apiFetch, ApiError, Category, CategoryType } from './lib/api';
 
 interface Props {
@@ -11,13 +11,22 @@ interface Props {
   label?: string;
 }
 
+type Mode = 'idle' | 'add' | 'edit';
+
+const inputClass =
+  'flex-1 px-3 py-2 rounded-xl bg-jb-bg focus:outline-none focus:ring-2 focus:ring-jb-accent/60';
+const iconBtn =
+  'inline-flex items-center justify-center w-10 rounded-xl bg-jb-bg hover:bg-white hover:text-black transition shrink-0 disabled:opacity-40 disabled:hover:bg-jb-bg disabled:hover:text-current';
+
 export default function CategoryPicker({ type, value, onChange, label = 'Categoría' }: Props) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [adding, setAdding] = useState(false);
-  const [newName, setNewName] = useState('');
-  const [creating, setCreating] = useState(false);
+  const [mode, setMode] = useState<Mode>('idle');
+  const [name, setName] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  const selected = categories.find((c) => c.id === value) ?? null;
 
   const load = async (selectId?: string) => {
     setLoading(true);
@@ -27,8 +36,8 @@ export default function CategoryPicker({ type, value, onChange, label = 'Categor
       setCategories(data);
       if (selectId) {
         onChange(selectId);
-      } else if (!value && data[0]) {
-        onChange(data[0].id);
+      } else if (!data.some((c) => c.id === value)) {
+        onChange(data[0]?.id ?? '');
       }
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Error cargando categorías.');
@@ -42,23 +51,59 @@ export default function CategoryPicker({ type, value, onChange, label = 'Categor
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type]);
 
-  const handleCreate = async (e: FormEvent) => {
+  const cancel = () => {
+    setMode('idle');
+    setName('');
+    setError('');
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!newName.trim()) return;
-    setCreating(true);
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    setBusy(true);
     setError('');
     try {
-      const category = await apiFetch<Category>('/categories', {
-        method: 'POST',
-        body: JSON.stringify({ name: newName.trim(), type }),
-      });
-      setNewName('');
-      setAdding(false);
-      await load(category.id);
+      if (mode === 'add') {
+        const category = await apiFetch<Category>('/categories', {
+          method: 'POST',
+          body: JSON.stringify({ name: trimmed, type }),
+        });
+        cancel();
+        await load(category.id);
+      } else if (mode === 'edit' && selected) {
+        await apiFetch<Category>(`/categories/${selected.id}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ name: trimmed }),
+        });
+        cancel();
+        await load(selected.id);
+      }
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Error creando categoría.');
+      setError(
+        err instanceof ApiError
+          ? err.message
+          : mode === 'add'
+            ? 'Error creando categoría.'
+            : 'Error editando categoría.',
+      );
     } finally {
-      setCreating(false);
+      setBusy(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!selected) return;
+    if (!window.confirm(`¿Eliminar la categoría "${selected.name}"?`)) return;
+    setBusy(true);
+    setError('');
+    try {
+      await apiFetch(`/categories/${selected.id}`, { method: 'DELETE' });
+      await load();
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Error eliminando categoría.');
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -68,31 +113,24 @@ export default function CategoryPicker({ type, value, onChange, label = 'Categor
         {label}
       </label>
 
-      {adding ? (
-        <form onSubmit={handleCreate} className="flex gap-2">
+      {mode !== 'idle' ? (
+        <form onSubmit={handleSubmit} className="flex gap-2">
           <input
             autoFocus
             required
-            placeholder="Nombre de la categoría"
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            className="flex-1 px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500"
+            placeholder={mode === 'add' ? 'Nombre de la categoría' : 'Nuevo nombre'}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className={inputClass}
           />
           <button
             type="submit"
-            disabled={creating}
-            className="px-3 rounded-xl bg-honeydew-500 text-black font-bold hover:bg-white transition disabled:opacity-50"
+            disabled={busy}
+            className="px-3 rounded-xl bg-jb-accent text-black font-bold hover:bg-white transition disabled:opacity-50"
           >
-            {creating ? '...' : 'Crear'}
+            {busy ? '...' : mode === 'add' ? 'Crear' : <Check size={16} />}
           </button>
-          <button
-            type="button"
-            onClick={() => {
-              setAdding(false);
-              setNewName('');
-            }}
-            className="inline-flex items-center justify-center w-10 rounded-xl bg-honeydew-900 hover:bg-white hover:text-black transition"
-          >
+          <button type="button" onClick={cancel} className={iconBtn}>
             <X size={16} />
           </button>
         </form>
@@ -103,7 +141,7 @@ export default function CategoryPicker({ type, value, onChange, label = 'Categor
             value={value}
             disabled={loading || categories.length === 0}
             onChange={(e) => onChange(e.target.value)}
-            className="flex-1 px-3 py-2 rounded-xl bg-honeydew-900 focus:outline-none focus:ring-2 focus:ring-honeydew-500 disabled:opacity-50"
+            className={`${inputClass} disabled:opacity-50`}
           >
             {categories.length === 0 && <option value="">Sin categorías todavía</option>}
             {categories.map((c) => (
@@ -114,11 +152,35 @@ export default function CategoryPicker({ type, value, onChange, label = 'Categor
           </select>
           <button
             type="button"
-            onClick={() => setAdding(true)}
+            onClick={() => {
+              setName('');
+              setMode('add');
+            }}
             title="Nueva categoría"
-            className="inline-flex items-center justify-center w-10 rounded-xl bg-honeydew-900 hover:bg-white hover:text-black transition shrink-0"
+            className={iconBtn}
           >
             <Plus size={16} />
+          </button>
+          <button
+            type="button"
+            disabled={!selected || busy}
+            onClick={() => {
+              setName(selected?.name ?? '');
+              setMode('edit');
+            }}
+            title="Editar categoría"
+            className={iconBtn}
+          >
+            <Pencil size={16} />
+          </button>
+          <button
+            type="button"
+            disabled={!selected || busy}
+            onClick={handleDelete}
+            title="Eliminar categoría"
+            className={`${iconBtn} hover:!bg-red-500 hover:!text-white`}
+          >
+            <Trash2 size={16} />
           </button>
         </div>
       )}
