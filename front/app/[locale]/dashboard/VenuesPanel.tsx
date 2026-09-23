@@ -4,7 +4,7 @@ import { useState, FormEvent } from 'react';
 import { MapPin, Plus, Pencil } from 'lucide-react';
 import { errorMessage, Venue } from './lib/api';
 import { useCollection } from './lib/useCollection';
-import { CITIES, PLACE_PATTERN, cleanInput } from '@/app/utils/formRules';
+import { CITIES, CITY_PROVINCE, PLACE_PATTERN, cleanInput } from '@/app/utils/formRules';
 import Modal from './Modal';
 import {
   ConfirmDelete,
@@ -164,11 +164,11 @@ export default function VenuesPanel() {
             <Field label="Nombre del lugar">
               <input required minLength={2} maxLength={80} value={form.name} onChange={(e) => set('name', cleanInput(e.target, 'place'))} placeholder="Marina Ecovida" className={inputCls} />
             </Field>
-            <Field label="Ciudad" hint="Elige de la lista o escribe una nueva.">
+            <Field label="Ciudad" hint="Ciudades de las 24 provincias: elige de la lista o escribe una nueva.">
               <input required minLength={2} maxLength={60} list="venue-cities" value={form.city} onChange={(e) => set('city', cleanInput(e.target, 'place'))} className={inputCls} />
               <datalist id="venue-cities">
                 {CITIES.map((c) => (
-                  <option key={c} value={c} />
+                  <option key={c} value={c} label={CITY_PROVINCE[c]} />
                 ))}
               </datalist>
             </Field>

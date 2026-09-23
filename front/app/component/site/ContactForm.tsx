@@ -7,11 +7,12 @@ import { btnPrimary, inputClass } from './styles';
 import { useContactInfo } from './ContactInfo';
 import { fetchPublic, PublicVenue } from './api';
 import {
-  CITIES,
+  CITY_PROVINCE,
   EMAIL_PATTERN,
   NAME_PATTERN,
   PHONE_PATTERN,
   PLACE_PATTERN,
+  PROVINCES,
   TEXT_PATTERN,
   cleanInput,
   type FieldKind,
@@ -72,8 +73,11 @@ export default function ContactForm({ variant = 'full' }: { variant?: 'full' | '
     fetchPublic<PublicVenue[]>('/venues').then((list) => setVenues(list ?? []));
   }, [variant]);
 
-  // Fixed cities plus any city a dashboard venue uses
-  const cities = useMemo(() => [...new Set([...CITIES, ...venues.map((v) => v.city)])], [venues]);
+  // Cities of every province, plus any city a dashboard venue uses that is not in that list
+  const extraCities = useMemo(
+    () => [...new Set(venues.map((v) => v.city).filter((c) => !CITY_PROVINCE[c]))],
+    [venues],
+  );
   const cityVenues = venues.filter((v) => v.city === city);
 
   // Sets the browser's validation message for one field ('' = valid)
@@ -252,10 +256,19 @@ export default function ContactForm({ variant = 'full' }: { variant?: 'full' | '
                 className={inputClass}
               >
                 <option value="">{t('form.chooseCity')}</option>
-                {cities.map((c) => (
+                {extraCities.map((c) => (
                   <option key={c} value={c}>
                     {c}
                   </option>
+                ))}
+                {PROVINCES.map(({ province, cities }) => (
+                  <optgroup key={province} label={province}>
+                    {cities.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </optgroup>
                 ))}
                 <option value={OTHER}>{t('form.otherCity')}</option>
               </select>

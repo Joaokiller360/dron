@@ -16,32 +16,43 @@ export const TEXT_PATTERN = /^[\p{L}\p{M}0-9\s.,;:¿?¡!()'"%$/+-]+$/u;
 /** Stricter than the browser's type=email check (requires a dot in the domain) */
 export const EMAIL_PATTERN = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 
-// Cities offered in the contact form. Cities used by dashboard venues are added
-// to this list automatically.
-export const CITIES = [
-  'Esmeraldas',
-  'Atacames',
-  'Tonsupa',
-  'Súa',
-  'Same',
-  'Muisne',
-  'Quinindé',
-  'Quito',
-  'Guayaquil',
-  'Cuenca',
-  'Santo Domingo',
-  'Manta',
-  'Portoviejo',
-  'Ibarra',
-  'Otavalo',
-  'Ambato',
-  'Riobamba',
-  'Latacunga',
-  'Loja',
-  'Machala',
-  'Salinas',
-  'Montañita',
+// The 24 provinces of Ecuador with their capital first, then other main cities
+// and tourist towns. Esmeraldas goes first: it is where most work happens.
+export const PROVINCES: { province: string; cities: string[] }[] = [
+  { province: 'Esmeraldas', cities: ['Esmeraldas', 'Atacames', 'Tonsupa', 'Súa', 'Same', 'Muisne', 'Quinindé', 'Rioverde', 'San Lorenzo'] },
+  { province: 'Azuay', cities: ['Cuenca', 'Gualaceo', 'Paute'] },
+  { province: 'Bolívar', cities: ['Guaranda', 'San Miguel'] },
+  { province: 'Cañar', cities: ['Azogues', 'La Troncal', 'Cañar'] },
+  { province: 'Carchi', cities: ['Tulcán', 'San Gabriel'] },
+  { province: 'Chimborazo', cities: ['Riobamba', 'Alausí'] },
+  { province: 'Cotopaxi', cities: ['Latacunga', 'Salcedo', 'Pujilí'] },
+  { province: 'El Oro', cities: ['Machala', 'Pasaje', 'Santa Rosa', 'Huaquillas', 'Zaruma'] },
+  { province: 'Galápagos', cities: ['Puerto Baquerizo Moreno', 'Puerto Ayora', 'Puerto Villamil'] },
+  { province: 'Guayas', cities: ['Guayaquil', 'Durán', 'Samborondón', 'Daule', 'Milagro', 'Playas'] },
+  { province: 'Imbabura', cities: ['Ibarra', 'Otavalo', 'Cotacachi', 'Atuntaqui'] },
+  { province: 'Loja', cities: ['Loja', 'Catamayo', 'Vilcabamba'] },
+  { province: 'Los Ríos', cities: ['Babahoyo', 'Quevedo', 'Vinces'] },
+  { province: 'Manabí', cities: ['Portoviejo', 'Manta', 'Chone', 'Bahía de Caráquez', 'Puerto López', 'Jipijapa', 'Montecristi'] },
+  { province: 'Morona Santiago', cities: ['Macas', 'Gualaquiza'] },
+  { province: 'Napo', cities: ['Tena', 'Archidona'] },
+  { province: 'Orellana', cities: ['El Coca'] },
+  { province: 'Pastaza', cities: ['Puyo'] },
+  { province: 'Pichincha', cities: ['Quito', 'Cayambe', 'Sangolquí', 'Machachi', 'Mindo'] },
+  { province: 'Santa Elena', cities: ['Santa Elena', 'Salinas', 'La Libertad', 'Montañita', 'Olón'] },
+  { province: 'Santo Domingo de los Tsáchilas', cities: ['Santo Domingo'] },
+  { province: 'Sucumbíos', cities: ['Nueva Loja'] },
+  { province: 'Tungurahua', cities: ['Ambato', 'Baños'] },
+  { province: 'Zamora Chinchipe', cities: ['Zamora', 'Yantzaza'] },
 ];
+
+/** City → its province, for suggestion labels ("Manta · Manabí") */
+export const CITY_PROVINCE: Record<string, string> = Object.fromEntries(
+  PROVINCES.flatMap(({ province, cities }) => cities.map((c) => [c, province])),
+);
+
+// Cities offered in the contact form and the venues dashboard. Cities used by
+// dashboard venues are added to this list automatically.
+export const CITIES = PROVINCES.flatMap((p) => p.cities);
 
 // Characters each kind of field refuses while typing (complements of the patterns above)
 const BLOCKED = {
