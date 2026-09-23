@@ -1,7 +1,7 @@
 import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { PresignUploadDto } from './dto/presign-upload.dto';
+import { CompleteUploadDto, PresignUploadDto } from './dto/presign-upload.dto';
 import { UploadsService } from './uploads.service';
 
 @ApiTags('uploads')
@@ -13,8 +13,21 @@ export class UploadsController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Admin: signed S3 POST to upload an image or video from the browser' })
+  @ApiOperation({
+    summary: 'Admin: signed S3 POST to upload an image or video into the private incoming/ area',
+  })
   presign(@Body() dto: PresignUploadDto) {
     return this.uploads.presign(dto);
+  }
+
+  @Post('complete')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Admin: verify an uploaded file (real format, re-encoded images) and publish it',
+  })
+  complete(@Body() dto: CompleteUploadDto) {
+    return this.uploads.complete(dto);
   }
 }

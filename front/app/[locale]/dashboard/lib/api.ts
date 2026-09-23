@@ -309,16 +309,54 @@ export function errorMessage(err: unknown, fallback: string) {
 
 export type UploadFolder = 'projects' | 'services' | 'team' | 'clients' | 'misc';
 
+const MB = 1024 * 1024;
+
+// Same allow-list as the API (back/src/uploads/upload-types.ts). The API
+// re-checks everything; this only gives instant feedback before uploading.
+export const UPLOAD_FORMATS = {
+  image: { types: ['image/jpeg', 'image/png', 'image/webp'], label: 'JPG, PNG o WebP', maxBytes: 20 * MB },
+  video: { types: ['video/mp4', 'video/quicktime', 'video/webm'], label: 'MP4, MOV o WebM', maxBytes: 1024 * MB },
+} as const;
+
+const ascii = (b: Uint8Array, start: number, end: number) => String.fromCharCode(...b.subarray(start, end));
+const SNIFF: Record<string, (b: Uint8Array) => boolean> = {
+  'image/jpeg': (b) => b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff,
+  'image/png': (b) => [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a].every((v, i) => b[i] === v),
+  'image/webp': (b) => ascii(b, 0, 4) === 'RIFF' && ascii(b, 8, 12) === 'WEBP',
+  'video/mp4': (b) => ascii(b, 4, 8) === 'ftyp',
+  'video/quicktime': (b) => ['ftyp', 'moov', 'mdat', 'wide', 'free', 'skip', 'pnot'].includes(ascii(b, 4, 8)),
+  'video/webm': (b) => [0x1a, 0x45, 0xdf, 0xa3].every((v, i) => b[i] === v),
+};
+
+/** Rejects files whose type, size or actual bytes are not an allowed image/video. */
+export async function checkUploadFile(file: File, accept: 'image' | 'video' | 'any'): Promise<string | null> {
+  const kinds = accept === 'any' ? (['image', 'video'] as const) : ([accept] as const);
+  const kind = kinds.find((k) => (UPLOAD_FORMATS[k].types as readonly string[]).includes(file.type));
+  if (!kind) {
+    return `Formato no permitido. Usa ${kinds.map((k) => UPLOAD_FORMATS[k].label).join(' o ')}.`;
+  }
+  const { maxBytes } = UPLOAD_FORMATS[kind];
+  if (file.size > maxBytes) {
+    return `El archivo pesa ${Math.round(file.size / MB)} MB; el máximo es ${maxBytes / MB} MB.`;
+  }
+  const head = new Uint8Array(await file.slice(0, 16).arrayBuffer());
+  if (!SNIFF[file.type](head)) {
+    return 'El contenido del archivo no coincide con su extensión.';
+  }
+  return null;
+}
+
 interface PresignedUpload {
   url: string;
   fields: Record<string, string>;
-  publicUrl: string;
+  key: string;
 }
 
 /**
- * Uploads a file straight from the browser to the S3 bucket: the API only
- * signs the request, so large videos never pass through it. Resolves with the
- * file's public URL.
+ * Uploads a file straight from the browser to the bucket's private incoming
+ * area (the API only signs the request, so large videos never pass through
+ * it), then asks the API to verify the real content and publish it. Resolves
+ * with the file's public URL.
  */
 export async function uploadFile(file: File, folder: UploadFolder, onProgress?: (pct: number) => void): Promise<string> {
   const signed = await apiFetch<PresignedUpload>('/uploads/presign', {
@@ -344,5 +382,9 @@ export async function uploadFile(file: File, folder: UploadFolder, onProgress?: 
     xhr.send(form);
   });
 
-  return signed.publicUrl;
+  const { publicUrl } = await apiFetch<{ publicUrl: string }>('/uploads/complete', {
+    method: 'POST',
+    body: JSON.stringify({ key: signed.key }),
+  });
+  return publicUrl;
 }

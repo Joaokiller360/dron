@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsIn, IsInt, IsOptional, IsString, Matches, MaxLength, Min } from 'class-validator';
+import { ALLOWED_CONTENT_TYPES } from '../upload-types';
 
 export const UPLOAD_FOLDERS = ['projects', 'services', 'team', 'clients', 'misc'] as const;
 export type UploadFolder = (typeof UPLOAD_FOLDERS)[number];
@@ -10,8 +11,10 @@ export class PresignUploadDto {
   @MaxLength(200)
   filename: string;
 
-  @ApiProperty({ example: 'video/mp4' })
-  @Matches(/^(image|video)\/[\w.+-]+$/, { message: 'Solo se permiten imágenes o videos' })
+  @ApiProperty({ example: 'video/mp4', enum: ALLOWED_CONTENT_TYPES })
+  @IsIn(ALLOWED_CONTENT_TYPES, {
+    message: 'Formato no permitido. Imágenes: JPG, PNG o WebP. Videos: MP4, MOV o WebM',
+  })
   contentType: string;
 
   @ApiProperty({ example: 52428800, description: 'File size in bytes' })
@@ -23,4 +26,12 @@ export class PresignUploadDto {
   @IsOptional()
   @IsIn(UPLOAD_FOLDERS)
   folder?: UploadFolder;
+}
+
+export class CompleteUploadDto {
+  @ApiProperty({ example: 'incoming/projects/2026/09/3f2a9c1e-halloween-party.mp4' })
+  @IsString()
+  @MaxLength(300)
+  @Matches(/^incoming\//)
+  key: string;
 }
