@@ -34,12 +34,21 @@ export default async function Clients() {
 
       <section className="px-6 pt-4 pb-20">
         {clients.length > 0 ? (
-          <div className="max-w-[1180px] mx-auto grid grid-cols-[repeat(auto-fill,minmax(170px,1fr))] gap-px bg-white/[.08] border border-white/[.08] rounded-2xl overflow-hidden">
+          <div className="max-w-[1180px] mx-auto grid grid-cols-[repeat(auto-fill,minmax(270px,5fr))] gap-px bg-white/[.08] border border-white/[.08] rounded-2xl overflow-hidden">
             {clients.map((c) => {
               const link = c.links?.[0]?.url;
               const cell = (
                 <>
-                  <Shot src={c.photoUrl} alt={c.name} label={c.name} labelPosition="center" className="absolute inset-0" />
+                  {/* Whole logo visible, kept clear of the name bar at the bottom */}
+                  <Shot
+                    src={c.photoUrl}
+                    alt={c.name}
+                    label={c.name}
+                    labelPosition="center"
+                    fit="contain"
+                    imgClassName="px-6 pt-5 pb-[70px] transition-transform duration-300 group-hover:scale-[1.04]"
+                    className="absolute inset-0"
+                  />
                   <span className="absolute inset-x-0 bottom-0 px-3 pt-6 pb-2.5 bg-gradient-to-t from-[rgba(10,28,18,.9)] to-transparent">
                     <span className="block text-[13px] font-semibold text-white truncate">{c.name}</span>
                     {c.category && (
@@ -50,7 +59,7 @@ export default async function Clients() {
                   </span>
                 </>
               );
-              const cls = 'relative block aspect-[3/2] bg-jb-band overflow-hidden';
+              const cls = 'relative block aspect-[4/3] bg-jb-band overflow-hidden';
               return link ? (
                 <a
                   key={c.id}

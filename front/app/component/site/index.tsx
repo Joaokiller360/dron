@@ -237,7 +237,9 @@ export function PageHero({
   );
 }
 
-// Image with the design's striped placeholder as fallback (missing or broken src)
+// Image with the design's striped placeholder as fallback (missing or broken src).
+// fit="contain" shows the whole image (logos, any aspect ratio) over a blurred,
+// dimmed copy of itself so the empty sides are not bare.
 export function Shot({
   src,
   alt = '',
@@ -245,6 +247,7 @@ export function Shot({
   className = '',
   imgClassName = '',
   labelPosition = 'bottom',
+  fit = 'cover',
 }: {
   src?: string | null;
   alt?: string;
@@ -252,8 +255,19 @@ export function Shot({
   className?: string;
   imgClassName?: string;
   labelPosition?: 'bottom' | 'center';
+  fit?: 'cover' | 'contain';
 }) {
   const [failed, setFailed] = useState(false);
+  if (src && !failed && fit === 'contain') {
+    return (
+      <div className={`jb-stripes overflow-hidden ${className}`}>
+        <div className="relative w-full h-full overflow-hidden">
+          <img src={src} alt="" aria-hidden loading="lazy" className="absolute inset-0 object-cover w-full h-full scale-125 blur-2xl opacity-35" />
+          <img src={src} alt={alt} loading="lazy" className={`relative object-contain w-full h-full ${imgClassName}`} onError={() => setFailed(true)} />
+        </div>
+      </div>
+    );
+  }
   if (src && !failed) {
     return (
       <div className={`jb-stripes overflow-hidden ${className}`}>
