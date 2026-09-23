@@ -7,7 +7,7 @@ import { useCollection } from './lib/useCollection';
 import CategoryPicker from './CategoryPicker';
 import LinksEditor from './LinksEditor';
 import Modal from './Modal';
-import MediaInput from './MediaInput';
+import MediaInput, { useUploadTracker } from './MediaInput';
 import {
   ConfirmDelete,
   EmptyState,
@@ -43,6 +43,7 @@ export default function ClientsPanel() {
   const [editing, setEditing] = useState<Client | 'new' | null>(null);
   const [form, setForm] = useState<Form>(emptyForm);
   const [saving, setSaving] = useState(false);
+  const { uploading, onBusyChange } = useUploadTracker();
   const [formError, setFormError] = useState('');
 
   const q = query.trim().toLowerCase();
@@ -61,6 +62,7 @@ export default function ClientsPanel() {
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
+    if (uploading) return;
     setSaving(true);
     setFormError('');
     const body = {
@@ -183,12 +185,12 @@ export default function ClientsPanel() {
             </div>
           </div>
           <Field label="Logo o foto">
-            <MediaInput required folder="clients" value={form.photoUrl} onChange={(url) => set('photoUrl', url)} />
+            <MediaInput onBusyChange={onBusyChange} required folder="clients" value={form.photoUrl} onChange={(url) => set('photoUrl', url)} />
           </Field>
           <LinksEditor value={form.links} onChange={(links) => set('links', links)} />
           <Toggle checked={form.published} onChange={(v) => set('published', v)} label="Publicado" description="Visible en /clients." />
           {formError && <ErrorNote>{formError}</ErrorNote>}
-          <FormActions saving={saving} disabled={!form.categoryId} onCancel={() => setEditing(null)} submitLabel={editing === 'new' ? 'Añadir cliente' : 'Guardar cambios'} />
+          <FormActions saving={saving} uploading={uploading} disabled={!form.categoryId} onCancel={() => setEditing(null)} submitLabel={editing === 'new' ? 'Añadir cliente' : 'Guardar cambios'} />
         </form>
       </Modal>
     </div>

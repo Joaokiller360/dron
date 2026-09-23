@@ -385,11 +385,14 @@ export function StatusPill({ published, labels = ['Publicado', 'Oculto'] }: { pu
 export function FormActions({
   saving,
   disabled,
+  uploading = false,
   onCancel,
   submitLabel,
 }: {
   saving: boolean;
   disabled?: boolean;
+  /** A photo or video is still uploading: saving now would store an empty URL */
+  uploading?: boolean;
   onCancel: () => void;
   submitLabel: string;
 }) {
@@ -398,8 +401,8 @@ export function FormActions({
       <button type="button" onClick={onCancel} className={btn.ghost}>
         Cancelar
       </button>
-      <button type="submit" disabled={saving || disabled} className={btn.primary}>
-        {saving ? 'Guardando…' : submitLabel}
+      <button type="submit" disabled={saving || disabled || uploading} className={btn.primary}>
+        {saving ? 'Guardando…' : uploading ? 'Subiendo archivo…' : submitLabel}
       </button>
     </div>
   );

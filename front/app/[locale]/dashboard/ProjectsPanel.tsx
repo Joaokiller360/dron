@@ -7,7 +7,7 @@ import { useCollection } from './lib/useCollection';
 import { projectCover, videoSource } from '@/app/component/site/video';
 import CategoryPicker from './CategoryPicker';
 import Modal from './Modal';
-import MediaInput from './MediaInput';
+import MediaInput, { useUploadTracker } from './MediaInput';
 import {
   ConfirmDelete,
   EmptyState,
@@ -53,6 +53,7 @@ export default function ProjectsPanel() {
   const [editing, setEditing] = useState<Project | 'new' | null>(null);
   const [form, setForm] = useState<Form>(emptyForm);
   const [saving, setSaving] = useState(false);
+  const { uploading, onBusyChange } = useUploadTracker();
   const [formError, setFormError] = useState('');
 
   const q = query.trim().toLowerCase();
@@ -82,6 +83,7 @@ export default function ProjectsPanel() {
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
+    if (uploading) return;
     setSaving(true);
     setFormError('');
     const body = {
@@ -216,7 +218,7 @@ export default function ProjectsPanel() {
             <div className="flex flex-col gap-4">
               <CategoryPicker type="PROJECT" value={form.categoryId} onChange={(id) => set('categoryId', id)} />
               <Field label="Portada" hint="Opcional si el video es de YouTube o Cloudinary: se usa su miniatura.">
-                <MediaInput folder="projects" value={form.coverUrl} onChange={(url) => set('coverUrl', url)} placeholder="Sube una imagen o pega su URL" />
+                <MediaInput onBusyChange={onBusyChange} folder="projects" value={form.coverUrl} onChange={(url) => set('coverUrl', url)} placeholder="Sube una imagen o pega su URL" />
               </Field>
             </div>
           </div>
@@ -234,14 +236,14 @@ export default function ProjectsPanel() {
               <input value={form.descriptionEn} onChange={(e) => set('descriptionEn', e.target.value)} className={inputCls} />
             </Field>
             <Field label="Video" hint="Subido aquí se reproduce limpio, sin marcos. También acepta YouTube, Instagram, TikTok, Vimeo o Facebook." className="sm:col-span-2">
-              <MediaInput folder="projects" accept="video" value={form.href} onChange={(url) => set('href', url)} placeholder="Sube el video o pega un enlace de YouTube, Instagram…" />
+              <MediaInput onBusyChange={onBusyChange} folder="projects" accept="video" value={form.href} onChange={(url) => set('href', url)} placeholder="Sube el video o pega un enlace de YouTube, Instagram…" />
               {form.href.trim() && !videoSource(form.href) && (
                 <span className="text-[12px] text-amber-300">No reconocemos este enlace como video: se mostrará como botón “Ver video”.</span>
               )}
             </Field>
           </div>
           {formError && <ErrorNote>{formError}</ErrorNote>}
-          <FormActions saving={saving} disabled={!form.categoryId} onCancel={() => setEditing(null)} submitLabel={editing === 'new' ? 'Crear proyecto' : 'Guardar cambios'} />
+          <FormActions saving={saving} uploading={uploading} disabled={!form.categoryId} onCancel={() => setEditing(null)} submitLabel={editing === 'new' ? 'Crear proyecto' : 'Guardar cambios'} />
         </form>
       </Modal>
     </div>

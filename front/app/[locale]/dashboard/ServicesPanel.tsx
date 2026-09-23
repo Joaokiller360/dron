@@ -6,7 +6,7 @@ import { errorMessage, Service, ServicePageData, slugify } from './lib/api';
 import { useCollection } from './lib/useCollection';
 import ServicePageEditor from './ServicePageEditor';
 import Modal from './Modal';
-import MediaInput from './MediaInput';
+import MediaInput, { useUploadTracker } from './MediaInput';
 import {
   ConfirmDelete,
   EmptyState,
@@ -91,6 +91,7 @@ export default function ServicesPanel() {
   const [form, setForm] = useState<FormState>(emptyForm);
   const [editing, setEditing] = useState<Service | 'new' | null>(null);
   const [saving, setSaving] = useState(false);
+  const { uploading, onBusyChange } = useUploadTracker();
   const [formError, setFormError] = useState('');
 
   const openNew = () => {
@@ -130,6 +131,7 @@ export default function ServicesPanel() {
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
+    if (uploading) return;
     setSaving(true);
     setFormError('');
     try {
@@ -266,7 +268,7 @@ export default function ServicesPanel() {
                 <input value={form.titleEn} onChange={(e) => set('titleEn', e.target.value)} className={inputCls} />
               </Field>
               <Field label="Portada" className="sm:col-span-2">
-                <MediaInput required folder="services" value={form.coverUrl} onChange={(url) => set('coverUrl', url)} />
+                <MediaInput onBusyChange={onBusyChange} required folder="services" value={form.coverUrl} onChange={(url) => set('coverUrl', url)} />
               </Field>
             </div>
           </div>
@@ -306,6 +308,7 @@ export default function ServicesPanel() {
           {formError && <ErrorNote>{formError}</ErrorNote>}
           <FormActions
             saving={saving}
+            uploading={uploading}
             onCancel={() => setEditing(null)}
             submitLabel={editing === 'new' ? (form.isPage ? 'Crear página' : 'Crear servicio') : 'Guardar cambios'}
           />

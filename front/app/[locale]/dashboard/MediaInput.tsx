@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Upload } from 'lucide-react';
 import { checkUploadFile, errorMessage, uploadFile, UPLOAD_FORMATS, type UploadFolder } from './lib/api';
 import { btn, inputCls } from './ui';
@@ -15,6 +15,16 @@ const formatsLabel = (accept: Accept) =>
   accept === 'any' ? `${UPLOAD_FORMATS.image.label} o ${UPLOAD_FORMATS.video.label}` : UPLOAD_FORMATS[accept].label;
 
 /**
+ * Counts the MediaInputs of a form that are uploading, so the form can block
+ * its submit button until every file is in place.
+ */
+export function useUploadTracker() {
+  const [count, setCount] = useState(0);
+  const onBusyChange = useCallback((busy: boolean) => setCount((c) => Math.max(0, c + (busy ? 1 : -1))), []);
+  return { uploading: count > 0, onBusyChange };
+}
+
+/**
  * URL field with an "Subir" button: paste a link or upload a file to the S3
  * bucket and the field is filled with its public URL once the API has
  * verified it.
@@ -26,6 +36,7 @@ export default function MediaInput({
   accept = 'image',
   required = false,
   placeholder,
+  onBusyChange,
 }: {
   value: string;
   onChange: (url: string) => void;
@@ -33,6 +44,7 @@ export default function MediaInput({
   accept?: Accept;
   required?: boolean;
   placeholder?: string;
+  onBusyChange?: (busy: boolean) => void;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [progress, setProgress] = useState<number | null>(null);
@@ -40,6 +52,14 @@ export default function MediaInput({
   const uploading = progress !== null;
   // Upload finished, the API is checking and publishing the file
   const verifying = progress === 100;
+
+  // Tell the form when an upload starts or ends, including when the field
+  // unmounts mid-upload (modal closed)
+  useEffect(() => {
+    if (!uploading) return;
+    onBusyChange?.(true);
+    return () => onBusyChange?.(false);
+  }, [uploading, onBusyChange]);
 
   const pick = async (file: File | undefined) => {
     if (fileRef.current) fileRef.current.value = '';

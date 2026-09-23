@@ -6,7 +6,7 @@ import { errorMessage, Link, slugify, TeamMember } from './lib/api';
 import { useCollection } from './lib/useCollection';
 import LinksEditor from './LinksEditor';
 import Modal from './Modal';
-import MediaInput from './MediaInput';
+import MediaInput, { useUploadTracker } from './MediaInput';
 import {
   ConfirmDelete,
   EmptyState,
@@ -54,6 +54,7 @@ export default function TeamPanel() {
   const [editing, setEditing] = useState<TeamMember | 'new' | null>(null);
   const [form, setForm] = useState<Form>(emptyForm);
   const [saving, setSaving] = useState(false);
+  const { uploading, onBusyChange } = useUploadTracker();
   const [formError, setFormError] = useState('');
 
   const openNew = () => {
@@ -81,6 +82,7 @@ export default function TeamPanel() {
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
+    if (uploading) return;
     setSaving(true);
     setFormError('');
     const body = {
@@ -205,7 +207,7 @@ export default function TeamPanel() {
                 <input required value={form.role} onChange={(e) => set('role', e.target.value)} placeholder="Piloto principal" className={inputCls} />
               </Field>
               <Field label="Foto" className="sm:col-span-2">
-                <MediaInput required folder="team" value={form.photoUrl} onChange={(url) => set('photoUrl', url)} />
+                <MediaInput onBusyChange={onBusyChange} required folder="team" value={form.photoUrl} onChange={(url) => set('photoUrl', url)} />
               </Field>
             </div>
           </div>
@@ -232,7 +234,7 @@ export default function TeamPanel() {
           <LinksEditor value={form.links} onChange={(links) => set('links', links)} />
           <Toggle checked={form.published} onChange={(v) => set('published', v)} label="Publicado" description="Visible en /teams." />
           {formError && <ErrorNote>{formError}</ErrorNote>}
-          <FormActions saving={saving} onCancel={() => setEditing(null)} submitLabel={editing === 'new' ? 'Añadir miembro' : 'Guardar cambios'} />
+          <FormActions saving={saving} uploading={uploading} onCancel={() => setEditing(null)} submitLabel={editing === 'new' ? 'Añadir miembro' : 'Guardar cambios'} />
         </form>
       </Modal>
     </div>
