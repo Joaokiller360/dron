@@ -5,7 +5,48 @@
     "portfolio": "Portafolio",
     "clients": "Clientes",
     "teams": "Equipo",
+    "store": "Tienda",
     "contact": "Contacto"
+  },
+  "store": {
+    "metadeta": {
+      "TitleMeta": "Tienda | JB.SKYLENS",
+      "DescriptionMeta": "Compra productos de JB.SKYLENS: fotografía aérea impresa, packs y más, con entrega en Ecuador."
+    },
+    "eyebrow": "Tienda",
+    "title": "Productos JB.SKYLENS",
+    "intro": "Elige tus productos y haz el pedido. Te contactamos para confirmar el pago y la entrega.",
+    "empty": "Todavía no hay productos a la venta.",
+    "paused": "Las ventas están pausadas por ahora. Puedes ver el catálogo y volver pronto.",
+    "soldOut": "Agotado",
+    "onlyLeft": "Quedan {count}",
+    "askPrice": "Consultar precio",
+    "add": "Añadir",
+    "added": "Añadido al carrito",
+    "cart": "Carrito",
+    "openCart": "Ver carrito",
+    "cartEmpty": "Tu carrito está vacío.",
+    "remove": "Quitar",
+    "decrease": "Menos",
+    "increase": "Más",
+    "total": "Total",
+    "checkout": "Hacer pedido",
+    "back": "Volver al carrito",
+    "close": "Cerrar",
+    "name": "Nombre",
+    "email": "Correo",
+    "phone": "Teléfono",
+    "note": "Nota",
+    "optional": "opcional",
+    "notePlaceholder": "Dirección de entrega, dudas, fecha…",
+    "placeOrder": "Enviar pedido",
+    "sending": "Enviando…",
+    "payNote": "No se cobra nada ahora: te escribimos para confirmar el pedido y coordinar pago y entrega.",
+    "successTitle": "¡Pedido recibido!",
+    "successText": "Tu código de pedido es {code}. Te contactaremos pronto para confirmarlo.",
+    "keepShopping": "Seguir comprando",
+    "errorGeneric": "No se pudo enviar el pedido. Inténtalo de nuevo.",
+    "errorInvalid": "Revisa tus datos: nombre, correo y teléfono válidos."
   },
   "home": {
     "metadeta": {
@@ -1188,10 +1229,6 @@
         {
           "t": "Permisos DGAC",
           "b": "Gestionamos las autorizaciones de vuelo."
-        },
-        {
-          "t": "Color aplicado",
-          "b": "Material listo para publicar o presentar."
         }
       ],
       "open": "Ver servicio",

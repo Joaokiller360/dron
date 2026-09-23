@@ -2,7 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsIn, IsInt, IsOptional, IsString, Matches, MaxLength, Min } from 'class-validator';
 import { ALLOWED_CONTENT_TYPES } from '../upload-types';
 
-export const UPLOAD_FOLDERS = ['projects', 'services', 'team', 'clients', 'misc'] as const;
+export const UPLOAD_FOLDERS = ['projects', 'services', 'team', 'clients', 'products', 'misc'] as const;
 export type UploadFolder = (typeof UPLOAD_FOLDERS)[number];
 
 export class PresignUploadDto {

@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState, ReactNode } from 'react';
-import { Mail, FolderKanban, Wrench, Users, Handshake, Quote, BadgePercent, ArrowRight, Inbox } from 'lucide-react';
+import { Mail, FolderKanban, Wrench, Users, Handshake, Quote, BadgePercent, ArrowRight, Inbox, ShoppingBag, Receipt } from 'lucide-react';
 import { apiFetch, ContactMessage, Stats } from './lib/api';
 import { useLive } from './lib/live';
 import { Card, PanelHeader, Pill, btn } from './ui';
@@ -59,7 +59,7 @@ export default function OverviewPanel({ onNavigate }: { onNavigate: (tab: Tab) =
     load();
   }, [load]);
   useLive(
-    ['contact-messages', 'projects', 'services', 'team-members', 'clients', 'testimonials', 'promotions'],
+    ['contact-messages', 'projects', 'services', 'team-members', 'clients', 'testimonials', 'promotions', 'products', 'orders'],
     load,
   );
 
@@ -85,6 +85,15 @@ export default function OverviewPanel({ onNavigate }: { onNavigate: (tab: Tab) =
         <StatCard icon={<Users size={19} />} label="Equipo" value={stats?.team.total ?? '–'} detail={pub(stats?.team)} onClick={() => onNavigate('equipo')} />
         <StatCard icon={<Quote size={19} />} label="Testimonios" value={stats?.testimonials.total ?? '–'} detail={pub(stats?.testimonials)} onClick={() => onNavigate('testimonios')} />
         <StatCard icon={<BadgePercent size={19} />} label="Promociones" value={stats?.promotions.total ?? '–'} detail={pub(stats?.promotions, 'activas')} onClick={() => onNavigate('promociones')} />
+        <StatCard
+          icon={<Receipt size={19} />}
+          label="Pedidos pendientes"
+          value={stats?.orders?.pending ?? '–'}
+          detail={stats?.orders ? `${stats.orders.total} en total` : undefined}
+          onClick={() => onNavigate('pedidos')}
+          highlight={!!stats?.orders?.pending}
+        />
+        <StatCard icon={<ShoppingBag size={19} />} label="Productos" value={stats?.products?.total ?? '–'} detail={pub(stats?.products)} onClick={() => onNavigate('tienda')} />
       </div>
 
       <Card className="overflow-hidden">

@@ -7,7 +7,7 @@ import { getMessages, getLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/app/utils'
 import FlowbiteInit from "../flowbait-init";
-import { SiteHeader, SiteFooter, LiveRefresh, ContactInfoProvider, getContactInfo } from '@/app/component';
+import { SiteHeader, SiteFooter, LiveRefresh, ContactInfoProvider, getContactInfo, getStoreEnabled } from '@/app/component';
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -30,7 +30,7 @@ export default async function LocaleLayout({
 }) {
   const locale = await getLocale();
   const messages = await getMessages();
-  const contact = await getContactInfo();
+  const [contact, storeEnabled] = await Promise.all([getContactInfo(), getStoreEnabled()]);
 
   return (
     <>
@@ -51,12 +51,12 @@ export default async function LocaleLayout({
             <FlowbiteInit />
             <div className="flex flex-col min-h-screen bg-jb-bg">
               <LiveRefresh />
-              <SiteHeader />
+              <SiteHeader storeEnabled={storeEnabled} />
               {/* CONTENIDO */}
               <main className="flex-1 text-jb-text">
                 {children}
               </main>
-              <SiteFooter />
+              <SiteFooter storeEnabled={storeEnabled} />
             </div>
           </ContactInfoProvider>
         </NextIntlClientProvider>

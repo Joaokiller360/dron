@@ -239,3 +239,57 @@ model Venue {
   @@index([city])
   @@index([published])
 }
+
+// Online store. Switches (store visible, sales open) live in site_settings
+// under key "store".
+model Product {
+  id             String   @id @default(uuid())
+  slug           String   @unique
+  nameEs         String   @map("name_es")
+  nameEn         String?  @map("name_en")
+  descriptionEs  String?  @map("description_es")
+  descriptionEn  String?  @map("description_en")
+  // Prices in cents (USD) to avoid float rounding
+  priceCents     Int      @map("price_cents")
+  // Crossed-out "before" price, optional
+  compareAtCents Int?     @map("compare_at_cents")
+  // null = unlimited stock
+  stock          Int?
+  coverUrl       String   @map("cover_url")
+  mediaUrls      String[] @default([]) @map("media_urls")
+  published      Boolean  @default(true)
+  sortOrder      Int      @default(0) @map("sort_order")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@index([published])
+  @@map("products")
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+// Order placed from the store; paid/arranged offline after the admin confirms
+model Order {
+  id         String      @id @default(uuid())
+  // Short human reference shown to the buyer (e.g. "JB-7K2Q9M")
+  code       String      @unique
+  name       String
+  email      String
+  phone      String
+  note       String?
+  locale     String      @default("es")
+  // Snapshot of what was bought: { productId, name, unitCents, quantity }[]
+  items      Json
+  totalCents Int         @map("total_cents")
+  status     OrderStatus @default(PENDING)
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@map("orders")
+}

@@ -25,6 +25,7 @@ import { StatsModule } from './stats/stats.module';
 import { VenuesModule } from './venues/venues.module';
 import { SettingsModule } from './settings/settings.module';
 import { UploadsModule } from './uploads/uploads.module';
+import { StoreModule } from './store/store.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { UploadsModule } from './uploads/uploads.module';
     VenuesModule,
     SettingsModule,
     UploadsModule,
+    StoreModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

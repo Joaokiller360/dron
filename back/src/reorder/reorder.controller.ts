@@ -22,6 +22,7 @@ const RESOURCES = {
   promotions: 'promotion',
   testimonials: 'testimonial',
   venues: 'venue',
+  products: 'product',
 } as const;
 
 @ApiTags('reorder')

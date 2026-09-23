@@ -61,6 +61,32 @@ export interface PublicPromotions {
   items: PublicPromotion[];
 }
 
+export interface PublicProduct {
+  id: string;
+  slug: string;
+  nameEs: string;
+  nameEn?: string | null;
+  descriptionEs?: string | null;
+  descriptionEn?: string | null;
+  /** null when the store hides prices */
+  priceCents: number | null;
+  compareAtCents?: number | null;
+  /** null = unlimited */
+  stock: number | null;
+  coverUrl: string;
+}
+
+export interface PublicStore {
+  settings: { enabled: boolean; sales: boolean; showPrices: boolean; pausedNotice: string };
+  products: PublicProduct[];
+}
+
+/** Whether the store is on (drives the menu link); off when the API is unreachable */
+export async function getStoreEnabled(): Promise<boolean> {
+  const status = await fetchPublic<{ enabled: boolean }>('/store/status');
+  return !!status?.enabled;
+}
+
 export interface PublicTestimonial {
   id: string;
   quote: string;

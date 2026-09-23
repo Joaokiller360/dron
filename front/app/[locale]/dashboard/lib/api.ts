@@ -220,6 +220,57 @@ export interface PromotionSettings {
   badges: boolean;
 }
 
+export interface Product {
+  id: string;
+  slug: string;
+  nameEs: string;
+  nameEn?: string | null;
+  descriptionEs?: string | null;
+  descriptionEn?: string | null;
+  priceCents: number;
+  compareAtCents?: number | null;
+  /** null = unlimited */
+  stock: number | null;
+  coverUrl: string;
+  mediaUrls: string[];
+  published: boolean;
+  sortOrder: number;
+}
+
+export interface StoreSettings {
+  enabled: boolean;
+  sales: boolean;
+  showPrices: boolean;
+  pausedNotice: string;
+}
+
+export type OrderStatus = 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
+
+export interface OrderLine {
+  productId: string;
+  name: string;
+  unitCents: number;
+  quantity: number;
+}
+
+export interface Order {
+  id: string;
+  code: string;
+  name: string;
+  email: string;
+  phone: string;
+  note?: string | null;
+  locale: string;
+  items: OrderLine[];
+  totalCents: number;
+  status: OrderStatus;
+  createdAt: string;
+}
+
+/** 2500 → "$25.00" */
+export const formatMoney = (cents: number) =>
+  (cents / 100).toLocaleString('es-EC', { style: 'currency', currency: 'USD' });
+
 export interface Stats {
   messages: { total: number; new: number };
   projects: { total: number; published: number };
@@ -228,6 +279,8 @@ export interface Stats {
   clients: { total: number; published: number };
   testimonials: { total: number; published: number };
   promotions: { total: number; published: number };
+  products: { total: number; published: number };
+  orders: { total: number; pending: number };
 }
 
 /** Resources that support PATCH /reorder/:resource */
@@ -240,7 +293,8 @@ export type ReorderResource =
   | 'legal-pages'
   | 'promotions'
   | 'testimonials'
-  | 'venues';
+  | 'venues'
+  | 'products';
 
 export class ApiError extends Error {
   constructor(
@@ -307,7 +361,7 @@ export function errorMessage(err: unknown, fallback: string) {
   return err instanceof ApiError ? err.message : fallback;
 }
 
-export type UploadFolder = 'projects' | 'services' | 'team' | 'clients' | 'misc';
+export type UploadFolder = 'projects' | 'services' | 'team' | 'clients' | 'products' | 'misc';
 
 const MB = 1024 * 1024;
 

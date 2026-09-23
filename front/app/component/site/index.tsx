@@ -40,7 +40,7 @@ function Brand({ href, size = 22 }: { href: string; size?: number }) {
   );
 }
 
-export function SiteHeader() {
+export function SiteHeader({ storeEnabled = false }: { storeEnabled?: boolean }) {
   const t = useTranslations('nav');
   const s = useTranslations('site.header');
   const prefix = usePrefix();
@@ -55,6 +55,7 @@ export function SiteHeader() {
     { key: 'teams', href: '/teams' },
     { key: 'portfolio', href: '/portfolio' },
     { key: 'clients', href: '/clients' },
+    ...(storeEnabled ? [{ key: 'store', href: '/store' }] : []),
     { key: 'contact', href: '/contact' },
   ];
 
@@ -139,7 +140,7 @@ function FooterHeading({ children }: { children: ReactNode }) {
 
 const footerLink = 'text-sm text-jb-soft hover:text-white transition';
 
-export function SiteFooter() {
+export function SiteFooter({ storeEnabled = false }: { storeEnabled?: boolean }) {
   const t = useTranslations('nav');
   const f = useTranslations('site.footer');
   const prefix = usePrefix();
@@ -167,6 +168,7 @@ export function SiteFooter() {
           <Link href={`${prefix}/teams`} className={footerLink}>{t('teams')}</Link>
           <Link href={`${prefix}/portfolio`} className={footerLink}>{t('portfolio')}</Link>
           <Link href={`${prefix}/clients`} className={footerLink}>{t('clients')}</Link>
+          {storeEnabled && <Link href={`${prefix}/store`} className={footerLink}>{t('store')}</Link>}
         </div>
         <div className="flex flex-col gap-2.5">
           <FooterHeading>{t('contact')}</FooterHeading>

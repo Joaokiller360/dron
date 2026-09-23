@@ -13,6 +13,8 @@ const PUBLIC_RESOURCES = new Set([
   'legal-pages',
   'promotions',
   'testimonials',
+  'store',
+  'products',
 ]);
 
 /**

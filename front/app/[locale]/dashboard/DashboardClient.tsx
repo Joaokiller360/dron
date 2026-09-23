@@ -19,6 +19,8 @@ import {
   ExternalLink,
   MapPin,
   Phone,
+  ShoppingBag,
+  Receipt,
 } from 'lucide-react';
 import LoginForm from './LoginForm';
 import OverviewPanel from './OverviewPanel';
@@ -34,6 +36,8 @@ import TestimonialsPanel from './TestimonialsPanel';
 import PromotionsPanel from './PromotionsPanel';
 import VenuesPanel from './VenuesPanel';
 import ContactPanel from './ContactPanel';
+import StorePanel from './StorePanel';
+import OrdersPanel from './OrdersPanel';
 import { apiFetch, Stats, TOKEN_KEY, UNAUTHORIZED_EVENT } from './lib/api';
 import { LiveProvider, useLive, useLiveStatus } from './lib/live';
 import { Toaster, useToast } from './ui';
@@ -49,6 +53,8 @@ export type Tab =
   | 'testimonios'
   | 'promociones'
   | 'lugares'
+  | 'tienda'
+  | 'pedidos'
   | 'legal'
   | 'categorias'
   | 'estado';
@@ -80,6 +86,13 @@ const NAV: { group: string; items: NavItem[] }[] = [
       { id: 'lugares', label: 'Lugares', icon: <MapPin size={17} /> },
       { id: 'legal', label: 'Legal', icon: <Scale size={17} /> },
       { id: 'categorias', label: 'Categorías', icon: <Tags size={17} /> },
+    ],
+  },
+  {
+    group: 'Tienda',
+    items: [
+      { id: 'tienda', label: 'Productos', icon: <ShoppingBag size={17} /> },
+      { id: 'pedidos', label: 'Pedidos', icon: <Receipt size={17} /> },
     ],
   },
   {
@@ -146,6 +159,7 @@ function Shell({ email, onLogout }: { email: string; onLogout: () => void }) {
   const [tab, setTabState] = useState<Tab>(tabFromHash);
   const [drawer, setDrawer] = useState(false);
   const [newMessages, setNewMessages] = useState(0);
+  const [pendingOrders, setPendingOrders] = useState(0);
   const live = useLiveStatus();
   const toast = useToast();
 
@@ -174,13 +188,16 @@ function Shell({ email, onLogout }: { email: string; onLogout: () => void }) {
 
   const loadBadge = useCallback(() => {
     apiFetch<Stats>('/stats')
-      .then((s) => setNewMessages(s.messages.new))
+      .then((s) => {
+        setNewMessages(s.messages.new);
+        setPendingOrders(s.orders?.pending ?? 0);
+      })
       .catch(() => {});
   }, []);
   useEffect(() => {
     loadBadge();
   }, [loadBadge]);
-  useLive('contact-messages', loadBadge);
+  useLive(['contact-messages', 'orders'], loadBadge);
 
   const sidebar = (
     <nav aria-label="Secciones" className="flex flex-col gap-6">
@@ -203,9 +220,9 @@ function Shell({ email, onLogout }: { email: string; onLogout: () => void }) {
               >
                 <span className={active ? 'text-jb-accent' : 'text-jb-muted'}>{item.icon}</span>
                 <span className="flex-1">{item.label}</span>
-                {item.id === 'mensajes' && newMessages > 0 && (
+                {(item.id === 'mensajes' ? newMessages : item.id === 'pedidos' ? pendingOrders : 0) > 0 && (
                   <span className="min-w-5 h-5 px-1.5 rounded-full bg-jb-accent text-jb-ink text-[11px] font-bold flex items-center justify-center">
-                    {newMessages}
+                    {item.id === 'mensajes' ? newMessages : pendingOrders}
                   </span>
                 )}
               </button>
@@ -218,7 +235,7 @@ function Shell({ email, onLogout }: { email: string; onLogout: () => void }) {
 
   const brand = (
     <div className="flex items-center gap-2.5 px-3">
-      <img src="/img/logo-p.png" alt="" className="w-7 h-7 bg-white rounded-full" />
+      <img src="/img/logo-p.png" alt="" className="bg-white rounded-full w-7 h-7" />
       <div className="leading-tight">
         <div className="font-mono text-[14px] font-bold text-white">JB.SKYLENS</div>
         <div className="font-mono text-[10px] tracking-[.14em] uppercase text-jb-mint">Dashboard</div>
@@ -288,7 +305,7 @@ function Shell({ email, onLogout }: { email: string; onLogout: () => void }) {
           </div>
         </header>
 
-        <main className="px-4 py-8 sm:px-8 max-w-[1120px]">
+        <main className="w-full px-4 py-8 sm:px-8">
           {tab === 'resumen' && <OverviewPanel onNavigate={setTab} />}
           {tab === 'mensajes' && <MessagesPanel />}
           {tab === 'contacto' && <ContactPanel />}
@@ -299,6 +316,8 @@ function Shell({ email, onLogout }: { email: string; onLogout: () => void }) {
           {tab === 'testimonios' && <TestimonialsPanel />}
           {tab === 'promociones' && <PromotionsPanel />}
           {tab === 'lugares' && <VenuesPanel />}
+          {tab === 'tienda' && <StorePanel />}
+          {tab === 'pedidos' && <OrdersPanel />}
           {tab === 'legal' && <LegalPanel />}
           {tab === 'categorias' && <CategoriesPanel />}
           {tab === 'estado' && <HealthPanel />}

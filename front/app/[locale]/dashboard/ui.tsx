@@ -103,7 +103,7 @@ export function PanelHeader({
       <div>
         <h1 className="m-0 font-mono text-[22px] font-bold tracking-[-.02em] text-white">
           {title}
-          {typeof count === 'number' && <span className="ml-2 text-jb-muted text-base font-medium">{count}</span>}
+          {typeof count === 'number' && <span className="ml-2 text-base font-medium text-jb-muted">{count}</span>}
         </h1>
         {subtitle && <p className="mt-1 mb-0 text-[13.5px] text-jb-muted">{subtitle}</p>}
       </div>

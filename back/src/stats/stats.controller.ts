@@ -21,17 +21,31 @@ export class StatsController {
       const [t, pub] = await Promise.all([total, published]);
       return { total: t, published: pub };
     };
-    const [messages, newMessages, projects, services, team, clients, testimonials, promotions] =
-      await Promise.all([
-        p.contactMessage.count(),
-        p.contactMessage.count({ where: { status: 'NEW' } }),
-        pair(p.project.count(), p.project.count({ where: { published: true } })),
-        pair(p.service.count(), p.service.count({ where: { published: true } })),
-        pair(p.teamMember.count(), p.teamMember.count({ where: { published: true } })),
-        pair(p.client.count(), p.client.count({ where: { published: true } })),
-        pair(p.testimonial.count(), p.testimonial.count({ where: { published: true } })),
-        pair(p.promotion.count(), p.promotion.count({ where: { active: true } })),
-      ]);
+    const [
+      messages,
+      newMessages,
+      projects,
+      services,
+      team,
+      clients,
+      testimonials,
+      promotions,
+      products,
+      orders,
+      pendingOrders,
+    ] = await Promise.all([
+      p.contactMessage.count(),
+      p.contactMessage.count({ where: { status: 'NEW' } }),
+      pair(p.project.count(), p.project.count({ where: { published: true } })),
+      pair(p.service.count(), p.service.count({ where: { published: true } })),
+      pair(p.teamMember.count(), p.teamMember.count({ where: { published: true } })),
+      pair(p.client.count(), p.client.count({ where: { published: true } })),
+      pair(p.testimonial.count(), p.testimonial.count({ where: { published: true } })),
+      pair(p.promotion.count(), p.promotion.count({ where: { active: true } })),
+      pair(p.product.count(), p.product.count({ where: { published: true } })),
+      p.order.count(),
+      p.order.count({ where: { status: 'PENDING' } }),
+    ]);
     return {
       messages: { total: messages, new: newMessages },
       projects,
@@ -40,6 +54,8 @@ export class StatsController {
       clients,
       testimonials,
       promotions,
+      products,
+      orders: { total: orders, pending: pendingOrders },
     };
   }
 }

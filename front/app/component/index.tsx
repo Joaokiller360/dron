@@ -17,9 +17,9 @@ import {
 } from './site';
 import ContactForm from './site/ContactForm';
 import LiveRefresh from './site/LiveRefresh';
-import { fetchPublic, localized, getContactInfo, whatsappUrl } from './site/api';
+import { fetchPublic, localized, getContactInfo, getStoreEnabled, whatsappUrl } from './site/api';
 import { ContactInfoProvider, useContactInfo } from './site/ContactInfo';
-import type { ContactInfo, PublicService, PublicProject, PublicClient, PublicPromotions, PublicTestimonial } from './site/api';
+import type { ContactInfo, PublicService, PublicProject, PublicClient, PublicPromotions, PublicTestimonial, PublicProduct, PublicStore } from './site/api';
 import { btnPrimary, btnGhost, inputClass } from './site/styles';
 import { videoSource, videoThumbnail, projectVideoUrl, projectCover } from './site/video';
 import type { VideoSource } from './site/video';
@@ -49,6 +49,7 @@ export {
   btnGhost,
   inputClass,
   getContactInfo,
+  getStoreEnabled,
   whatsappUrl,
   ContactInfoProvider,
   useContactInfo,
@@ -59,4 +60,4 @@ export {
   ProjectShot,
 };
 
-export type { VideoSource, ContactInfo, PublicService, PublicProject, PublicClient, PublicPromotions, PublicTestimonial };
+export type { VideoSource, ContactInfo, PublicService, PublicProject, PublicClient, PublicPromotions, PublicTestimonial, PublicProduct, PublicStore };
