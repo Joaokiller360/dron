@@ -2,8 +2,8 @@
 
 // Shared building blocks for the dashboard, in the site's jb-* palette.
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, ReactNode } from 'react';
-import { ArrowDown, ArrowUp, Check, Eye, EyeOff, ImageOff, Search, Trash2, X, AlertTriangle } from 'lucide-react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, ReactNode, type LiHTMLAttributes } from 'react';
+import { ArrowDown, ArrowUp, Check, Eye, EyeOff, GripVertical, ImageOff, Search, Trash2, X, AlertTriangle } from 'lucide-react';
 
 /* ---------- class helpers ---------- */
 
@@ -306,6 +306,7 @@ export function ListRow({
   actions,
   dimmed,
   onOpen,
+  drag,
 }: {
   thumb?: ReactNode;
   title: ReactNode;
@@ -314,9 +315,25 @@ export function ListRow({
   actions: ReactNode;
   dimmed?: boolean;
   onOpen?: () => void;
+  /** Drag & drop reordering (see lib/useDragSort): row props plus its visual state */
+  drag?: { props: LiHTMLAttributes<HTMLLIElement>; dragging: boolean; dropTarget: boolean };
 }) {
   return (
-    <li className="flex flex-wrap items-center gap-x-3.5 gap-y-2 px-3.5 py-3 rounded-2xl border border-white/[.08] bg-jb-card transition hover:border-white/[.16]">
+    <li
+      {...drag?.props}
+      className={`flex flex-wrap items-center gap-x-3.5 gap-y-2 px-3.5 py-3 rounded-2xl border bg-jb-card transition hover:border-white/[.16] ${
+        drag?.dropTarget ? 'border-jb-accent ring-1 ring-jb-accent' : 'border-white/[.08]'
+      } ${drag?.dragging ? 'opacity-40' : ''}`}
+    >
+      {drag?.props.draggable && (
+        <span
+          title="Arrastra para cambiar el orden"
+          aria-hidden
+          className="hidden [@media(pointer:fine)]:inline-flex items-center -mx-1.5 text-jb-muted/70 hover:text-white cursor-grab active:cursor-grabbing"
+        >
+          <GripVertical size={16} />
+        </span>
+      )}
       <span className={`contents ${dimmed ? '[&>*]:opacity-60' : ''}`}>{thumb}</span>
       <button
         type="button"

@@ -1,12 +1,11 @@
 'use client'
 
 import { useState, FormEvent } from 'react';
-import { ImageOff } from 'lucide-react';
 import { FolderKanban, Plus, Pencil, ExternalLink } from 'lucide-react';
 import { errorMessage, Project, slugify } from './lib/api';
 import { useCollection } from './lib/useCollection';
-import { projectCover, projectVideoUrl, videoSource } from '@/app/component/site/video';
-import BentoGrid, { BentoCard } from './BentoGrid';
+import { useDragSort } from './lib/useDragSort';
+import { projectCover, videoSource } from '@/app/component/site/video';
 import CategoryPicker from './CategoryPicker';
 import Modal from './Modal';
 import MediaInput, { useUploadTracker } from './MediaInput';
@@ -16,6 +15,8 @@ import {
   ErrorNote,
   Field,
   FormActions,
+  ListRow,
+  MoveButtons,
   PanelHeader,
   PublishToggle,
   StatusPill,
@@ -44,7 +45,7 @@ const orNull = (v: string) => (v.trim() ? v.trim() : null);
 
 export default function ProjectsPanel() {
   const toast = useToast();
-  const { items, loading, error, create, update, remove, moveTo } = useCollection<Project>('/projects/admin', {
+  const { items, loading, error, create, update, remove, move, moveTo } = useCollection<Project>('/projects/admin', {
     live: ['projects', 'categories'],
     base: '/projects',
     reorderAs: 'projects',
@@ -60,6 +61,8 @@ export default function ProjectsPanel() {
   const visible = q
     ? items.filter((p) => [p.titleEs, p.titleEn ?? '', p.category?.name ?? ''].some((f) => f.toLowerCase().includes(q)))
     : items;
+  // Drag rows to reorder (desktop); off while searching, positions would be ambiguous
+  const dragSort = useDragSort((id, to) => run(() => moveTo(id, to), '', 'No se pudo reordenar.'), !q);
 
   const openNew = () => {
     setForm({ ...emptyForm, categoryId: form.categoryId });
@@ -155,22 +158,16 @@ export default function ProjectsPanel() {
           }
         />
       ) : (
-        <>
-          <p className="m-0 mb-3 text-[12.5px] text-jb-muted">
-            {q
-              ? 'Borra la búsqueda para cambiar el orden.'
-              : 'El orden de las tarjetas es el del portafolio; el #1 es el destacado. Arrastra una tarjeta o usa las flechas para moverla.'}
-          </p>
-          <BentoGrid
-            items={visible}
-            reorderable={!q}
-            onMove={(id, to) => run(() => moveTo(id, to), '', 'No se pudo reordenar.')}
-            renderCard={(p, ctx) => (
-              <BentoCard
-                ctx={ctx}
+        <ul className="flex flex-col gap-2 p-0 m-0 list-none">
+          {visible.map((p) => {
+            const index = items.indexOf(p);
+            return (
+              <ListRow
+                key={p.id}
+                drag={{ props: dragSort.itemProps(p.id, index), ...dragSort.itemState(p.id, index) }}
                 dimmed={!p.published}
                 onOpen={() => openEdit(p)}
-                cover={<ProjectCover project={p} />}
+                thumb={<Thumb src={p.coverUrl} alt={p.titleEs} className="w-16 h-12" />}
                 title={p.titleEs}
                 meta={[p.category?.name, p.descriptionEs].filter(Boolean).join(' · ')}
                 pills={<StatusPill published={p.published} />}
@@ -186,6 +183,14 @@ export default function ProjectsPanel() {
                         )
                       }
                     />
+                    {!q && (
+                      <MoveButtons
+                        first={index === 0}
+                        last={index === items.length - 1}
+                        onUp={() => run(() => move(p.id, -1), '', 'No se pudo reordenar.')}
+                        onDown={() => run(() => move(p.id, 1), '', 'No se pudo reordenar.')}
+                      />
+                    )}
                     {p.published && (
                       <a href={`/portfolio#${p.slug}`} target="_blank" rel="noopener noreferrer" title="Ver en el sitio" className={iconBtnCls}>
                         <ExternalLink size={15} />
@@ -198,10 +203,10 @@ export default function ProjectsPanel() {
                   </>
                 }
               />
-            )}
-          />
+            );
+          })}
           {visible.length === 0 && <p className="py-8 m-0 text-center text-[13.5px] text-jb-muted">Sin resultados para “{query}”.</p>}
-        </>
+        </ul>
       )}
 
       <Modal
@@ -246,23 +251,5 @@ export default function ProjectsPanel() {
         </form>
       </Modal>
     </div>
-  );
-}
-
-// Card cover: the image, the video's thumbnail, or the first frame of an uploaded video
-function ProjectCover({ project }: { project: Project }) {
-  const [failed, setFailed] = useState(false);
-  const cover = projectCover(project);
-  const video = videoSource(projectVideoUrl(project));
-  if (cover && !failed) {
-    return <img src={cover} alt="" loading="lazy" onError={() => setFailed(true)} className="block object-cover w-full h-full" />;
-  }
-  if (video?.kind === 'file') {
-    return <video src={`${video.src}#t=0.5`} muted playsInline preload="metadata" className="block object-cover w-full h-full" />;
-  }
-  return (
-    <span className="flex items-center justify-center w-full h-full jb-stripes text-jb-muted">
-      <ImageOff size={20} />
-    </span>
   );
 }
