@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, FormEvent } from 'react';
+import { useEffect, useState, KeyboardEvent } from 'react';
 import { Plus, X, Pencil, Trash2, Check } from 'lucide-react';
 import { apiFetch, ApiError, Category, CategoryType } from './lib/api';
 
@@ -57,8 +57,7 @@ export default function CategoryPicker({ type, value, onChange, label = 'Categor
     setError('');
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     const trimmed = name.trim();
     if (!trimmed) return;
     setBusy(true);
@@ -92,6 +91,18 @@ export default function CategoryPicker({ type, value, onChange, label = 'Categor
     }
   };
 
+  // Enter saves the category (instead of submitting the item's form), Escape cancels
+  const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSubmit();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      e.stopPropagation();
+      cancel();
+    }
+  };
+
   const handleDelete = async () => {
     if (!selected) return;
     if (!window.confirm(`¿Eliminar la categoría "${selected.name}"?`)) return;
@@ -114,26 +125,30 @@ export default function CategoryPicker({ type, value, onChange, label = 'Categor
       </label>
 
       {mode !== 'idle' ? (
-        <form onSubmit={handleSubmit} className="flex gap-2">
+        // Not a <form>: this picker lives inside the item's form, and nested
+        // forms are invalid HTML (the browser would submit the outer one)
+        <div className="flex gap-2">
           <input
             autoFocus
-            required
             placeholder={mode === 'add' ? 'Nombre de la categoría' : 'Nuevo nombre'}
             value={name}
             onChange={(e) => setName(e.target.value)}
+            onKeyDown={onKeyDown}
+            maxLength={100}
             className={inputClass}
           />
           <button
-            type="submit"
-            disabled={busy}
+            type="button"
+            onClick={handleSubmit}
+            disabled={busy || !name.trim()}
             className="px-3 rounded-xl bg-jb-accent text-black font-bold hover:bg-white transition disabled:opacity-50"
           >
             {busy ? '...' : mode === 'add' ? 'Crear' : <Check size={16} />}
           </button>
-          <button type="button" onClick={cancel} className={iconBtn}>
+          <button type="button" onClick={cancel} title="Cancelar" className={iconBtn}>
             <X size={16} />
           </button>
-        </form>
+        </div>
       ) : (
         <div className="flex gap-2">
           <select
