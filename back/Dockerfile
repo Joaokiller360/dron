@@ -21,9 +21,5 @@ RUN npm ci --omit=dev && npx prisma generate
 
 COPY --from=builder /app/dist ./dist
 
-# Run as the image's unprivileged "node" user; files stay root-owned (read-only for the app)
-USER node
-
 EXPOSE 3001
-# exec: node replaces the shell as PID 1 so it receives SIGTERM on redeploys
-CMD ["sh", "-c", "npx prisma migrate deploy && exec node dist/main"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main"]
