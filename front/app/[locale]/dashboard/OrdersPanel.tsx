@@ -237,8 +237,12 @@ export default function OrdersPanel() {
                                 {l.options?.length ? (
                                   <span className="block text-[12.5px] text-jb-muted">{l.options.map((o) => `${o.name}: ${o.value}`).join(' · ')}</span>
                                 ) : null}
+                                {l.promotion && <span className="block text-[12.5px] font-semibold text-jb-mint">{l.promotion}</span>}
                               </td>
-                              <td className="py-2 font-mono text-right text-jb-soft whitespace-nowrap">{formatMoney(l.unitCents * l.quantity)}</td>
+                              <td className="py-2 font-mono text-right text-jb-soft whitespace-nowrap">
+                                {formatMoney(l.unitCents * l.quantity)}
+                                {l.listCents ? <s className="block text-[11.5px] text-jb-muted">{formatMoney(l.listCents * l.quantity)}</s> : null}
+                              </td>
                             </tr>
                           ))}
                           {o.shippingZone && (

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState, FormEvent } from 'react';
 import { BadgePercent, Plus, Pencil } from 'lucide-react';
-import { apiFetch, errorMessage, Promotion, PromotionSettings, Service } from './lib/api';
+import { apiFetch, errorMessage, formatMoney, Product, Promotion, PromotionSettings, Service } from './lib/api';
 import { useCollection } from './lib/useCollection';
 import { useLive } from './lib/live';
 import Modal from './Modal';
@@ -37,11 +37,24 @@ const emptyForm = {
   serviceSlug: '',
   endsAt: '',
   active: true,
+  // Store discount: '' = display only; value typed as percent or dollars
+  discountType: '' as '' | 'PERCENT' | 'FIXED',
+  discountValue: '',
+  allProducts: true,
+  productIds: [] as string[],
 };
 type Form = typeof emptyForm;
 
 const orNull = (v: string) => (v.trim() ? v.trim() : null);
 const isExpired = (p: Promotion) => !!p.endsAt && new Date(p.endsAt).getTime() < Date.now();
+
+/** "-20% · 3 productos" for the list; null for display-only promotions */
+const discountText = (p: Promotion) =>
+  p.discountType && p.discountValue
+    ? `Tienda: ${p.discountType === 'PERCENT' ? `-${p.discountValue}%` : `-${formatMoney(p.discountValue)}`} · ${
+        p.productIds?.length ? `${p.productIds.length} producto${p.productIds.length === 1 ? '' : 's'}` : 'toda la tienda'
+      }`
+    : null;
 
 export default function PromotionsPanel() {
   const toast = useToast();
@@ -52,6 +65,7 @@ export default function PromotionsPanel() {
   });
   const [settings, setSettings] = useState<PromotionSettings | null>(null);
   const [services, setServices] = useState<Service[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [editing, setEditing] = useState<Promotion | 'new' | null>(null);
   const [form, setForm] = useState<Form>(emptyForm);
   const [saving, setSaving] = useState(false);
@@ -63,6 +77,7 @@ export default function PromotionsPanel() {
   useEffect(() => {
     loadSettings();
     apiFetch<Service[]>('/services/admin').then(setServices).catch(() => {});
+    apiFetch<Product[]>('/products/admin').then(setProducts).catch(() => {});
   }, [loadSettings]);
   useLive('promotions', loadSettings);
 
@@ -94,6 +109,10 @@ export default function PromotionsPanel() {
       serviceSlug: p.serviceSlug ?? '',
       endsAt: p.endsAt ? p.endsAt.slice(0, 10) : '',
       active: p.active,
+      discountType: p.discountType ?? '',
+      discountValue: !p.discountValue ? '' : p.discountType === 'FIXED' ? (p.discountValue / 100).toFixed(2) : String(p.discountValue),
+      allProducts: !p.productIds?.length,
+      productIds: p.productIds ?? [],
     });
     setFormError('');
     setEditing(p);
@@ -101,9 +120,23 @@ export default function PromotionsPanel() {
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
+    // Percent as typed; a fixed amount goes to the API in cents
+    const raw = parseFloat(form.discountValue.replace(',', '.'));
+    const discountValue = !form.discountType ? null : form.discountType === 'PERCENT' ? Math.round(raw) : Math.round(raw * 100);
+    if (form.discountType && (!Number.isFinite(raw) || !discountValue || discountValue < 1 || (form.discountType === 'PERCENT' && discountValue > 90))) {
+      setFormError(form.discountType === 'PERCENT' ? 'El porcentaje debe estar entre 1 y 90.' : 'Indica cuánto se descuenta por unidad.');
+      return;
+    }
+    if (form.discountType && !form.allProducts && !form.productIds.length) {
+      setFormError('Elige al menos un producto o aplica el descuento a toda la tienda.');
+      return;
+    }
     setSaving(true);
     setFormError('');
     const body = {
+      discountType: form.discountType || null,
+      discountValue,
+      productIds: form.discountType && !form.allProducts ? form.productIds : [],
       title: form.title.trim(),
       detail: orNull(form.detail),
       badge: orNull(form.badge),
@@ -147,7 +180,7 @@ export default function PromotionsPanel() {
       <PanelHeader
         title="Promociones"
         count={items.length}
-        subtitle="Ofertas de temporada del inicio: barra superior, sección de ofertas e insignias en servicios."
+        subtitle="Ofertas de temporada: barra superior, sección de ofertas, insignias en servicios y descuentos en productos de la tienda."
         actions={
           <button type="button" onClick={openNew} className={btn.primary}>
             <Plus size={16} /> Nueva promoción
@@ -163,10 +196,11 @@ export default function PromotionsPanel() {
           label="Módulo de promociones"
           description="Apagado oculta la barra, la sección y las insignias sin borrar las ofertas."
         />
-        <div className={`grid gap-1 pt-3 mt-3 border-t border-white/[.07] sm:grid-cols-3 sm:gap-6 ${settings?.enabled ? '' : 'opacity-40'}`}>
+        <div className={`grid gap-1 pt-3 mt-3 border-t border-white/[.07] sm:grid-cols-2 lg:grid-cols-4 sm:gap-6 ${settings?.enabled ? '' : 'opacity-40'}`}>
           <Toggle checked={settings?.bar ?? false} disabled={!settings?.enabled} onChange={(v) => saveSetting({ bar: v })} label="Barra superior" />
           <Toggle checked={settings?.section ?? false} disabled={!settings?.enabled} onChange={(v) => saveSetting({ section: v })} label="Sección de ofertas" />
           <Toggle checked={settings?.badges ?? false} disabled={!settings?.enabled} onChange={(v) => saveSetting({ badges: v })} label="Insignias en servicios" />
+          <Toggle checked={settings?.store ?? false} disabled={!settings?.enabled} onChange={(v) => saveSetting({ store: v })} label="Descuentos en la tienda" />
         </div>
       </Card>
 
@@ -198,7 +232,7 @@ export default function PromotionsPanel() {
                 </span>
               }
               title={p.title}
-              meta={[p.price && `${p.price}${p.oldPrice ? ` (antes ${p.oldPrice})` : ''}`, p.untilLabel, serviceName(p.serviceSlug)].filter(Boolean).join(' · ')}
+              meta={[p.price && `${p.price}${p.oldPrice ? ` (antes ${p.oldPrice})` : ''}`, p.untilLabel, serviceName(p.serviceSlug), discountText(p)].filter(Boolean).join(' · ')}
               pills={
                 <>
                   {isExpired(p) && <Pill tone="warn">Vencida</Pill>}
@@ -274,6 +308,55 @@ export default function PromotionsPanel() {
               </select>
             </Field>
           </div>
+          <fieldset className="flex flex-col gap-3 p-4 m-0 rounded-xl border border-white/[.08]">
+            <legend className="px-1.5 text-[13.5px] font-semibold text-white">Descuento en la tienda</legend>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Tipo" hint="Baja el precio real de los productos al comprar.">
+                <select value={form.discountType} onChange={(e) => set('discountType', e.target.value as Form['discountType'])} className={inputCls}>
+                  <option value="">Sin descuento (solo anuncio)</option>
+                  <option value="PERCENT">Porcentaje (%)</option>
+                  <option value="FIXED">Monto fijo por unidad (USD)</option>
+                </select>
+              </Field>
+              {form.discountType && (
+                <Field label={form.discountType === 'PERCENT' ? 'Porcentaje' : 'Descuento (USD)'} hint={form.discountType === 'PERCENT' ? 'Entre 1 y 90.' : 'Se resta a cada unidad.'}>
+                  <input
+                    required
+                    inputMode="decimal"
+                    value={form.discountValue}
+                    onChange={(e) => set('discountValue', e.target.value)}
+                    placeholder={form.discountType === 'PERCENT' ? '20' : '5.00'}
+                    className={`${inputCls} font-mono`}
+                  />
+                </Field>
+              )}
+            </div>
+            {form.discountType && (
+              <div className="flex flex-col gap-2">
+                <Toggle checked={form.allProducts} onChange={(v) => set('allProducts', v)} label="Toda la tienda" description="Apagado, elige los productos con descuento." />
+                {!form.allProducts && (
+                  <div className="grid gap-1.5 max-h-56 overflow-y-auto p-2 rounded-lg border border-white/[.08] sm:grid-cols-2">
+                    {products.length === 0 && <span className="px-2 py-1.5 text-[13px] text-jb-muted">No hay productos en la tienda.</span>}
+                    {products.map((pr) => (
+                      <label key={pr.id} className="flex items-center gap-2.5 px-2 py-1.5 rounded-md text-[13.5px] text-jb-text hover:bg-white/[.04] cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={form.productIds.includes(pr.id)}
+                          onChange={(e) => set('productIds', e.target.checked ? [...form.productIds, pr.id] : form.productIds.filter((id) => id !== pr.id))}
+                          className="accent-jb-accent"
+                        />
+                        <span className="min-w-0 truncate">{pr.nameEs}</span>
+                        {!pr.published && <span className="text-[11.5px] text-jb-muted">(oculto)</span>}
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            <p className="m-0 text-[12.5px] text-jb-muted">
+              Se aplica mientras la promoción esté activa y sin vencer, con «Descuentos en la tienda» encendido. Si un producto tiene varias, gana la de mejor precio.
+            </p>
+          </fieldset>
           <Toggle checked={form.active} onChange={(v) => set('active', v)} label="Activa" description="Visible en el sitio mientras no haya vencido." />
           {formError && <ErrorNote>{formError}</ErrorNote>}
           <FormActions saving={saving} onCancel={() => setEditing(null)} submitLabel={editing === 'new' ? 'Crear promoción' : 'Guardar cambios'} />

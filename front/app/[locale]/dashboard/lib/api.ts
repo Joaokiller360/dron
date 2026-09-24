@@ -208,6 +208,11 @@ export interface Promotion {
   price?: string | null;
   oldPrice?: string | null;
   serviceSlug?: string | null;
+  /** Store discount: percent or cents off each unit; null = display only */
+  discountType?: 'PERCENT' | 'FIXED' | null;
+  discountValue?: number | null;
+  /** Discounted products; empty = whole store */
+  productIds: string[];
   endsAt?: string | null;
   active: boolean;
   sortOrder: number;
@@ -218,6 +223,8 @@ export interface PromotionSettings {
   bar: boolean;
   section: boolean;
   badges: boolean;
+  /** Promotion discounts apply to store prices */
+  store: boolean;
 }
 
 export interface Product {
@@ -297,6 +304,9 @@ export interface OrderLine {
   /** Options the buyer picked, already included in unitCents */
   options?: { name: string; value: string }[];
   unitCents: number;
+  /** Promotion applied and the unit price before it */
+  promotion?: string;
+  listCents?: number;
   quantity: number;
 }
 
