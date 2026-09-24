@@ -38,6 +38,48 @@ export class StoreSettingsDto {
   @MaxLength(200)
   pausedNotice?: string;
 
+  @ApiPropertyOptional({ description: 'Show a products section on the landing page' })
+  @IsOptional()
+  @IsBoolean()
+  homeSection?: boolean;
+
+  // Store page header (also used by the landing section); empty = the site's default text
+  @ApiPropertyOptional({ example: 'Tienda' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(40)
+  heroEyebrowEs?: string;
+
+  @ApiPropertyOptional({ example: 'Store' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(40)
+  heroEyebrowEn?: string;
+
+  @ApiPropertyOptional({ example: 'Productos JB.SKYLENS' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  heroTitleEs?: string;
+
+  @ApiPropertyOptional({ example: 'JB.SKYLENS products' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  heroTitleEn?: string;
+
+  @ApiPropertyOptional({ example: 'Elige tus productos y haz el pedido.' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(300)
+  heroIntroEs?: string;
+
+  @ApiPropertyOptional({ example: 'Pick your products and place an order.' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(300)
+  heroIntroEn?: string;
+
   @ApiPropertyOptional({ description: 'Offer bank transfer as a payment method' })
   @IsOptional()
   @IsBoolean()
@@ -92,6 +134,13 @@ export const DEFAULT_STORE_SETTINGS: StoreSettings = {
   sales: true,
   showPrices: true,
   pausedNotice: '',
+  homeSection: true,
+  heroEyebrowEs: '',
+  heroEyebrowEn: '',
+  heroTitleEs: '',
+  heroTitleEn: '',
+  heroIntroEs: '',
+  heroIntroEn: '',
   transferEnabled: false,
   bankName: '',
   accountType: 'AHORROS',

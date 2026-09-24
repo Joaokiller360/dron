@@ -257,6 +257,15 @@ export interface StoreSettings {
   sales: boolean;
   showPrices: boolean;
   pausedNotice: string;
+  /** Products section on the landing page */
+  homeSection: boolean;
+  /** Store header texts; empty = the site's default */
+  heroEyebrowEs: string;
+  heroEyebrowEn: string;
+  heroTitleEs: string;
+  heroTitleEn: string;
+  heroIntroEs: string;
+  heroIntroEn: string;
   transferEnabled: boolean;
   bankName: string;
   accountType: 'AHORROS' | 'CORRIENTE';

@@ -16,10 +16,13 @@ import {
   btnGhost,
   useContactInfo,
   ProjectShot,
+  storeHeader,
   type PublicService,
   type PublicProject,
   type PublicPromotions,
+  type PublicStore,
 } from '@/app/component';
+import { useMoney } from './(site)/store/cart';
 
 const BAR_KEY = 'jb-promo-bar-dismissed';
 const SSR = '__ssr__';
@@ -36,10 +39,13 @@ export default function HomeClient({
   services,
   projects,
   promotions,
+  store,
 }: {
   services: PublicService[];
   projects: PublicProject[];
   promotions: PublicPromotions | null;
+  /** Store settings and the first products; null hides the section */
+  store: Pick<PublicStore, 'settings' | 'products'> | null;
 }) {
   const t = useTranslations('site.home');
   const c = useTranslations('site.common');
@@ -48,6 +54,10 @@ export default function HomeClient({
   const contact = useContactInfo();
   const stats = t.raw('stats') as { value: string; label: string }[];
   const reasons = t.raw('reasons') as { title: string; body: string }[];
+
+  const st = useTranslations('store');
+  const money = useMoney();
+  const storeText = store ? storeHeader(store.settings, locale, st) : null;
 
   const p = useTranslations('site.home.promo');
   const promos = promotions?.settings.enabled ? promotions.items : [];
@@ -228,6 +238,65 @@ export default function HomeClient({
                         {localized(locale, s.descriptionEs ?? '', s.descriptionEn)}
                       </p>
                       <span className="font-mono text-xs text-jb-mint">{c('viewMore')} →</span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* PRODUCTOS: follows the services grid without a second gap (full padding when there are no services) */}
+      {store && storeText && (
+        <section id="productos" className={`px-6 pb-[86px] ${services.length > 0 ? 'pt-0' : 'pt-[86px]'}`}>
+          <div className="max-w-[1180px] mx-auto">
+            <Eyebrow className="mb-3">{storeText.eyebrow}</Eyebrow>
+            <div className="flex flex-wrap items-end justify-between gap-4 mb-3">
+              <SectionTitle>{storeText.title}</SectionTitle>
+              <Link href={`${prefix}/store`} className="font-mono text-xs tracking-[.08em] uppercase text-jb-mint hover:text-jb-accent-hi">
+                {t('storeAll')}
+              </Link>
+            </div>
+            <p className="m-0 mb-9 text-base text-jb-soft max-w-[560px] leading-[1.6] text-pretty">{storeText.intro}</p>
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(min(230px,100%),1fr))] gap-4">
+              {store.products.map((pr) => {
+                const name = localized(locale, pr.nameEs, pr.nameEn);
+                const soldOut = pr.stock !== null && pr.stock <= 0;
+                return (
+                  <Link
+                    key={pr.id}
+                    href={`${prefix}/store/${pr.slug}`}
+                    className="group flex flex-col overflow-hidden border rounded-[14px] border-white/[.09] bg-jb-card hover:border-[rgba(52,209,122,.5)] transition"
+                  >
+                    <div className="relative overflow-hidden">
+                      <Shot
+                        src={pr.coverUrl}
+                        alt={name}
+                        label={name}
+                        labelPosition="center"
+                        className={`aspect-[4/3] ${soldOut ? 'opacity-50' : ''}`}
+                        imgClassName="transition-transform duration-300 group-hover:scale-[1.03]"
+                      />
+                      {soldOut && (
+                        <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/70 font-mono text-[11px] font-bold tracking-[.08em] uppercase text-white">
+                          {st('soldOut')}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex flex-col flex-1 gap-1.5 px-4 py-3.5">
+                      <div className="text-[15px] font-semibold leading-snug text-white">{name}</div>
+                      <div className="mt-auto">
+                        {pr.priceCents !== null ? (
+                          <span className="flex items-baseline gap-2">
+                            {!!pr.options?.length && <span className="text-[12px] text-jb-muted">{st('from')}</span>}
+                            <span className="font-mono text-[16px] font-bold text-white">{money(pr.priceCents)}</span>
+                            {pr.compareAtCents ? <s className="font-mono text-[12px] text-jb-muted">{money(pr.compareAtCents)}</s> : null}
+                          </span>
+                        ) : (
+                          <span className="text-[13px] text-jb-soft">{st('askPrice')}</span>
+                        )}
+                      </div>
                     </div>
                   </Link>
                 );

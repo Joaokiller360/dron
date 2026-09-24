@@ -83,7 +83,21 @@ export interface PublicProduct {
 }
 
 export interface PublicStore {
-  settings: { enabled: boolean; sales: boolean; showPrices: boolean; pausedNotice: string };
+  settings: {
+    enabled: boolean;
+    sales: boolean;
+    showPrices: boolean;
+    pausedNotice: string;
+    /** Products section on the landing page */
+    homeSection: boolean;
+    /** Store header texts from the dashboard; empty = the translation's default */
+    heroEyebrowEs: string;
+    heroEyebrowEn: string;
+    heroTitleEs: string;
+    heroTitleEn: string;
+    heroIntroEs: string;
+    heroIntroEn: string;
+  };
   /** paypalClientId is null while PayPal isn't configured on the API */
   payments: {
     paypalClientId: string | null;
@@ -116,6 +130,16 @@ export interface PublicTestimonial {
 
 export function localized(locale: string, es: string, en?: string | null) {
   return locale === 'en' && en ? en : es;
+}
+
+/** Store header texts: the dashboard's wording for this locale, else the translation (t is the "store" namespace) */
+export function storeHeader(settings: PublicStore['settings'], locale: string, t: (key: 'eyebrow' | 'title' | 'intro') => string) {
+  const en = locale === 'en';
+  return {
+    eyebrow: (en ? settings.heroEyebrowEn : settings.heroEyebrowEs) || t('eyebrow'),
+    title: (en ? settings.heroTitleEn : settings.heroTitleEs) || t('title'),
+    intro: (en ? settings.heroIntroEn : settings.heroIntroEs) || t('intro'),
+  };
 }
 
 export interface PublicVenue {

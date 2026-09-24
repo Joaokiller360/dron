@@ -21,6 +21,7 @@ import {
   Phone,
   ShoppingBag,
   Receipt,
+  Settings2,
 } from 'lucide-react';
 import LoginForm from './LoginForm';
 import OverviewPanel from './OverviewPanel';
@@ -37,6 +38,7 @@ import PromotionsPanel from './PromotionsPanel';
 import VenuesPanel from './VenuesPanel';
 import ContactPanel from './ContactPanel';
 import StorePanel from './StorePanel';
+import StoreSettingsPanel from './StoreSettingsPanel';
 import OrdersPanel from './OrdersPanel';
 import { apiFetch, Stats, TOKEN_KEY, UNAUTHORIZED_EVENT } from './lib/api';
 import { LiveProvider, useLive, useLiveStatus } from './lib/live';
@@ -54,6 +56,7 @@ export type Tab =
   | 'promociones'
   | 'lugares'
   | 'tienda'
+  | 'tienda-config'
   | 'pedidos'
   | 'legal'
   | 'categorias'
@@ -93,6 +96,7 @@ const NAV: { group: string; items: NavItem[] }[] = [
     items: [
       { id: 'tienda', label: 'Productos', icon: <ShoppingBag size={17} /> },
       { id: 'pedidos', label: 'Pedidos', icon: <Receipt size={17} /> },
+      { id: 'tienda-config', label: 'Configuración', icon: <Settings2 size={17} /> },
     ],
   },
   {
@@ -318,6 +322,7 @@ function Shell({ email, onLogout }: { email: string; onLogout: () => void }) {
           {tab === 'lugares' && <VenuesPanel />}
           {tab === 'tienda' && <StorePanel />}
           {tab === 'pedidos' && <OrdersPanel />}
+          {tab === 'tienda-config' && <StoreSettingsPanel />}
           {tab === 'legal' && <LegalPanel />}
           {tab === 'categorias' && <CategoriesPanel />}
           {tab === 'estado' && <HealthPanel />}

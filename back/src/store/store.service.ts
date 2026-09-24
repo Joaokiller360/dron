@@ -79,6 +79,13 @@ export class StoreService {
       sales: all.sales,
       showPrices: all.showPrices,
       pausedNotice: all.pausedNotice,
+      homeSection: all.homeSection,
+      heroEyebrowEs: all.heroEyebrowEs,
+      heroEyebrowEn: all.heroEyebrowEn,
+      heroTitleEs: all.heroTitleEs,
+      heroTitleEn: all.heroTitleEn,
+      heroIntroEs: all.heroIntroEs,
+      heroIntroEn: all.heroIntroEn,
     };
     const payments = {
       paypalClientId: this.paypal.clientId,

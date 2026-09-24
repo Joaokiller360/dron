@@ -17,7 +17,7 @@ import {
 } from './site';
 import ContactForm from './site/ContactForm';
 import LiveRefresh from './site/LiveRefresh';
-import { fetchPublic, localized, getContactInfo, getStoreEnabled, whatsappUrl } from './site/api';
+import { fetchPublic, localized, storeHeader, getContactInfo, getStoreEnabled, whatsappUrl } from './site/api';
 import { ContactInfoProvider, useContactInfo } from './site/ContactInfo';
 import type { ContactInfo, PublicService, PublicProject, PublicClient, PublicPromotions, PublicTestimonial, PublicProduct, PublicStore } from './site/api';
 import { btnPrimary, btnGhost, inputClass } from './site/styles';
@@ -45,6 +45,7 @@ export {
   LiveRefresh,
   fetchPublic,
   localized,
+  storeHeader,
   btnPrimary,
   btnGhost,
   inputClass,
