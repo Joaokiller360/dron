@@ -87,11 +87,11 @@ export default function OverviewPanel({ onNavigate }: { onNavigate: (tab: Tab) =
         <StatCard icon={<BadgePercent size={19} />} label="Promociones" value={stats?.promotions.total ?? '–'} detail={pub(stats?.promotions, 'activas')} onClick={() => onNavigate('promociones')} />
         <StatCard
           icon={<Receipt size={19} />}
-          label="Pedidos pendientes"
-          value={stats?.orders?.pending ?? '–'}
-          detail={stats?.orders ? `${stats.orders.total} en total` : undefined}
+          label="Pedidos por atender"
+          value={stats?.orders ? stats.orders.toShip + stats.orders.toVerify : '–'}
+          detail={stats?.orders ? `${stats.orders.toShip} por enviar · ${stats.orders.toVerify} transferencias por verificar` : undefined}
           onClick={() => onNavigate('pedidos')}
-          highlight={!!stats?.orders?.pending}
+          highlight={!!(stats?.orders?.toShip || stats?.orders?.toVerify)}
         />
         <StatCard icon={<ShoppingBag size={19} />} label="Productos" value={stats?.products?.total ?? '–'} detail={pub(stats?.products)} onClick={() => onNavigate('tienda')} />
       </div>

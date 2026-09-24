@@ -242,9 +242,17 @@ export interface StoreSettings {
   sales: boolean;
   showPrices: boolean;
   pausedNotice: string;
+  transferEnabled: boolean;
+  bankName: string;
+  accountType: 'AHORROS' | 'CORRIENTE';
+  accountNumber: string;
+  accountHolder: string;
+  /** Cédula (10 digits) or RUC (13) */
+  holderId: string;
+  transferEmail: string;
 }
 
-export type OrderStatus = 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
+export type OrderStatus = 'PENDING_PAYMENT' | 'PAID' | 'SHIPPED' | 'COMPLETED' | 'CANCELLED' | 'REFUNDED';
 
 export interface OrderLine {
   productId: string;
@@ -259,12 +267,42 @@ export interface Order {
   name: string;
   email: string;
   phone: string;
+  address: string;
+  city: string;
   note?: string | null;
   locale: string;
   items: OrderLine[];
   totalCents: number;
   status: OrderStatus;
+  paymentMethod: 'PAYPAL' | 'TRANSFER';
+  transferBank?: string | null;
+  transferReference?: string | null;
+  paypalOrderId?: string | null;
+  paypalCaptureId?: string | null;
+  paidAt?: string | null;
+  refundedAt?: string | null;
+  carrier?: string | null;
+  trackingNumber?: string | null;
+  trackingUrl?: string | null;
+  shippedAt?: string | null;
+  paidEmailAt?: string | null;
+  shippedEmailAt?: string | null;
   createdAt: string;
+}
+
+/** PayPal setup as seen by the API (no secrets) */
+export interface PaymentStatus {
+  configured: boolean;
+  mode: 'sandbox' | 'live';
+  webhook: boolean;
+}
+
+/** PaymentStatus plus a live round trip to PayPal */
+export interface PaymentCheck extends PaymentStatus {
+  connected: boolean;
+  message: string;
+  latencyMs?: number;
+  checkedAt: string;
 }
 
 /** 2500 → "$25.00" */
@@ -280,7 +318,7 @@ export interface Stats {
   testimonials: { total: number; published: number };
   promotions: { total: number; published: number };
   products: { total: number; published: number };
-  orders: { total: number; pending: number };
+  orders: { total: number; toShip: number; toVerify: number };
 }
 
 /** Resources that support PATCH /reorder/:resource */

@@ -32,7 +32,8 @@ export class StatsController {
       promotions,
       products,
       orders,
-      pendingOrders,
+      ordersToShip,
+      transfersToVerify,
     ] = await Promise.all([
       p.contactMessage.count(),
       p.contactMessage.count({ where: { status: 'NEW' } }),
@@ -44,7 +45,8 @@ export class StatsController {
       pair(p.promotion.count(), p.promotion.count({ where: { active: true } })),
       pair(p.product.count(), p.product.count({ where: { published: true } })),
       p.order.count(),
-      p.order.count({ where: { status: 'PENDING' } }),
+      p.order.count({ where: { status: 'PAID' } }),
+      p.order.count({ where: { status: 'PENDING_PAYMENT', paymentMethod: 'TRANSFER' } }),
     ]);
     return {
       messages: { total: messages, new: newMessages },
@@ -55,7 +57,7 @@ export class StatsController {
       testimonials,
       promotions,
       products,
-      orders: { total: orders, pending: pendingOrders },
+      orders: { total: orders, toShip: ordersToShip, toVerify: transfersToVerify },
     };
   }
 }

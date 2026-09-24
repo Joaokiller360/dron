@@ -22,6 +22,22 @@ export class StoreController {
     return { enabled, sales };
   }
 
+  @Get('payments')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Admin: whether PayPal is configured (sandbox/live, webhook)' })
+  payments() {
+    return this.store.paymentStatus();
+  }
+
+  @Get('payments/check')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Admin: test the PayPal credentials against PayPal' })
+  checkPayments() {
+    return this.store.checkPayments();
+  }
+
   @Get('settings')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

@@ -17,7 +17,12 @@ import {
   MinLength,
   ValidateNested,
 } from 'class-validator';
-import { NAME_PATTERN, PHONE_PATTERN, TEXT_PATTERN } from '../../common/text-patterns';
+import {
+  NAME_PATTERN,
+  PHONE_PATTERN,
+  PLACE_PATTERN,
+  TEXT_PATTERN,
+} from '../../common/text-patterns';
 
 export class OrderLineDto {
   @ApiProperty()
@@ -58,7 +63,21 @@ export class CreateOrderDto {
   @IsEmail()
   email: string;
 
-  @ApiPropertyOptional({ example: 'Entrega en Esmeraldas, por favor.' })
+  @ApiProperty({ example: 'Av. Libertad y Manabí, casa 12' })
+  @IsString()
+  @MinLength(5)
+  @MaxLength(200)
+  @Matches(TEXT_PATTERN, { message: 'address contains invalid characters' })
+  address: string;
+
+  @ApiProperty({ example: 'Esmeraldas' })
+  @IsString()
+  @MinLength(2)
+  @MaxLength(80)
+  @Matches(PLACE_PATTERN, { message: 'city contains invalid characters' })
+  city: string;
+
+  @ApiPropertyOptional({ example: 'Entregar por la tarde, por favor.' })
   @IsOptional()
   @IsString()
   @MaxLength(1000)

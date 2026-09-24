@@ -190,7 +190,7 @@ function Shell({ email, onLogout }: { email: string; onLogout: () => void }) {
     apiFetch<Stats>('/stats')
       .then((s) => {
         setNewMessages(s.messages.new);
-        setPendingOrders(s.orders?.pending ?? 0);
+        setPendingOrders((s.orders?.toShip ?? 0) + (s.orders?.toVerify ?? 0));
       })
       .catch(() => {});
   }, []);

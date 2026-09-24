@@ -20,7 +20,7 @@ export default async function Store() {
   return (
     <div className="bg-jb-bg">
       <PageHero eyebrow={t('eyebrow')} title={t('title')} intro={t('intro')} />
-      <StoreClient products={store.products} settings={store.settings} />
+      <StoreClient products={store.products} settings={store.settings} payments={store.payments} />
     </div>
   );
 }

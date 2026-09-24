@@ -27,5 +27,15 @@ export default () => ({
     // Base URL files are served from (CDN or public bucket URL); defaults to the AWS bucket URL
     publicUrl: process.env.S3_PUBLIC_URL,
   },
+  // PayPal checkout for the store (REST app from developer.paypal.com)
+  paypal: {
+    clientId: process.env.PAYPAL_CLIENT_ID,
+    clientSecret: process.env.PAYPAL_CLIENT_SECRET,
+    // "sandbox" for testing, "live" for real payments
+    mode: process.env.PAYPAL_MODE === 'live' ? 'live' : 'sandbox',
+    // Id of the webhook registered for <API>/orders/paypal/webhook; events are
+    // only trusted after PayPal confirms their signature against it
+    webhookId: process.env.PAYPAL_WEBHOOK_ID,
+  },
   logLevel: process.env.LOG_LEVEL ?? 'info',
 });

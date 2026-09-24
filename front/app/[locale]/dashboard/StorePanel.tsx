@@ -1,8 +1,8 @@
 'use client'
 
 import { useCallback, useEffect, useState, FormEvent } from 'react';
-import { ShoppingBag, Plus, Pencil, ExternalLink } from 'lucide-react';
-import { apiFetch, errorMessage, formatMoney, Product, slugify, StoreSettings } from './lib/api';
+import { ShoppingBag, Plus, Pencil, ExternalLink, CreditCard, AlertTriangle, Landmark } from 'lucide-react';
+import { apiFetch, errorMessage, formatMoney, PaymentStatus, Product, slugify, StoreSettings } from './lib/api';
 import { useCollection } from './lib/useCollection';
 import { useDragSort } from './lib/useDragSort';
 import { useLive } from './lib/live';
@@ -55,6 +55,88 @@ function uniqueSlug(name: string, taken: string[]) {
   return slug;
 }
 
+type TransferForm = Pick<
+  StoreSettings,
+  'bankName' | 'accountType' | 'accountNumber' | 'accountHolder' | 'holderId' | 'transferEmail'
+>;
+const TRANSFER_FIELDS: (keyof TransferForm)[] = ['bankName', 'accountType', 'accountNumber', 'accountHolder', 'holderId', 'transferEmail'];
+
+/** Account the buyers transfer to; shown on the store while transfer is on */
+function TransferCard({ settings, onSave }: { settings: StoreSettings; onSave: (patch: Partial<StoreSettings>) => Promise<boolean | undefined> }) {
+  const toast = useToast();
+  const [form, setForm] = useState<TransferForm>(() => Object.fromEntries(TRANSFER_FIELDS.map((k) => [k, settings[k]])) as TransferForm);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+  const set = <K extends keyof TransferForm>(k: K, v: TransferForm[K]) => setForm((f) => ({ ...f, [k]: v }));
+  const complete = !!(settings.bankName && settings.accountNumber && settings.accountHolder && settings.holderId);
+  const dirty = TRANSFER_FIELDS.some((k) => form[k].trim() !== settings[k]);
+
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
+    const clean = Object.fromEntries(TRANSFER_FIELDS.map((k) => [k, form[k].trim()])) as TransferForm;
+    if (clean.holderId && !/^(\d{10}|\d{13})$/.test(clean.holderId)) {
+      setError('La cédula debe tener 10 dígitos o el RUC 13.');
+      return;
+    }
+    if (clean.accountNumber && !/^[0-9-]+$/.test(clean.accountNumber)) {
+      setError('El número de cuenta solo lleva dígitos.');
+      return;
+    }
+    setError('');
+    setSaving(true);
+    if (await onSave(clean)) toast.success('Datos de transferencia guardados');
+    setSaving(false);
+  };
+
+  return (
+    <Card className="p-5">
+      <Toggle
+        checked={settings.transferEnabled}
+        onChange={(v) => onSave({ transferEnabled: v }).then((ok) => ok && toast.success(v ? 'Transferencia activada' : 'Transferencia desactivada'))}
+        label="Pago por transferencia bancaria"
+        description="El cliente transfiere a tu cuenta y escribe el banco y el código de la transferencia. Tú confirmas el pago en Pedidos cuando veas el dinero."
+      />
+      {settings.transferEnabled && !complete && (
+        <p className="mt-2 mb-0 text-[12.5px] text-amber-300">Completa banco, número de cuenta, titular y cédula/RUC para que aparezca en la tienda.</p>
+      )}
+      <form onSubmit={submit} className="flex flex-col gap-4 pt-4 mt-3 border-t border-white/[.07]">
+        <span className="inline-flex items-center gap-2 text-[13.5px] font-semibold text-white">
+          <Landmark size={15} className="text-jb-accent" /> Datos de tu cuenta
+        </span>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="Banco">
+            <input maxLength={80} value={form.bankName} onChange={(e) => set('bankName', e.target.value)} placeholder="Banco Pichincha" className={inputCls} />
+          </Field>
+          <Field label="Tipo de cuenta">
+            <select value={form.accountType} onChange={(e) => set('accountType', e.target.value as TransferForm['accountType'])} className={inputCls}>
+              <option value="AHORROS">Ahorros</option>
+              <option value="CORRIENTE">Corriente</option>
+            </select>
+          </Field>
+          <Field label="Número de cuenta">
+            <input inputMode="numeric" maxLength={30} value={form.accountNumber} onChange={(e) => set('accountNumber', e.target.value)} placeholder="2201234567" className={`${inputCls} font-mono`} />
+          </Field>
+          <Field label="Titular">
+            <input maxLength={100} value={form.accountHolder} onChange={(e) => set('accountHolder', e.target.value)} placeholder="Nombre del titular" className={inputCls} />
+          </Field>
+          <Field label="Cédula o RUC" hint="10 dígitos (cédula) o 13 (RUC).">
+            <input inputMode="numeric" maxLength={13} value={form.holderId} onChange={(e) => set('holderId', e.target.value)} className={`${inputCls} font-mono`} />
+          </Field>
+          <Field label="Correo para comprobantes" hint="Opcional. Se muestra al cliente.">
+            <input type="email" maxLength={120} value={form.transferEmail} onChange={(e) => set('transferEmail', e.target.value)} className={inputCls} />
+          </Field>
+        </div>
+        {error && <ErrorNote>{error}</ErrorNote>}
+        <div className="flex justify-end">
+          <button type="submit" disabled={saving || !dirty} className={btn.primary}>
+            {saving ? 'Guardando…' : 'Guardar datos'}
+          </button>
+        </div>
+      </form>
+    </Card>
+  );
+}
+
 export default function StorePanel() {
   const toast = useToast();
   const { items, loading, error, create, update, remove, moveTo } = useCollection<Product>('/products/admin', {
@@ -63,6 +145,7 @@ export default function StorePanel() {
   });
   const [settings, setSettings] = useState<StoreSettings | null>(null);
   const [notice, setNotice] = useState('');
+  const [payments, setPayments] = useState<PaymentStatus | null>(null);
   const [editing, setEditing] = useState<Product | 'new' | null>(null);
   const [form, setForm] = useState<Form>(emptyForm);
   const [saving, setSaving] = useState(false);
@@ -79,6 +162,7 @@ export default function StorePanel() {
   }, []);
   useEffect(() => {
     loadSettings();
+    apiFetch<PaymentStatus>('/store/payments').then(setPayments).catch(() => {});
   }, [loadSettings]);
   useLive('store', loadSettings);
 
@@ -178,7 +262,7 @@ export default function StorePanel() {
       <PanelHeader
         title="Tienda"
         count={items.length}
-        subtitle="Catálogo de productos en /store. Los pedidos llegan a la sección Pedidos."
+        subtitle="Catálogo de productos en /store, con pago por PayPal. Los pedidos llegan a la sección Pedidos."
         actions={
           <>
             {settings?.enabled && (
@@ -234,6 +318,29 @@ export default function StorePanel() {
           </form>
         )}
       </Card>
+
+      {payments &&
+        (payments.configured ? (
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 px-5 py-3.5 rounded-2xl border border-white/[.08] bg-jb-card text-[13px] text-jb-soft">
+            <span className="inline-flex items-center gap-2 font-semibold text-white">
+              <CreditCard size={15} className="text-jb-accent" /> PayPal conectado
+            </span>
+            <Pill tone={payments.mode === 'live' ? 'on' : 'warn'}>{payments.mode === 'live' ? 'Pagos reales' : 'Sandbox (pruebas)'}</Pill>
+            <span className={payments.webhook ? 'text-jb-mint' : 'text-amber-300'}>
+              {payments.webhook ? 'Webhook verificado activo' : 'Sin webhook: los pagos se confirman al volver del checkout y por la tarea de revisión'}
+            </span>
+          </div>
+        ) : (
+          <div className="flex items-start gap-3 px-5 py-4 rounded-2xl border border-amber-400/30 bg-amber-400/[.06] text-[13.5px] text-jb-soft">
+            <AlertTriangle size={17} className="flex-none mt-px text-amber-300" />
+            <span>
+              PayPal no está configurado: solo se puede pagar por transferencia (si la activas abajo). Agrega <code className="font-mono text-[12px]">PAYPAL_CLIENT_ID</code>,{' '}
+              <code className="font-mono text-[12px]">PAYPAL_CLIENT_SECRET</code> y <code className="font-mono text-[12px]">PAYPAL_MODE</code> a la API.
+            </span>
+          </div>
+        ))}
+
+      {settings && <TransferCard key={TRANSFER_FIELDS.map((k) => settings[k]).join('|')} settings={settings} onSave={saveSetting} />}
 
       {error && <ErrorNote>{error}</ErrorNote>}
 

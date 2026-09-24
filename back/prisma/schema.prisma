@@ -266,14 +266,23 @@ model Product {
   @@map("products")
 }
 
-enum OrderStatus {
-  PENDING
-  CONFIRMED
-  COMPLETED
-  CANCELLED
+enum PaymentMethod {
+  PAYPAL
+  TRANSFER
 }
 
-// Order placed from the store; paid/arranged offline after the admin confirms
+// PENDING_PAYMENT → PAID (PayPal capture verified) → SHIPPED (carrier + tracking)
+// → COMPLETED. Unpaid orders expire to CANCELLED; paid ones end in REFUNDED.
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAID
+  SHIPPED
+  COMPLETED
+  CANCELLED
+  REFUNDED
+}
+
+// Order placed from the store and paid through PayPal
 model Order {
   id         String      @id @default(uuid())
   // Short human reference shown to the buyer (e.g. "JB-7K2Q9M")
@@ -281,15 +290,42 @@ model Order {
   name       String
   email      String
   phone      String
+  // Delivery address typed at checkout
+  address    String
+  city       String
   note       String?
   locale     String      @default("es")
   // Snapshot of what was bought: { productId, name, unitCents, quantity }[]
   items      Json
   totalCents Int         @map("total_cents")
-  status     OrderStatus @default(PENDING)
+  status     OrderStatus @default(PENDING_PAYMENT)
+  paymentMethod PaymentMethod @default(PAYPAL) @map("payment_method")
+
+  // Bank transfer: bank the buyer paid from and the transfer code; the owner
+  // checks it against the bank statement and confirms in the dashboard
+  transferBank      String? @map("transfer_bank")
+  transferReference String? @map("transfer_reference")
+
+  // PayPal: order created at checkout, capture made (and verified) on approval
+  paypalOrderId   String?   @unique @map("paypal_order_id")
+  paypalCaptureId String?   @unique @map("paypal_capture_id")
+  paidAt          DateTime? @map("paid_at")
+  refundedAt      DateTime? @map("refunded_at")
+
+  // Shipping, set by the owner in the dashboard
+  carrier        String?
+  trackingNumber String?   @map("tracking_number")
+  trackingUrl    String?   @map("tracking_url")
+  shippedAt      DateTime? @map("shipped_at")
+
+  // Buyer emails are sent by a background task; null = still to send (retried)
+  paidEmailAt    DateTime? @map("paid_email_at")
+  shippedEmailAt DateTime? @map("shipped_email_at")
+
   createdAt  DateTime    @default(now()) @map("created_at")
   updatedAt  DateTime    @updatedAt @map("updated_at")
 
   @@index([status])
+  @@index([transferReference])
   @@map("orders")
 }

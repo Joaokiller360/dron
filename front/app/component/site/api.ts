@@ -78,6 +78,20 @@ export interface PublicProduct {
 
 export interface PublicStore {
   settings: { enabled: boolean; sales: boolean; showPrices: boolean; pausedNotice: string };
+  /** paypalClientId is null while PayPal isn't configured on the API */
+  payments: {
+    paypalClientId: string | null;
+    currency: string;
+    /** Account to transfer to; null while transfer isn't offered */
+    transfer: {
+      bankName: string;
+      accountType: 'AHORROS' | 'CORRIENTE';
+      accountNumber: string;
+      accountHolder: string;
+      holderId: string;
+      email: string;
+    } | null;
+  };
   products: PublicProduct[];
 }
 
