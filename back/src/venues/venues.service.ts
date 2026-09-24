@@ -34,7 +34,7 @@ export class VenuesService {
 
   private async ensureExists(id: string) {
     const found = await this.prisma.venue.findUnique({ where: { id } });
-    if (!found) throw new NotFoundException(`Venue ${id} not found`);
+    if (!found) throw new NotFoundException(`El lugar ${id} no existe`);
     return found;
   }
 }

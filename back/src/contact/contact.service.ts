@@ -47,7 +47,7 @@ export class ContactService {
   async findOne(id: string) {
     const message = await this.prisma.contactMessage.findUnique({ where: { id } });
     if (!message) {
-      throw new NotFoundException(`Contact message ${id} not found`);
+      throw new NotFoundException(`El mensaje ${id} no existe`);
     }
     return message;
   }
@@ -73,7 +73,7 @@ export class ContactService {
     const from = this.config.get<string>('resend.from');
     if (!apiKey || !from) {
       throw new ServiceUnavailableException(
-        'Email is not configured: set RESEND_API_KEY and RESEND_FROM in .env and restart the backend (watch mode does not reload .env)',
+        'El correo no está configurado: agrega RESEND_API_KEY y RESEND_FROM a la API y reiníciala',
       );
     }
     const { email: replyTo } = await this.settings.getContact();
@@ -106,7 +106,7 @@ export class ContactService {
     const result = (await res.json().catch(() => ({}))) as { id?: string; message?: string };
     if (!res.ok) {
       this.logger.error(`Resend rejected reply to ${id}: ${res.status} ${result.message ?? ''}`);
-      throw new BadGatewayException(result.message ?? 'The email provider refused the message');
+      throw new BadGatewayException(result.message ?? 'El proveedor de correo rechazó el mensaje');
     }
 
     if (message.status === ContactStatus.NEW) {

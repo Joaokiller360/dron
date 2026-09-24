@@ -251,7 +251,7 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
     const trusted = await this.paypal.verifyWebhook(headers, event).catch(() => false);
     if (!trusted) {
       this.logger.warn(`Rejected PayPal webhook ${event?.id ?? '?'} (${event?.event_type ?? '?'})`);
-      throw new UnauthorizedException('Invalid webhook signature');
+      throw new UnauthorizedException('Firma del webhook no válida');
     }
     // Signed by PayPal, but still only strings reach the database queries
     const raw = event.resource ?? {};
@@ -698,7 +698,7 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
 
   private async ensure(id: string) {
     const found = await this.prisma.order.findUnique({ where: { id } });
-    if (!found) throw new NotFoundException(`Order ${id} not found`);
+    if (!found) throw new NotFoundException(`El pedido ${id} no existe`);
     return found;
   }
 

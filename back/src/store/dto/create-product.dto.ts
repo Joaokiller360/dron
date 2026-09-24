@@ -67,7 +67,7 @@ export class CreateProductDto {
   @ApiProperty({ example: 'foto-aerea-impresa-a3' })
   @IsString()
   @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
-    message: 'slug must be lowercase, alphanumeric, dash-separated',
+    message: 'La dirección (slug) solo admite minúsculas, números y guiones',
   })
   slug: string;
 

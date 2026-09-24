@@ -34,7 +34,7 @@ export class TestimonialsService {
 
   private async ensureExists(id: string) {
     const found = await this.prisma.testimonial.findUnique({ where: { id } });
-    if (!found) throw new NotFoundException(`Testimonial ${id} not found`);
+    if (!found) throw new NotFoundException(`El testimonio ${id} no existe`);
     return found;
   }
 }

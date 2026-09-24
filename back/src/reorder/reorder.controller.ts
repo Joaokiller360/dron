@@ -39,7 +39,7 @@ export class ReorderController {
     const model = Object.prototype.hasOwnProperty.call(RESOURCES, resource)
       ? RESOURCES[resource as keyof typeof RESOURCES]
       : undefined;
-    if (!model) throw new NotFoundException(`Cannot reorder ${resource}`);
+    if (!model) throw new NotFoundException(`No se puede reordenar ${resource}`);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const delegate = (this.prisma as any)[model];
     await this.prisma.$transaction(

@@ -99,7 +99,7 @@ export class StoreSettingsDto {
   @ApiPropertyOptional({ example: '2201234567' })
   @IsOptional()
   @IsString()
-  @Matches(/^[0-9-]{0,30}$/, { message: 'accountNumber must contain only digits' })
+  @Matches(/^[0-9-]{0,30}$/, { message: 'El número de cuenta solo lleva dígitos' })
   accountNumber?: string;
 
   @ApiPropertyOptional({ example: 'Joao Barres' })
@@ -112,7 +112,7 @@ export class StoreSettingsDto {
   @IsOptional()
   @IsString()
   @Matches(/^(\d{10}|\d{13})?$/, {
-    message: 'holderId must be a cédula (10 digits) or RUC (13 digits)',
+    message: 'La cédula debe tener 10 dígitos o el RUC 13',
   })
   holderId?: string;
 

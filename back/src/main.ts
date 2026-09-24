@@ -7,6 +7,7 @@ import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { winstonLoggerOptions } from './common/logger/winston.logger';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { spanishValidationErrors } from './common/validation/validation-es';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -27,6 +28,7 @@ async function bootstrap() {
       whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
+      exceptionFactory: spanishValidationErrors,
     }),
   );
   app.useGlobalFilters(new HttpExceptionFilter());

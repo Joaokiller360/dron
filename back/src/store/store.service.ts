@@ -162,7 +162,7 @@ export class StoreService {
 
   private async ensureProduct(id: string) {
     const found = await this.prisma.product.findUnique({ where: { id } });
-    if (!found) throw new NotFoundException(`Product ${id} not found`);
+    if (!found) throw new NotFoundException(`El producto ${id} no existe`);
     return found;
   }
 

@@ -46,7 +46,7 @@ export class TeamMembersService {
   private async ensureExists(id: string) {
     const member = await this.prisma.teamMember.findUnique({ where: { id } });
     if (!member) {
-      throw new NotFoundException(`Team member ${id} not found`);
+      throw new NotFoundException(`El miembro del equipo ${id} no existe`);
     }
     return member;
   }

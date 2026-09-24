@@ -53,7 +53,7 @@ export class ClientsService {
   private async ensureExists(id: string) {
     const client = await this.prisma.client.findUnique({ where: { id } });
     if (!client) {
-      throw new NotFoundException(`Client ${id} not found`);
+      throw new NotFoundException(`El cliente ${id} no existe`);
     }
     return client;
   }

@@ -36,7 +36,7 @@ export class ProjectsService {
       include: { category: true },
     });
     if (!project) {
-      throw new NotFoundException(`Project "${slug}" not found`);
+      throw new NotFoundException(`El proyecto "${slug}" no existe`);
     }
     return project;
   }
@@ -54,7 +54,7 @@ export class ProjectsService {
   private async ensureExists(id: string) {
     const project = await this.prisma.project.findUnique({ where: { id } });
     if (!project) {
-      throw new NotFoundException(`Project ${id} not found`);
+      throw new NotFoundException(`El proyecto ${id} no existe`);
     }
     return project;
   }

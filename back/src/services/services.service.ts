@@ -62,7 +62,7 @@ export class ServicesService {
   private async ensureExists(id: string) {
     const service = await this.prisma.service.findUnique({ where: { id } });
     if (!service) {
-      throw new NotFoundException(`Service ${id} not found`);
+      throw new NotFoundException(`El servicio ${id} no existe`);
     }
     return service;
   }
@@ -73,7 +73,7 @@ export class ServicesService {
       include: { category: true },
     });
     if (!service || !service.published) {
-      throw new NotFoundException(`Service "${slug}" not found`);
+      throw new NotFoundException(`El servicio "${slug}" no existe`);
     }
     return service;
   }

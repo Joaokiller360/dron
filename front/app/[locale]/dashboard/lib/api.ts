@@ -399,7 +399,7 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
           ? inner
           : Array.isArray(inner)
             ? inner.join(', ')
-            : `Request failed with status ${res.status}`;
+            : `La solicitud falló (código ${res.status})`;
     // Expired/invalid session: let the dashboard shell drop back to the login
     if (res.status === 401 && token && !path.startsWith('/auth/login')) {
       window.dispatchEvent(new Event(UNAUTHORIZED_EVENT));

@@ -61,7 +61,7 @@ export class PromotionsService {
 
   private async ensureExists(id: string) {
     const found = await this.prisma.promotion.findUnique({ where: { id } });
-    if (!found) throw new NotFoundException(`Promotion ${id} not found`);
+    if (!found) throw new NotFoundException(`La promoción ${id} no existe`);
     return found;
   }
 }

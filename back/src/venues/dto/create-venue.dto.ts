@@ -15,14 +15,14 @@ export class CreateVenueDto {
   @IsString()
   @MinLength(2)
   @MaxLength(80)
-  @Matches(PLACE_PATTERN, { message: 'name contains invalid characters' })
+  @Matches(PLACE_PATTERN, { message: 'El nombre tiene caracteres no permitidos' })
   name: string;
 
   @ApiProperty({ example: 'Esmeraldas' })
   @IsString()
   @MinLength(2)
   @MaxLength(60)
-  @Matches(PLACE_PATTERN, { message: 'city contains invalid characters' })
+  @Matches(PLACE_PATTERN, { message: 'La ciudad tiene caracteres no permitidos' })
   city: string;
 
   @ApiPropertyOptional({ default: true })

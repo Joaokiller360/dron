@@ -69,14 +69,14 @@ export class CreateOrderDto {
   @IsString()
   @MinLength(2)
   @MaxLength(100)
-  @Matches(NAME_PATTERN, { message: 'name contains invalid characters' })
+  @Matches(NAME_PATTERN, { message: 'El nombre tiene caracteres no permitidos' })
   name: string;
 
   @ApiProperty({ example: '0987654321' })
   @IsString()
   @MinLength(7)
   @MaxLength(20)
-  @Matches(PHONE_PATTERN, { message: 'phone contains invalid characters' })
+  @Matches(PHONE_PATTERN, { message: 'El teléfono tiene caracteres no permitidos' })
   phone: string;
 
   @ApiProperty({ example: 'joao@example.com' })
@@ -87,21 +87,21 @@ export class CreateOrderDto {
   @IsString()
   @MinLength(5)
   @MaxLength(200)
-  @Matches(TEXT_PATTERN, { message: 'address contains invalid characters' })
+  @Matches(TEXT_PATTERN, { message: 'La dirección tiene caracteres no permitidos' })
   address: string;
 
   @ApiProperty({ example: 'Esmeraldas' })
   @IsString()
   @MinLength(2)
   @MaxLength(80)
-  @Matches(PLACE_PATTERN, { message: 'city contains invalid characters' })
+  @Matches(PLACE_PATTERN, { message: 'La ciudad tiene caracteres no permitidos' })
   city: string;
 
   @ApiPropertyOptional({ example: 'Entregar por la tarde, por favor.' })
   @IsOptional()
   @IsString()
   @MaxLength(1000)
-  @Matches(TEXT_PATTERN, { message: 'note contains invalid characters' })
+  @Matches(TEXT_PATTERN, { message: 'La nota tiene caracteres no permitidos' })
   note?: string;
 
   @ApiPropertyOptional({ example: 'es', enum: ['es', 'en'] })

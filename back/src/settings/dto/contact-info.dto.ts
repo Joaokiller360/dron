@@ -9,7 +9,7 @@ export class ContactInfoDto {
   @IsString()
   @MinLength(7)
   @MaxLength(20)
-  @Matches(PHONE_PATTERN, { message: 'phone contains invalid characters' })
+  @Matches(PHONE_PATTERN, { message: 'El teléfono tiene caracteres no permitidos' })
   phone?: string;
 
   @ApiPropertyOptional({ example: 'contacto@joaobarres.dev' })

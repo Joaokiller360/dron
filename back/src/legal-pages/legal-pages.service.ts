@@ -35,7 +35,7 @@ export class LegalPagesService {
   async findBySlug(slug: string) {
     const page = await this.prisma.legalPage.findUnique({ where: { slug } });
     if (!page || !page.published) {
-      throw new NotFoundException(`Legal page "${slug}" not found`);
+      throw new NotFoundException(`La página legal "${slug}" no existe`);
     }
     return page;
   }

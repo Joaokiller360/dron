@@ -17,7 +17,7 @@ export class CreateServiceDto {
   @ApiProperty({ example: 'fotografia-aerea' })
   @IsString()
   @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
-    message: 'slug must be lowercase, alphanumeric, dash-separated',
+    message: 'La dirección (slug) solo admite minúsculas, números y guiones',
   })
   slug: string;
 
@@ -58,7 +58,7 @@ export class CreateServiceDto {
   @IsOptional()
   @IsString()
   @MaxLength(500)
-  @Matches(SAFE_HREF_PATTERN, { message: 'href must be an http(s) URL or a path starting with /' })
+  @Matches(SAFE_HREF_PATTERN, { message: 'El enlace debe ser una URL http(s) o una ruta que empiece con /' })
   href?: string;
 
   @ApiPropertyOptional({ default: true })

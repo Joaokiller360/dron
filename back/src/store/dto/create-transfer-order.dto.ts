@@ -9,13 +9,13 @@ export class CreateTransferOrderDto extends CreateOrderDto {
   @IsString()
   @MinLength(2)
   @MaxLength(80)
-  @Matches(PLACE_PATTERN, { message: 'transferBank contains invalid characters' })
+  @Matches(PLACE_PATTERN, { message: 'El banco tiene caracteres no permitidos' })
   transferBank: string;
 
   @ApiProperty({ example: '123456789', description: 'Transfer code / receipt number' })
   @IsString()
   @MinLength(4)
   @MaxLength(40)
-  @Matches(/^[A-Za-z0-9-]+$/, { message: 'transferReference must be letters, digits or dashes' })
+  @Matches(/^[A-Za-z0-9-]+$/, { message: 'El código de la transferencia solo admite letras, números y guiones' })
   transferReference: string;
 }

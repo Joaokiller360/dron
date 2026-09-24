@@ -25,7 +25,7 @@ function hasForbiddenKey(value: unknown, depth = 0): boolean {
 export class SafeInputMiddleware implements NestMiddleware {
   use(req: Request, _res: Response, next: NextFunction) {
     if (hasForbiddenKey(req.body) || hasForbiddenKey(req.query)) {
-      throw new BadRequestException('Invalid input');
+      throw new BadRequestException('Datos no válidos');
     }
     next();
   }
