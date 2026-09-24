@@ -1,5 +1,20 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsDateString, IsInt, IsOptional, IsString, MaxLength } from 'class-validator';
+import {
+  ArrayMaxSize,
+  IsArray,
+  IsBoolean,
+  IsDateString,
+  IsIn,
+  IsInt,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Max,
+  MaxLength,
+  Min,
+  ValidateIf,
+} from 'class-validator';
+import { DISCOUNT_TYPES, type DiscountType } from '../store-discounts';
 
 export class CreatePromotionDto {
   @ApiProperty({ example: 'Pack Boda Completa' })
@@ -47,6 +62,30 @@ export class CreatePromotionDto {
   @IsString()
   @MaxLength(120)
   serviceSlug?: string;
+
+  @ApiPropertyOptional({
+    enum: DISCOUNT_TYPES,
+    nullable: true,
+    description: 'Store discount: PERCENT or FIXED (cents); null = display only',
+  })
+  @IsOptional()
+  @IsIn(DISCOUNT_TYPES)
+  discountType?: DiscountType | null;
+
+  @ApiPropertyOptional({ example: 20, description: 'Percent (1–90) or cents off each unit' })
+  // Checked whenever sent (updates may change only the value); cleared with the type
+  @ValidateIf((o: CreatePromotionDto) => o.discountValue != null)
+  @IsInt()
+  @Min(1)
+  @Max(10000000)
+  discountValue?: number | null;
+
+  @ApiPropertyOptional({ type: [String], description: 'Discounted products; empty = all' })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(200)
+  @IsUUID('4', { each: true })
+  productIds?: string[];
 
   @ApiPropertyOptional({ example: '2026-09-30T23:59:59.000Z' })
   @IsOptional()

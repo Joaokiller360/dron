@@ -184,7 +184,7 @@ export class StoreMailService {
     const rows = lines
       .map(
         (l) =>
-          `<tr><td style="padding:6px 12px 6px 0">${l.quantity} × ${esc(lineTitle(l.name, l.options))}</td><td style="padding:6px 0;text-align:right">${money(l.unitCents * l.quantity)}</td></tr>`,
+          `<tr><td style="padding:6px 12px 6px 0">${l.quantity} × ${esc(lineTitle(l.name, l.options))}${l.promotion ? `<br><span style="color:#16a34a;font-size:12px">${esc(l.promotion)}</span>` : ''}</td><td style="padding:6px 0;text-align:right">${money(l.unitCents * l.quantity)}</td></tr>`,
       )
       .join('');
     // Orders from before zones (or a store without zones) have no shipping row

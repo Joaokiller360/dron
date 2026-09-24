@@ -12,6 +12,8 @@ import {
 } from './dto/store-settings.dto';
 import { PaypalService } from './paypal.service';
 import { optionsOf, type ChosenOption } from './product-options';
+import { PromotionsService } from '../promotions/promotions.service';
+import { discountsFor, type StoreDiscount } from '../promotions/store-discounts';
 
 const SETTINGS_KEY = 'store';
 
@@ -21,15 +23,29 @@ export interface OrderLine {
   name: string;
   /** Options the buyer picked (size, color…), already priced into unitCents */
   options?: ChosenOption[];
+  /** Unit price paid (after the promotion, if any) */
   unitCents: number;
+  /** Promotion applied: its title and the unit price before it */
+  promotion?: string;
+  listCents?: number;
   quantity: number;
 }
+
+/** What the catalog tells the browser about a promotion (no internals) */
+const publicDiscount = (d: StoreDiscount) => ({
+  title: d.title,
+  badge: d.badge,
+  type: d.type,
+  value: d.value,
+  endsAt: d.endsAt,
+});
 
 @Injectable()
 export class StoreService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly paypal: PaypalService,
+    private readonly promotions: PromotionsService,
   ) {}
 
   // ── Settings ──────────────────────────────────────────────────────────────
@@ -114,14 +130,18 @@ export class StoreService {
         : null,
     };
     if (!settings.enabled) return { settings, payments, products: [] };
-    const products = await this.prisma.product.findMany({
-      where: { published: true },
-      orderBy: { sortOrder: 'asc' },
-    });
+    const [products, discounts] = await Promise.all([
+      this.prisma.product.findMany({ where: { published: true }, orderBy: { sortOrder: 'asc' } }),
+      this.promotions.activeStoreDiscounts(),
+    ]);
     return {
       settings,
       payments,
-      products: products.map((p) => this.publicProduct(p, settings.showPrices)),
+      products: products.map((p) => ({
+        ...this.publicProduct(p, settings.showPrices),
+        // Running promotions for this product; the page picks the best one per price
+        discounts: discountsFor(p.id, discounts).map(publicDiscount),
+      })),
     };
   }
 

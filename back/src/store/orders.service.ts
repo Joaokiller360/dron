@@ -22,6 +22,8 @@ import { ShipOrderDto } from './dto/ship-order.dto';
 import { StoreService, OrderLine } from './store.service';
 import { lineTitle, priceWithOptions } from './product-options';
 import { PaypalError, PaypalOrder, PaypalService } from './paypal.service';
+import { PromotionsService } from '../promotions/promotions.service';
+import { bestPrice, discountsFor } from '../promotions/store-discounts';
 import { StoreMailService } from './store-mail.service';
 
 type Tx = Prisma.TransactionClient;
@@ -76,6 +78,7 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
     private readonly paypal: PaypalService,
     private readonly mail: StoreMailService,
     private readonly events: EventsService,
+    private readonly promotions: PromotionsService,
   ) {}
 
   onModuleInit() {
@@ -180,6 +183,7 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
     extra: { paymentMethod: PaymentMethod; transferBank?: string; transferReference?: string },
   ) {
     const zone = this.shippingZone(dto, settings);
+    const discounts = await this.promotions.activeStoreDiscounts();
     const order = await this.prisma.$transaction(async (tx) => {
       const ids = [...new Set(dto.items.map((l) => l.productId))];
       const products = await tx.product.findMany({ where: { id: { in: ids }, published: true } });
@@ -190,7 +194,10 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
       const byKey = new Map<string, OrderLine>();
       for (const item of dto.items) {
         const product = products.find((p) => p.id === item.productId)!;
-        const { unitCents, options } = priceWithOptions(product, item.options);
+        const { unitCents: listCents, options } = priceWithOptions(product, item.options);
+        // Running promotions lower the price here too, so it can't come from the browser
+        const deal = bestPrice(listCents, discountsFor(product.id, discounts));
+        const unitCents = deal?.unitCents ?? listCents;
         const key = `${product.id}|${JSON.stringify(options)}`;
         const line = byKey.get(key);
         if (line) line.quantity += item.quantity;
@@ -200,6 +207,7 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
             name: product.nameEs,
             ...(options.length ? { options } : {}),
             unitCents,
+            ...(deal ? { promotion: deal.discount.title, listCents } : {}),
             quantity: item.quantity,
           });
       }

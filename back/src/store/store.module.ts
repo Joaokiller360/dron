@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { SettingsModule } from '../settings/settings.module';
+import { PromotionsModule } from '../promotions/promotions.module';
 import { StoreController } from './store.controller';
 import { ProductsController } from './products.controller';
 import { OrdersController } from './orders.controller';
@@ -9,7 +10,7 @@ import { PaypalService } from './paypal.service';
 import { StoreMailService } from './store-mail.service';
 
 @Module({
-  imports: [SettingsModule],
+  imports: [SettingsModule, PromotionsModule],
   controllers: [StoreController, ProductsController, OrdersController],
   providers: [StoreService, OrdersService, PaypalService, StoreMailService],
 })

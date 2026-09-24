@@ -22,6 +22,11 @@ export class PromotionSettingsDto {
   @IsOptional()
   @IsBoolean()
   badges?: boolean;
+
+  @ApiPropertyOptional({ description: 'Promotion discounts apply to store prices' })
+  @IsOptional()
+  @IsBoolean()
+  store?: boolean;
 }
 
 export type PromotionSettings = Required<PromotionSettingsDto>;
@@ -31,4 +36,5 @@ export const DEFAULT_PROMOTION_SETTINGS: PromotionSettings = {
   bar: true,
   section: true,
   badges: true,
+  store: true,
 };

@@ -189,6 +189,11 @@ model Promotion {
   oldPrice    String?   @map("old_price")
   // Service whose card gets the badge (Service.slug), optional
   serviceSlug String?   @map("service_slug")
+  // Real discount on store products: PERCENT (1–90) or FIXED (cents off each
+  // unit); null = display-only promotion. productIds empty = whole store
+  discountType  String?  @map("discount_type")
+  discountValue Int?     @map("discount_value")
+  productIds    String[] @default([]) @map("product_ids")
   // Hidden automatically once this date passes
   endsAt      DateTime? @map("ends_at")
   active      Boolean   @default(true)

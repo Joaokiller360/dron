@@ -1,7 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePromotionDto } from './dto/create-promotion.dto';
+import { StoreDiscount, toStoreDiscount } from './store-discounts';
 import { UpdatePromotionDto } from './dto/update-promotion.dto';
 import {
   DEFAULT_PROMOTION_SETTINGS,
@@ -41,17 +42,47 @@ export class PromotionsService {
     return { settings, items };
   }
 
+  /** Discounts running now (module and store switch on, active, not expired) */
+  async activeStoreDiscounts(): Promise<StoreDiscount[]> {
+    const settings = await this.getSettings();
+    if (!settings.enabled || !settings.store) return [];
+    const items = await this.prisma.promotion.findMany({
+      where: {
+        active: true,
+        discountType: { not: null },
+        OR: [{ endsAt: null }, { endsAt: { gt: new Date() } }],
+      },
+      orderBy: { sortOrder: 'asc' },
+    });
+    return items.map(toStoreDiscount).filter((d): d is StoreDiscount => d !== null);
+  }
+
   findAllForAdmin() {
     return this.prisma.promotion.findMany({ orderBy: { sortOrder: 'asc' } });
   }
 
   create(dto: CreatePromotionDto) {
-    return this.prisma.promotion.create({ data: dto });
+    return this.prisma.promotion.create({ data: this.withDiscount(dto) });
   }
 
   async update(id: string, dto: UpdatePromotionDto) {
-    await this.ensureExists(id);
-    return this.prisma.promotion.update({ where: { id }, data: dto });
+    const current = await this.ensureExists(id);
+    return this.prisma.promotion.update({ where: { id }, data: this.withDiscount(dto, current) });
+  }
+
+  /** Keeps type and value consistent: no type = no value; a percent tops out at 90 */
+  private withDiscount<T extends UpdatePromotionDto>(
+    dto: T,
+    current?: { discountType: string | null; discountValue: number | null },
+  ): T {
+    const type = dto.discountType !== undefined ? dto.discountType : current?.discountType;
+    const value = dto.discountValue !== undefined ? dto.discountValue : current?.discountValue;
+    if (!type) return { ...dto, discountType: null, discountValue: null };
+    if (!value) throw new BadRequestException('Indica el valor del descuento');
+    if (type === 'PERCENT' && value > 90) {
+      throw new BadRequestException('El descuento en porcentaje admite hasta 90%');
+    }
+    return dto;
   }
 
   async remove(id: string) {
