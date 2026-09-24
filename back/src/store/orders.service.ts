@@ -17,7 +17,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { EventsService } from '../events/events.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { CreateTransferOrderDto } from './dto/create-transfer-order.dto';
-import { StoreSettings, shippingFor, transferReady } from './dto/store-settings.dto';
+import { StoreSettings, sameCity, shippingFor, transferReady } from './dto/store-settings.dto';
 import { ShipOrderDto } from './dto/ship-order.dto';
 import { StoreService, OrderLine } from './store.service';
 import { lineTitle, priceWithOptions } from './product-options';
@@ -162,18 +162,16 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
     return settings;
   }
 
-  /** Zone the buyer picked; none needed while the store has no zones */
-  private shippingZone(dto: CreateOrderDto, settings: StoreSettings) {
-    if (!settings.shippingZones.length) return null;
-    const zone = settings.shippingZones.find((z) => z.id === dto.shippingZoneId);
-    if (!zone) {
+  /** Shipping rate for the buyer's city; none while the store lists no cities */
+  private shippingCity(dto: CreateOrderDto, settings: StoreSettings) {
+    if (!settings.shippingCities.length) return null;
+    const city = settings.shippingCities.find((c) => sameCity(c.name, dto.city));
+    if (!city) {
       throw new BadRequestException(
-        dto.shippingZoneId
-          ? 'La zona de envío ya no está disponible. Elige otra.'
-          : 'Elige una zona de envío',
+        `No hacemos envíos a "${dto.city}". Elige una ciudad de la lista.`,
       );
     }
-    return zone;
+    return city;
   }
 
   /** Prices the cart (and shipping) from the database, reserves the units and stores the order */
@@ -182,7 +180,7 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
     settings: StoreSettings,
     extra: { paymentMethod: PaymentMethod; transferBank?: string; transferReference?: string },
   ) {
-    const zone = this.shippingZone(dto, settings);
+    const city = this.shippingCity(dto, settings);
     const discounts = await this.promotions.activeStoreDiscounts();
     const order = await this.prisma.$transaction(async (tx) => {
       const ids = [...new Set(dto.items.map((l) => l.productId))];
@@ -214,7 +212,7 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
       const lines = [...byKey.values()];
       const itemsCents = lines.reduce((sum, l) => sum + l.unitCents * l.quantity, 0);
       if (itemsCents <= 0) throw new BadRequestException('El total del pedido debe ser mayor a 0');
-      const shippingCents = zone ? shippingFor(zone, itemsCents) : 0;
+      const shippingCents = city ? shippingFor(city, itemsCents) : 0;
       await this.reserve(tx, lines);
 
       return tx.order.create({
@@ -224,11 +222,12 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
           email: dto.email,
           phone: dto.phone,
           address: dto.address,
-          city: dto.city,
+          // The listed spelling, so orders group by city
+          city: city?.name ?? dto.city,
           note: dto.note || null,
           locale: dto.locale ?? 'es',
           items: lines as unknown as Prisma.InputJsonValue,
-          shippingZone: zone?.name ?? null,
+          shippingCity: city?.name ?? null,
           shippingCents,
           totalCents: itemsCents + shippingCents,
           ...extra,

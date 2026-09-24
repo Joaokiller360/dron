@@ -19,7 +19,7 @@ import ContactForm from './site/ContactForm';
 import LiveRefresh from './site/LiveRefresh';
 import { fetchPublic, localized, storeHeader, shippingFor, bestDeal, dealBadge, getContactInfo, getStoreEnabled, whatsappUrl } from './site/api';
 import { ContactInfoProvider, useContactInfo } from './site/ContactInfo';
-import type { ContactInfo, PublicService, PublicProject, PublicClient, PublicPromotions, PublicTestimonial, PublicProduct, PublicStore, ShippingZone, PublicDiscount } from './site/api';
+import type { ContactInfo, PublicService, PublicProject, PublicClient, PublicPromotions, PublicTestimonial, PublicProduct, PublicStore, ShippingCity, PublicDiscount } from './site/api';
 import { btnPrimary, btnGhost, inputClass } from './site/styles';
 import { videoSource, videoThumbnail, projectVideoUrl, projectCover } from './site/video';
 import type { VideoSource } from './site/video';
@@ -64,4 +64,4 @@ export {
   ProjectShot,
 };
 
-export type { VideoSource, ContactInfo, PublicService, PublicProject, PublicClient, PublicPromotions, PublicTestimonial, PublicProduct, PublicStore, ShippingZone, PublicDiscount };
+export type { VideoSource, ContactInfo, PublicService, PublicProject, PublicClient, PublicPromotions, PublicTestimonial, PublicProduct, PublicStore, ShippingCity, PublicDiscount };

@@ -1,4 +1,9 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { Prisma, Product } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
@@ -52,7 +57,16 @@ export class StoreService {
 
   async getSettings(): Promise<StoreSettings> {
     const row = await this.prisma.siteSetting.findUnique({ where: { key: SETTINGS_KEY } });
-    return { ...DEFAULT_STORE_SETTINGS, ...((row?.value as Partial<StoreSettings>) ?? {}) };
+    const saved = (row?.value ?? {}) as Partial<StoreSettings> & {
+      shippingZones?: StoreSettings['shippingCities'];
+    };
+    // Shipping was first set per zone, with the same fields; those become cities
+    const { shippingZones, ...rest } = saved;
+    return {
+      ...DEFAULT_STORE_SETTINGS,
+      ...(shippingZones && !rest.shippingCities ? { shippingCities: shippingZones } : {}),
+      ...rest,
+    };
   }
 
   async updateSettings(dto: StoreSettingsDto) {
@@ -60,15 +74,19 @@ export class StoreService {
     const patch: Partial<StoreSettings> = Object.fromEntries(
       Object.entries(dto).filter(([, v]) => v !== null && v !== undefined),
     );
-    // Zones keep their id across edits (orders and carts point at it); new ones get one
-    if (dto.shippingZones) {
-      patch.shippingZones = dto.shippingZones.map((z) => ({
-        id: z.id || randomUUID().slice(0, 8),
-        name: z.name.trim(),
-        priceCents: z.priceCents,
-        freeFromCents: z.freeFromCents ?? null,
-        deliveryTime: z.deliveryTime?.trim() ?? '',
+    // Cities keep their id across edits; new ones get one
+    if (dto.shippingCities) {
+      patch.shippingCities = dto.shippingCities.map((c) => ({
+        id: c.id || randomUUID().slice(0, 8),
+        name: c.name.trim().replace(/\s+/g, ' '),
+        priceCents: c.priceCents,
+        freeFromCents: c.freeFromCents ?? null,
+        deliveryTime: c.deliveryTime?.trim() ?? '',
       }));
+      const names = patch.shippingCities.map((c) => c.name.toLowerCase());
+      if (new Set(names).size !== names.length) {
+        throw new BadRequestException('Hay ciudades repetidas en la lista de envíos');
+      }
     }
     const value = { ...(await this.getSettings()), ...patch };
     await this.prisma.siteSetting.upsert({
@@ -113,7 +131,7 @@ export class StoreService {
       heroTitleEn: all.heroTitleEn,
       heroIntroEs: all.heroIntroEs,
       heroIntroEn: all.heroIntroEn,
-      shippingZones: all.shippingZones,
+      shippingCities: all.shippingCities,
     };
     const payments = {
       paypalClientId: this.paypal.clientId,

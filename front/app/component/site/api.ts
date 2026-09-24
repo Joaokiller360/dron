@@ -108,8 +108,8 @@ export interface PublicProduct {
   discounts?: PublicDiscount[];
 }
 
-/** Delivery zone the buyer picks at checkout */
-export interface ShippingZone {
+/** City the store ships to, with its price; the buyer picks it as their city */
+export interface ShippingCity {
   id: string;
   name: string;
   priceCents: number;
@@ -119,9 +119,9 @@ export interface ShippingZone {
   deliveryTime: string;
 }
 
-/** What a zone charges for an order of `subtotalCents` (same rule as the API) */
-export const shippingFor = (zone: ShippingZone, subtotalCents: number) =>
-  zone.freeFromCents != null && subtotalCents >= zone.freeFromCents ? 0 : zone.priceCents;
+/** What shipping to a city costs for an order of `subtotalCents` (same rule as the API) */
+export const shippingFor = (city: ShippingCity, subtotalCents: number) =>
+  city.freeFromCents != null && subtotalCents >= city.freeFromCents ? 0 : city.priceCents;
 
 export interface PublicStore {
   settings: {
@@ -138,8 +138,8 @@ export interface PublicStore {
     heroTitleEn: string;
     heroIntroEs: string;
     heroIntroEn: string;
-    /** Empty = no shipping cost or zone to pick */
-    shippingZones: ShippingZone[];
+    /** Cities the store ships to; empty = any city, no shipping cost */
+    shippingCities: ShippingCity[];
   };
   /** paypalClientId is null while PayPal isn't configured on the API */
   payments: {

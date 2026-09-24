@@ -259,8 +259,8 @@ export interface ProductSpec {
   value: string;
 }
 
-/** Delivery zone (same shape as the API's) */
-export interface ShippingZone {
+/** City the store ships to, with its price (same shape as the API's) */
+export interface ShippingCity {
   id: string;
   name: string;
   priceCents: number;
@@ -284,8 +284,8 @@ export interface StoreSettings {
   heroTitleEn: string;
   heroIntroEs: string;
   heroIntroEn: string;
-  /** Delivery zones the buyer picks from; empty = no shipping charge */
-  shippingZones: ShippingZone[];
+  /** Cities the buyer picks from, each with its shipping price; empty = no shipping charge */
+  shippingCities: ShippingCity[];
   transferEnabled: boolean;
   bankName: string;
   accountType: 'AHORROS' | 'CORRIENTE';
@@ -321,8 +321,8 @@ export interface Order {
   note?: string | null;
   locale: string;
   items: OrderLine[];
-  /** Zone name picked at checkout; null on orders without zones */
-  shippingZone?: string | null;
+  /** City whose shipping rate was charged; null on orders from a store without cities */
+  shippingCity?: string | null;
   shippingCents: number;
   /** Items + shipping */
   totalCents: number;

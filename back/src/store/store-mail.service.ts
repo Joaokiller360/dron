@@ -187,9 +187,9 @@ export class StoreMailService {
           `<tr><td style="padding:6px 12px 6px 0">${l.quantity} × ${esc(lineTitle(l.name, l.options))}${l.promotion ? `<br><span style="color:#16a34a;font-size:12px">${esc(l.promotion)}</span>` : ''}</td><td style="padding:6px 0;text-align:right">${money(l.unitCents * l.quantity)}</td></tr>`,
       )
       .join('');
-    // Orders from before zones (or a store without zones) have no shipping row
-    const shipping = order.shippingZone
-      ? `<tr><td style="padding:6px 12px 6px 0">${c.shippingCost} · ${esc(order.shippingZone)}</td><td style="padding:6px 0;text-align:right">${money(order.shippingCents)}</td></tr>`
+    // Orders from a store without shipping cities have no shipping row
+    const shipping = order.shippingCity
+      ? `<tr><td style="padding:6px 12px 6px 0">${c.shippingCost} · ${esc(order.shippingCity)}</td><td style="padding:6px 0;text-align:right">${money(order.shippingCents)}</td></tr>`
       : '';
     return `<p style="margin:20px 0 6px;font-weight:700">${c.order} ${order.code}</p>
 <table style="border-collapse:collapse;width:100%;max-width:460px">${rows}${shipping}

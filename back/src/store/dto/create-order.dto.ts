@@ -90,7 +90,10 @@ export class CreateOrderDto {
   @Matches(TEXT_PATTERN, { message: 'La dirección tiene caracteres no permitidos' })
   address: string;
 
-  @ApiProperty({ example: 'Esmeraldas' })
+  @ApiProperty({
+    example: 'Esmeraldas',
+    description: 'Once the store lists shipping cities, one of them (it sets the shipping cost)',
+  })
   @IsString()
   @MinLength(2)
   @MaxLength(80)
@@ -103,15 +106,6 @@ export class CreateOrderDto {
   @MaxLength(1000)
   @Matches(TEXT_PATTERN, { message: 'La nota tiene caracteres no permitidos' })
   note?: string;
-
-  @ApiPropertyOptional({
-    example: 'a1b2c3d4',
-    description: 'Delivery zone id; required once the store has zones',
-  })
-  @IsOptional()
-  @IsString()
-  @MaxLength(40)
-  shippingZoneId?: string;
 
   @ApiPropertyOptional({ example: 'es', enum: ['es', 'en'] })
   @IsOptional()

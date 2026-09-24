@@ -109,11 +109,11 @@ export default function CartDrawer({
                   {showPrices && (
                     <div className="flex flex-col gap-1">
                       <div className="flex items-baseline justify-between">
-                        {/* With zones, shipping is added at checkout */}
-                        <span className="text-[14px] text-jb-soft">{t(settings.shippingZones?.length ? 'subtotal' : 'total')}</span>
+                        {/* With shipping cities, shipping is added at checkout */}
+                        <span className="text-[14px] text-jb-soft">{t(settings.shippingCities?.length ? 'subtotal' : 'total')}</span>
                         <span className="font-mono text-[20px] font-bold text-white">{money(totalCents)}</span>
                       </div>
-                      {settings.shippingZones?.length > 0 && <p className="m-0 text-[12.5px] text-jb-muted">{t('shippingAtCheckout')}</p>}
+                      {settings.shippingCities?.length > 0 && <p className="m-0 text-[12.5px] text-jb-muted">{t('shippingAtCheckout')}</p>}
                     </div>
                   )}
                   {canPay ? (

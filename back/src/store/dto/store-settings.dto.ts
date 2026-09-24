@@ -17,19 +17,22 @@ import {
   ValidateIf,
   ValidateNested,
 } from 'class-validator';
+import { PLACE_PATTERN } from '../../common/text-patterns';
 
-/** A delivery zone the buyer picks at checkout, with its own price */
-export class ShippingZoneDto {
+/** A city the store delivers to, with its shipping price; the buyer picks it as their city */
+export class ShippingCityDto {
   @ApiPropertyOptional({ description: 'Assigned by the API when missing' })
   @IsOptional()
   @IsString()
-  @Matches(/^[a-z0-9-]{1,40}$/, { message: 'El identificador de la zona no es válido' })
+  @Matches(/^[a-z0-9-]{1,40}$/, { message: 'El identificador de la ciudad no es válido' })
   id?: string;
 
-  @ApiPropertyOptional({ example: 'Esmeraldas (ciudad)' })
+  @ApiPropertyOptional({ example: 'Esmeraldas' })
   @IsString()
   @MinLength(2)
   @MaxLength(80)
+  // Same rule as the order's city field, so every listed city can be ordered to
+  @Matches(PLACE_PATTERN, { message: 'El nombre de la ciudad tiene caracteres no permitidos' })
   name: string;
 
   @ApiPropertyOptional({ example: 300, description: 'Shipping price in cents (0 = free)' })
@@ -55,7 +58,7 @@ export class ShippingZoneDto {
   deliveryTime?: string;
 }
 
-export type ShippingZone = Required<Omit<ShippingZoneDto, 'freeFromCents'>> & {
+export type ShippingCity = Required<Omit<ShippingCityDto, 'freeFromCents'>> & {
   freeFromCents: number | null;
 };
 
@@ -130,15 +133,15 @@ export class StoreSettingsDto {
   heroIntroEn?: string;
 
   @ApiPropertyOptional({
-    type: [ShippingZoneDto],
-    description: 'Delivery zones; empty = orders carry no shipping cost',
+    type: [ShippingCityDto],
+    description: 'Cities the store delivers to; empty = any city, no shipping cost',
   })
   @IsOptional()
   @IsArray()
-  @ArrayMaxSize(30)
+  @ArrayMaxSize(100)
   @ValidateNested({ each: true })
-  @Type(() => ShippingZoneDto)
-  shippingZones?: ShippingZoneDto[];
+  @Type(() => ShippingCityDto)
+  shippingCities?: ShippingCityDto[];
 
   @ApiPropertyOptional({ description: 'Offer bank transfer as a payment method' })
   @IsOptional()
@@ -187,8 +190,8 @@ export class StoreSettingsDto {
   transferEmail?: string;
 }
 
-export type StoreSettings = Required<Omit<StoreSettingsDto, 'shippingZones'>> & {
-  shippingZones: ShippingZone[];
+export type StoreSettings = Required<Omit<StoreSettingsDto, 'shippingCities'>> & {
+  shippingCities: ShippingCity[];
 };
 
 export const DEFAULT_STORE_SETTINGS: StoreSettings = {
@@ -203,7 +206,7 @@ export const DEFAULT_STORE_SETTINGS: StoreSettings = {
   heroTitleEn: '',
   heroIntroEs: '',
   heroIntroEn: '',
-  shippingZones: [],
+  shippingCities: [],
   transferEnabled: false,
   bankName: '',
   accountType: 'AHORROS',
@@ -217,6 +220,13 @@ export const DEFAULT_STORE_SETTINGS: StoreSettings = {
 export const transferReady = (s: StoreSettings) =>
   s.transferEnabled && !!(s.bankName && s.accountNumber && s.accountHolder && s.holderId);
 
-/** What a zone charges for an order of `subtotalCents` (free above its threshold) */
-export const shippingFor = (zone: ShippingZone, subtotalCents: number) =>
-  zone.freeFromCents != null && subtotalCents >= zone.freeFromCents ? 0 : zone.priceCents;
+/** What shipping to a city costs for an order of `subtotalCents` (free above its threshold) */
+export const shippingFor = (city: ShippingCity, subtotalCents: number) =>
+  city.freeFromCents != null && subtotalCents >= city.freeFromCents ? 0 : city.priceCents;
+
+/** Same city regardless of case, accents or extra spaces ("  quito" = "Quito") */
+export const sameCity = (a: string, b: string) => {
+  const norm = (s: string) =>
+    s.normalize('NFD').replace(/\p{M}/gu, '').trim().replace(/\s+/g, ' ').toLowerCase();
+  return norm(a) === norm(b);
+};

@@ -77,16 +77,12 @@ export default function CheckoutClient({
   const showPrices = settings.showPrices && lines.every((l) => l.unitCents !== null);
   const itemsCents = lines.reduce((sum, l) => sum + (l.unitCents ?? 0) * l.quantity, 0);
 
-  // Delivery zone: only asked once the store has zones; a single zone is picked for the buyer
-  const zones = settings.shippingZones ?? [];
-  const [zoneId, setZoneId] = useState(zones.length === 1 ? zones[0].id : '');
-  const zone = zones.find((z) => z.id === zoneId) ?? null;
-  const shippingCents = zone ? shippingFor(zone, itemsCents) : 0;
+  // Shipping cities: the city field becomes a list of them and the chosen one sets the shipping cost
+  const cities = settings.shippingCities ?? [];
+  const shipCity = cities.find((c) => c.name === buyer.city) ?? null;
+  const shippingCents = shipCity ? shippingFor(shipCity, itemsCents) : 0;
   const totalCents = itemsCents + shippingCents;
-  const zonePrice = (z: (typeof zones)[number]) => {
-    const cents = shippingFor(z, itemsCents);
-    return cents === 0 ? t('shippingFree') : money(cents);
-  };
+  const shippingText = (cents: number) => (cents === 0 ? t('shippingFree') : money(cents));
 
   const hasPaypal = !!payments?.paypalClientId;
   const transfer = payments?.transfer ?? null;
@@ -113,8 +109,8 @@ export default function CheckoutClient({
       setFormError(t('errorInvalid'));
       return;
     }
-    if (zones.length && !zone) {
-      setFormError(t('errorZone'));
+    if (cities.length && !shipCity) {
+      setFormError(t('errorCity'));
       return;
     }
     setFormError('');
@@ -131,7 +127,6 @@ export default function CheckoutClient({
     address: buyer.address,
     city: buyer.city,
     note: buyer.note || undefined,
-    ...(zone ? { shippingZoneId: zone.id } : {}),
     locale,
     items: lines.map((l) => ({ productId: l.product.id, quantity: l.quantity, ...(l.options.length ? { options: l.options } : {}) })),
   };
@@ -208,7 +203,7 @@ export default function CheckoutClient({
       </ul>
       {showPrices && (
         <div className="flex flex-col gap-2 pt-4 border-t border-white/[.08]">
-          {zones.length > 0 && (
+          {cities.length > 0 && (
             <>
               <div className="flex items-baseline justify-between text-[13.5px] text-jb-soft">
                 <span>{t('subtotal')}</span>
@@ -217,9 +212,9 @@ export default function CheckoutClient({
               <div className="flex items-baseline justify-between gap-3 text-[13.5px] text-jb-soft">
                 <span className="min-w-0 truncate">
                   {t('shipping')}
-                  {zone && <span className="text-jb-muted"> · {zone.name}</span>}
+                  {shipCity && <span className="text-jb-muted"> · {shipCity.name}</span>}
                 </span>
-                <span className="font-mono">{zone ? (shippingCents === 0 ? t('shippingFree') : money(shippingCents)) : '—'}</span>
+                <span className="font-mono">{shipCity ? shippingText(shippingCents) : '—'}</span>
               </div>
             </>
           )}
@@ -298,42 +293,39 @@ export default function CheckoutClient({
                     </div>
                     <div className="flex flex-col gap-4">
                       <span className="font-mono text-[11px] tracking-[.16em] uppercase text-jb-mint">{t('shipping')}</span>
-                      {zones.length > 0 && (
-                        <fieldset className="flex flex-col gap-2 p-0 m-0 border-0 min-w-0">
-                          <legend className="mb-2 text-[13.5px] font-semibold text-jb-text">
-                            {t('shippingZone')} <span className="font-normal text-jb-muted">· {t('shippingPick')}</span>
-                          </legend>
-                          {zones.map((z) => (
-                            <label
-                              key={z.id}
-                              className={`flex items-center gap-3 px-4 py-3 rounded-xl border cursor-pointer transition ${
-                                zoneId === z.id ? 'border-jb-accent bg-jb-accent/[.07]' : 'border-white/[.1] hover:border-white/[.2]'
-                              }`}
-                            >
-                              <input type="radio" name="zone" value={z.id} checked={zoneId === z.id} onChange={() => setZoneId(z.id)} className="accent-jb-accent" />
-                              <span className="flex flex-col flex-1 min-w-0">
-                                <span className="text-[14px] font-semibold text-white">{z.name}</span>
-                                {(z.deliveryTime || (z.freeFromCents != null && itemsCents < z.freeFromCents)) && (
-                                  <span className="text-[12.5px] text-jb-muted">
-                                    {[z.deliveryTime, z.freeFromCents != null && itemsCents < z.freeFromCents ? t('shippingFreeFrom', { amount: money(z.freeFromCents) }) : '']
-                                      .filter(Boolean)
-                                      .join(' · ')}
-                                  </span>
-                                )}
-                              </span>
-                              <span className="font-mono text-[14px] font-semibold text-white whitespace-nowrap">{zonePrice(z)}</span>
-                            </label>
-                          ))}
-                        </fieldset>
-                      )}
                       <div className="grid gap-4 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
                         <Field label={t('address')}>
                           <input required minLength={5} maxLength={200} autoComplete="street-address" placeholder={t('addressPlaceholder')} value={buyer.address} onChange={(e) => setField('address', e.target.value)} className={inputClass} />
                         </Field>
                         <Field label={t('city')}>
-                          <input required minLength={2} maxLength={80} autoComplete="address-level2" value={buyer.city} onChange={(e) => setField('city', e.target.value)} className={inputClass} />
+                          {cities.length > 0 ? (
+                            <select required value={shipCity ? buyer.city : ''} onChange={(e) => setField('city', e.target.value)} className={inputClass}>
+                              <option value="" disabled>
+                                {t('cityPick')}
+                              </option>
+                              {cities.map((c) => (
+                                <option key={c.id} value={c.name}>
+                                  {c.name} · {shippingText(shippingFor(c, itemsCents))}
+                                </option>
+                              ))}
+                            </select>
+                          ) : (
+                            <input required minLength={2} maxLength={80} autoComplete="address-level2" value={buyer.city} onChange={(e) => setField('city', e.target.value)} className={inputClass} />
+                          )}
                         </Field>
                       </div>
+                      {shipCity && (
+                        <p className="flex items-start gap-2 m-0 -mt-1 text-[13px] text-jb-soft">
+                          <Truck size={14} className="flex-none mt-[3px] text-jb-accent" />
+                          <span>
+                            {t('shipping')} {shipCity.name}: <span className="font-mono font-semibold text-white">{shippingText(shippingCents)}</span>
+                            {shipCity.deliveryTime && <span className="text-jb-muted"> · {shipCity.deliveryTime}</span>}
+                            {shippingCents > 0 && shipCity.freeFromCents != null && (
+                              <span className="text-jb-muted"> · {t('shippingFreeFrom', { amount: money(shipCity.freeFromCents) })}</span>
+                            )}
+                          </span>
+                        </p>
+                      )}
                       <Field label={t('note')} optional={t('optional')}>
                         <textarea rows={2} maxLength={1000} placeholder={t('notePlaceholder')} value={buyer.note} onChange={(e) => setField('note', e.target.value)} className={`${inputClass} resize-y`} />
                       </Field>
@@ -356,10 +348,10 @@ export default function CheckoutClient({
                     <span className="inline-flex items-start gap-1.5 mt-1 text-jb-soft">
                       <MapPin size={14} className="flex-none mt-[3px] text-jb-muted" /> {buyer.address}, {buyer.city}
                     </span>
-                    {zone && (
+                    {shipCity && (
                       <span className="inline-flex items-start gap-1.5 text-jb-soft">
-                        <Truck size={14} className="flex-none mt-[3px] text-jb-muted" /> {zone.name}
-                        {zone.deliveryTime && <span className="text-jb-muted"> · {zone.deliveryTime}</span>}
+                        <Truck size={14} className="flex-none mt-[3px] text-jb-muted" /> {t('shipping')}: {shippingText(shippingCents)}
+                        {shipCity.deliveryTime && <span className="text-jb-muted"> · {shipCity.deliveryTime}</span>}
                       </span>
                     )}
                   </div>

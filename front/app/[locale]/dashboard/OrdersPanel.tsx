@@ -245,11 +245,11 @@ export default function OrdersPanel() {
                               </td>
                             </tr>
                           ))}
-                          {o.shippingZone && (
+                          {o.shippingCity && (
                             <tr className="border-b border-white/[.06]">
                               <td />
                               <td className="py-2 text-jb-soft">
-                                Envío <span className="text-jb-muted">· {o.shippingZone}</span>
+                                Envío <span className="text-jb-muted">· {o.shippingCity}</span>
                               </td>
                               <td className="py-2 font-mono text-right text-jb-soft whitespace-nowrap">{o.shippingCents ? formatMoney(o.shippingCents) : 'Gratis'}</td>
                             </tr>
