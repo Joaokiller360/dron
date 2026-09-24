@@ -41,7 +41,8 @@ export default function ProductClient({
   const photos = [p.coverUrl, ...(p.mediaUrls ?? [])].filter(Boolean);
   const current = photos[Math.min(index, photos.length - 1)] ?? '';
   const specs = (p.specs ?? []).filter((s) => s.label && s.value);
-  const soldOut = p.stock === 0;
+  // Below zero = oversold: also unavailable
+  const soldOut = p.stock !== null && p.stock <= 0;
   const go = (step: number) => setIndex((i) => (i + step + photos.length) % photos.length);
 
   return (

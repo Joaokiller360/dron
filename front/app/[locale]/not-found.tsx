@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createMetadata } from "@/app/utils"
 import { useTranslations } from "next-intl";
 
@@ -32,12 +33,12 @@ export default function NotFound() {
             ))}
           </p>
           <div className="flex justify-center pt-5">
-            <a
+            <Link
               href="/"
               className="inline-flex items-center gap-2 px-4 py-2 text-black transition-all rounded-xl bg-honeydew-500 hover:bg-white"
             >
               {t('backToHome')}
-            </a>
+            </Link>
           </div>
         </div>
       </main>

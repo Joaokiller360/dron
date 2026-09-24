@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createMetadata } from "@/app/utils"
 
 export const dynamic = 'force-dynamic'
@@ -25,12 +26,12 @@ export default function NotFound() {
             Lo sentimos, la página que buscas no existe.
           </p>
           <div className="flex justify-center pt-5">
-            <a
+            <Link
               href="/"
               className="inline-flex items-center gap-2 px-4 py-2 text-black transition-all rounded-xl bg-honeydew-500 hover:bg-white"
             >
               Volver al inicio
-            </a>
+            </Link>
           </div>
         </div>
       </main>

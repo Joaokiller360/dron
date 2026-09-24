@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { IsEnum, IsInt, IsString, Min, validateSync, IsOptional } from 'class-validator';
 
@@ -32,6 +33,12 @@ export function validate(config: Record<string, unknown>) {
 
   if (errors.length > 0) {
     throw new Error(errors.toString());
+  }
+  // Short secrets make JWTs brute-forceable; warn instead of refusing to boot
+  if (validatedConfig.JWT_SECRET.length < 32) {
+    new Logger('Config').warn(
+      'JWT_SECRET is shorter than 32 characters: use a long random value (e.g. `openssl rand -base64 48`)',
+    );
   }
   return validatedConfig;
 }

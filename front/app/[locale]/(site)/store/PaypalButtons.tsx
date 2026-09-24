@@ -20,13 +20,20 @@ interface PaypalSdk {
   }) => PaypalButtonsInstance;
 }
 
-let sdk: Promise<PaypalSdk> | null = null;
+// The SDK is loaded once per client id + language; switching language swaps it
+let sdk: { key: string; promise: Promise<PaypalSdk>; script: HTMLScriptElement } | null = null;
 
-/** Loads the PayPal SDK once per page (USD, capture intent) */
+/** Loads the PayPal SDK (USD, capture intent) in the page language */
 function loadPaypal(clientId: string, locale: string): Promise<PaypalSdk> {
+  const key = `${clientId}|${locale}`;
+  if (sdk && sdk.key !== key) {
+    sdk.script.remove();
+    delete (window as unknown as { paypal?: PaypalSdk }).paypal;
+    sdk = null;
+  }
   if (!sdk) {
-    sdk = new Promise((resolve, reject) => {
-      const script = document.createElement('script');
+    const script = document.createElement('script');
+    const promise = new Promise<PaypalSdk>((resolve, reject) => {
       const params = new URLSearchParams({
         'client-id': clientId,
         currency: 'USD',
@@ -48,8 +55,9 @@ function loadPaypal(clientId: string, locale: string): Promise<PaypalSdk> {
       };
       document.head.appendChild(script);
     });
+    sdk = { key, promise, script };
   }
-  return sdk;
+  return sdk.promise;
 }
 
 const API = process.env.NEXT_PUBLIC_API_URL;

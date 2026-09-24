@@ -21,9 +21,7 @@ export class ServicesService {
     const { page, ...rest } = dto;
     return {
       ...rest,
-      ...(page !== undefined
-        ? { page: page as unknown as Prisma.InputJsonValue }
-        : {}),
+      ...(page !== undefined ? { page: page as unknown as Prisma.InputJsonValue } : {}),
     };
   }
 

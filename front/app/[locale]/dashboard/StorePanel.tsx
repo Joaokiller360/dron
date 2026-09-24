@@ -83,12 +83,12 @@ const TRANSFER_FIELDS: (keyof TransferForm)[] = ['bankName', 'accountType', 'acc
 /** Account the buyers transfer to; shown on the store while transfer is on */
 function TransferCard({ settings, onSave }: { settings: StoreSettings; onSave: (patch: Partial<StoreSettings>) => Promise<boolean | undefined> }) {
   const toast = useToast();
-  const [form, setForm] = useState<TransferForm>(() => Object.fromEntries(TRANSFER_FIELDS.map((k) => [k, settings[k]])) as TransferForm);
+  const [form, setForm] = useState<TransferForm>(() => Object.fromEntries(TRANSFER_FIELDS.map((k) => [k, settings[k] ?? ''])) as TransferForm);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const set = <K extends keyof TransferForm>(k: K, v: TransferForm[K]) => setForm((f) => ({ ...f, [k]: v }));
   const complete = !!(settings.bankName && settings.accountNumber && settings.accountHolder && settings.holderId);
-  const dirty = TRANSFER_FIELDS.some((k) => form[k].trim() !== settings[k]);
+  const dirty = TRANSFER_FIELDS.some((k) => form[k].trim() !== (settings[k] ?? ''));
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -431,7 +431,7 @@ export default function StorePanel() {
                 .join(' · ')}
               pills={
                 <>
-                  {p.stock === 0 && <Pill tone="warn">Agotado</Pill>}
+                  {p.stock !== null && p.stock <= 0 && <Pill tone="warn">{p.stock < 0 ? `Sobrevendido (${-p.stock})` : 'Agotado'}</Pill>}
                   <StatusPill published={p.published} />
                 </>
               }

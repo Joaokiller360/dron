@@ -44,7 +44,8 @@ export default function StoreClient({
               {products.map((p) => {
                 const name = localized(locale, p.nameEs, p.nameEn);
                 const description = localized(locale, p.descriptionEs ?? '', p.descriptionEn);
-                const soldOut = p.stock === 0;
+                // Below zero = oversold: also unavailable
+                const soldOut = p.stock !== null && p.stock <= 0;
                 const hasOptions = !!p.options?.length;
                 // Products with options are added from their page, where the buyer picks them
                 const line = hasOptions ? undefined : lines.find((l) => l.key === keyOf(p.id, []));

@@ -14,7 +14,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
     locale = undefined;
   }
 
-  if (!locale || !routing.locales.includes(locale as any)) {
+  if (!locale || !routing.locales.includes(locale as (typeof routing.locales)[number])) {
     locale = routing.defaultLocale;
   }
 

@@ -39,7 +39,11 @@ export class StoreService {
   }
 
   async updateSettings(dto: StoreSettingsDto) {
-    const value = { ...(await this.getSettings()), ...dto };
+    // Optional fields accept null in the DTO; null must never overwrite a setting
+    const patch = Object.fromEntries(
+      Object.entries(dto).filter(([, v]) => v !== null && v !== undefined),
+    );
+    const value = { ...(await this.getSettings()), ...patch };
     await this.prisma.siteSetting.upsert({
       where: { key: SETTINGS_KEY },
       update: { value: value as Prisma.InputJsonValue },

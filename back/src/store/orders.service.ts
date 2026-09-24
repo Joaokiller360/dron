@@ -468,23 +468,21 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  /** Purchase confirmations and shipping notices not yet delivered */
+  /**
+   * Purchase confirmations and shipping notices not yet delivered. Each email
+   * is claimed before sending (so it can't go out twice) and released again if
+   * sending fails, to be retried on the next run. One failing address never
+   * blocks the rest of the queue.
+   */
   private async sendPendingEmails() {
     const since = new Date(Date.now() - EMAIL_RETRY_WINDOW_MS);
     const paid = await this.prisma.order.findMany({
-      where: {
-        paidEmailAt: null,
-        paidAt: { gt: since },
-        status: { in: PAID_STATES },
-      },
+      where: { paidEmailAt: null, paidAt: { gt: since }, status: { in: PAID_STATES } },
+      orderBy: { paidAt: 'asc' },
       take: 20,
     });
     for (const order of paid) {
-      await this.mail.orderPaid(order);
-      await this.prisma.order.update({
-        where: { id: order.id },
-        data: { paidEmailAt: new Date() },
-      });
+      await this.sendOnce(order, 'paidEmailAt', () => this.mail.orderPaid(order));
     }
     const shipped = await this.prisma.order.findMany({
       where: {
@@ -492,13 +490,32 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
         shippedAt: { gt: since },
         status: { in: [SHIPPED, COMPLETED] },
       },
+      orderBy: { shippedAt: 'asc' },
       take: 20,
     });
     for (const order of shipped) {
-      await this.mail.orderShipped(order);
-      await this.prisma.order.update({
-        where: { id: order.id },
-        data: { shippedEmailAt: new Date() },
+      await this.sendOnce(order, 'shippedEmailAt', () => this.mail.orderShipped(order));
+    }
+  }
+
+  private async sendOnce(
+    order: Order,
+    field: 'paidEmailAt' | 'shippedEmailAt',
+    send: () => Promise<void>,
+  ) {
+    const claimedAt = new Date();
+    const { count } = await this.prisma.order.updateMany({
+      where: { id: order.id, [field]: null },
+      data: { [field]: claimedAt },
+    });
+    if (count === 0) return; // sent meanwhile
+    try {
+      await send();
+    } catch (err) {
+      this.logger.warn(`Email ${field} for ${order.code} failed, will retry: ${err}`);
+      await this.prisma.order.updateMany({
+        where: { id: order.id, [field]: claimedAt },
+        data: { [field]: null },
       });
     }
   }
@@ -539,32 +556,34 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
     return 'DECLINED';
   }
 
+  /**
+   * Marks an order paid exactly once (compare-and-set on its status, so a
+   * capture, a webhook and the background task racing each other can't apply
+   * it twice). A paid order always holds its units: if the money arrives for a
+   * checkout that had already expired, its units are taken again even when that
+   * leaves stock below zero, which shows the owner it was oversold (restock or
+   * refund; a refund then gives the units back consistently).
+   */
   private async markPaid(order: Order, captureId: string | null) {
     const paid = await this.prisma.$transaction(async (tx) => {
       const current = await tx.order.findUniqueOrThrow({ where: { id: order.id } });
-      if (current.status === PENDING_PAYMENT) {
-        await tx.order.update({
-          where: { id: order.id },
-          data: { status: PAID, paidAt: new Date(), paypalCaptureId: captureId },
-        });
-        return true;
-      }
+      if (current.status !== PENDING_PAYMENT && current.status !== CANCELLED) return false;
+      const { count } = await tx.order.updateMany({
+        where: { id: order.id, status: current.status },
+        data: { status: PAID, paidAt: new Date(), paypalCaptureId: captureId },
+      });
+      if (count === 0) return false; // another path got there first
       if (current.status === CANCELLED) {
-        // Money arrived for a checkout that had expired: take the units again if possible
-        try {
-          await this.reserve(tx, current.items as unknown as OrderLine[]);
-        } catch {
+        const oversold = await this.reserve(tx, current.items as unknown as OrderLine[], {
+          allowOversell: true,
+        });
+        if (oversold.length) {
           this.logger.error(
-            `${order.code} was paid after expiring and stock ran out: refund or restock`,
+            `${order.code} was paid after expiring; oversold: ${oversold.join(', ')} (restock or refund)`,
           );
         }
-        await tx.order.update({
-          where: { id: order.id },
-          data: { status: PAID, paidAt: new Date(), paypalCaptureId: captureId },
-        });
-        return true;
       }
-      return false; // already paid
+      return true;
     });
     if (paid) {
       this.logger.log(
@@ -575,16 +594,26 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
+  /**
+   * Records a refund once (admin action and PayPal's REFUNDED webhook may both
+   * arrive). Units of an order that was paid but not shipped go back to stock;
+   * shipped goods left the shop, so they are not restocked automatically.
+   */
   private async markRefunded(order: Order, notify: boolean) {
-    if (order.status === REFUNDED) return order;
     const updated = await this.prisma.$transaction(async (tx) => {
-      // Units that never left can be sold again
-      if (order.status === PAID) await this.release(tx, order.items as unknown as OrderLine[]);
-      return tx.order.update({
-        where: { id: order.id },
+      const current = await tx.order.findUniqueOrThrow({ where: { id: order.id } });
+      if (!PAID_STATES.includes(current.status)) return null;
+      const { count } = await tx.order.updateMany({
+        where: { id: order.id, status: current.status },
         data: { status: REFUNDED, refundedAt: new Date() },
       });
+      if (count === 0) return null;
+      if (current.status === PAID) {
+        await this.release(tx, current.items as unknown as OrderLine[]);
+      }
+      return tx.order.findUniqueOrThrow({ where: { id: order.id } });
     });
+    if (!updated) return this.ensure(order.id); // already refunded by the other path
     this.announce();
     if (notify) {
       this.mail
@@ -615,22 +644,40 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
 
   // ── Stock ─────────────────────────────────────────────────────────────────
 
-  /** Takes units out of stock; products with unlimited stock (null) are skipped */
-  private async reserve(tx: Tx, lines: OrderLine[]) {
+  /**
+   * Takes units out of stock; products with unlimited stock (null) are skipped.
+   * With allowOversell, short stock is decremented anyway (can go below zero)
+   * and the names of the oversold products are returned instead of throwing,
+   * so the whole order is always reserved or not at all.
+   */
+  private async reserve(tx: Tx, lines: OrderLine[], opts: { allowOversell?: boolean } = {}) {
+    const oversold: string[] = [];
     for (const l of lines) {
       const product = await tx.product.findUnique({ where: { id: l.productId } });
-      if (!product) throw new ConflictException(`"${l.name}" ya no existe`);
+      if (!product) {
+        if (opts.allowOversell) continue; // deleted product: nothing to hold
+        throw new ConflictException(`"${l.name}" ya no existe`);
+      }
       if (product.stock === null) continue;
+      if (opts.allowOversell) {
+        await tx.product.update({
+          where: { id: l.productId },
+          data: { stock: { decrement: l.quantity } },
+        });
+        if (product.stock < l.quantity) oversold.push(product.nameEs);
+        continue;
+      }
       const { count } = await tx.product.updateMany({
         where: { id: l.productId, stock: { gte: l.quantity } },
         data: { stock: { decrement: l.quantity } },
       });
       if (count === 0) {
         throw new ConflictException(
-          `No hay stock suficiente de "${product.nameEs}" (quedan ${product.stock})`,
+          `No hay stock suficiente de "${product.nameEs}" (quedan ${Math.max(0, product.stock)})`,
         );
       }
     }
+    return oversold;
   }
 
   private async release(tx: Tx, lines: OrderLine[]) {

@@ -1,6 +1,6 @@
+import Link from "next/link";
 import { createMetadata } from "@/app/utils"
 import { useTranslations } from "next-intl";
-import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal, Key } from "react";
 
 export async function generateMetadata() {
   return createMetadata({
@@ -25,20 +25,20 @@ export default function NotFound() {
             {t('title')}
           </h1>
           <p className="mt-6 text-base leading-7">
-            {t.raw('message').map((line: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined, index: number) => (
+            {(t.raw('message') as string[]).map((line: string, index: number, arr: string[]) => (
               <span key={index}>
                 {line}
-                {index < t.raw('message').length - 1 && <br />}
+                {index < arr.length - 1 && <br />}
               </span>
             ))}
           </p>
           <div className="flex justify-center pt-5">
-            <a
+            <Link
               href="/"
               className="inline-flex items-center gap-2 px-4 py-2 text-black transition-all rounded-xl bg-honeydew-500 hover:bg-white"
             >
               {t('backToHome')}
-            </a>
+            </Link>
           </div>
         </div>
       </main>
