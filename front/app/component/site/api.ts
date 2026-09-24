@@ -61,6 +61,30 @@ export interface PublicPromotions {
   items: PublicPromotion[];
 }
 
+/** A running promotion that lowers a product's price (same rules as the API) */
+export interface PublicDiscount {
+  title: string;
+  badge: string | null;
+  type: 'PERCENT' | 'FIXED';
+  /** Percent, or cents off each unit */
+  value: number;
+  endsAt: string | null;
+}
+
+/** Cheapest price among the discounts, or null when none lowers it; they never stack */
+export function bestDeal(listCents: number, discounts: PublicDiscount[] = []) {
+  let best: { unitCents: number; discount: PublicDiscount } | null = null;
+  for (const d of discounts) {
+    const price = Math.max(0, d.type === 'PERCENT' ? Math.round((listCents * (100 - d.value)) / 100) : listCents - d.value);
+    if (price < listCents && (!best || price < best.unitCents)) best = { unitCents: price, discount: d };
+  }
+  return best;
+}
+
+/** Badge for a discounted product: the promotion's own, else "-20%" / "-$5.00" */
+export const dealBadge = (d: PublicDiscount, money: (cents: number) => string) =>
+  d.badge || (d.type === 'PERCENT' ? `-${d.value}%` : `-${money(d.value)}`);
+
 export interface PublicProduct {
   id: string;
   slug: string;
@@ -80,6 +104,8 @@ export interface PublicProduct {
   specs?: { label: string; value: string }[];
   /** Choices that add to the price (priceCents null while prices are hidden) */
   options?: { name: string; values: { label: string; priceCents: number | null }[] }[];
+  /** Promotions running for this product */
+  discounts?: PublicDiscount[];
 }
 
 /** Delivery zone the buyer picks at checkout */

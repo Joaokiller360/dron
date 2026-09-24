@@ -184,6 +184,7 @@ export default function CheckoutClient({
             <div className="flex flex-col flex-1 min-w-0 gap-1.5">
               <span className="text-[14px] font-semibold leading-snug text-white">{localized(locale, p.nameEs, p.nameEn)}</span>
               {line.options.length > 0 && <span className="-mt-1 text-[12.5px] text-jb-muted">{optionsText(line.options)}</span>}
+              {line.discount && <span className="-mt-1 text-[12px] font-semibold text-jb-mint">{line.discount.title}</span>}
               {step === 'details' ? (
                 <div className="flex items-center justify-between gap-2">
                   <Stepper value={quantity} max={maxFor(line)} onChange={(n) => setLineQty(line.key, n)} labels={[t('decrease'), t('increase')]} />
@@ -195,7 +196,12 @@ export default function CheckoutClient({
                 <span className="font-mono text-[12.5px] text-jb-muted">× {quantity}</span>
               )}
             </div>
-            {showPrices && <span className="font-mono text-[13.5px] text-jb-soft whitespace-nowrap">{money((line.unitCents ?? 0) * quantity)}</span>}
+            {showPrices && (
+              <span className="flex flex-col items-end font-mono text-[13.5px] text-jb-soft whitespace-nowrap">
+                {money((line.unitCents ?? 0) * quantity)}
+                {line.discount && line.listCents !== null && <s className="text-[11.5px] text-jb-muted">{money(line.listCents * quantity)}</s>}
+              </span>
+            )}
           </li>
           );
         })}

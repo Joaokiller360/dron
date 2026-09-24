@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
-import { ArrowLeft, ChevronLeft, ChevronRight, PauseCircle, ShoppingBag } from 'lucide-react';
-import { Shot, localized, btnPrimary, btnGhost, usePrefix, type PublicProduct, type PublicStore } from '@/app/component';
+import { ArrowLeft, BadgePercent, ChevronLeft, ChevronRight, PauseCircle, ShoppingBag } from 'lucide-react';
+import { Shot, localized, dealBadge, btnPrimary, btnGhost, usePrefix, type PublicProduct, type PublicStore } from '@/app/component';
 import { Stepper, unitPrice, useCart, useMoney, type ChosenOption } from '../cart';
 import CartDrawer from '../CartDrawer';
 
@@ -31,8 +31,10 @@ export default function ProductClient({
     Object.fromEntries((p.options ?? []).map((o) => [o.name, o.values[0]?.label ?? ''])),
   );
   const chosen: ChosenOption[] = (p.options ?? []).map((o) => ({ name: o.name, value: picked[o.name] }));
-  const price = unitPrice(p, chosen);
-  const extras = price !== null && p.priceCents !== null ? price - p.priceCents : 0;
+  const { unitCents: price, listCents, discount } = unitPrice(p, chosen);
+  const extras = listCents !== null && p.priceCents !== null ? listCents - p.priceCents : 0;
+  // A running promotion shows the price it lowers; otherwise the manual "before" price
+  const before = discount ? listCents : p.compareAtCents ? p.compareAtCents + extras : null;
   const line = lines.find((l) => l.key === keyOf(p.id, chosen));
   const noRoom = p.stock !== null && unitsOf(p.id) >= p.stock;
 
@@ -104,9 +106,16 @@ export default function ProductClient({
             <div className="flex flex-col gap-3">
               <h1 className="m-0 font-mono text-[clamp(28px,3.6vw,40px)] leading-[1.1] font-bold tracking-[-.02em] text-white text-balance">{name}</h1>
               {price !== null ? (
-                <div className="flex items-baseline gap-3">
-                  <span className="font-mono text-[30px] font-bold text-white">{money(price)}</span>
-                  {p.compareAtCents ? <s className="font-mono text-[16px] text-jb-muted">{money(p.compareAtCents + extras)}</s> : null}
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-baseline gap-3">
+                    <span className="font-mono text-[30px] font-bold text-white">{money(price)}</span>
+                    {before ? <s className="font-mono text-[16px] text-jb-muted">{money(before)}</s> : null}
+                  </div>
+                  {discount && (
+                    <span className="inline-flex items-center self-start gap-2 px-2.5 py-1 rounded-lg bg-jb-accent/[.12] text-[13px] font-semibold text-jb-mint">
+                      <BadgePercent size={15} /> {dealBadge(discount, money)} · {discount.title}
+                    </span>
+                  )}
                 </div>
               ) : (
                 <span className="text-[15px] text-jb-soft">{t('askPrice')}</span>

@@ -17,6 +17,8 @@ import {
   useContactInfo,
   ProjectShot,
   storeHeader,
+  bestDeal,
+  dealBadge,
   type PublicService,
   type PublicProject,
   type PublicPromotions,
@@ -263,6 +265,8 @@ export default function HomeClient({
               {store.products.map((pr) => {
                 const name = localized(locale, pr.nameEs, pr.nameEn);
                 const soldOut = pr.stock !== null && pr.stock <= 0;
+                const deal = pr.priceCents !== null ? bestDeal(pr.priceCents, pr.discounts) : null;
+                const before = deal ? pr.priceCents : pr.compareAtCents;
                 return (
                   <Link
                     key={pr.id}
@@ -283,6 +287,11 @@ export default function HomeClient({
                           {st('soldOut')}
                         </span>
                       )}
+                      {deal && (
+                        <span className="absolute top-3 right-3 px-2.5 py-1 rounded-md bg-jb-accent font-mono text-[11px] font-bold tracking-[.06em] text-jb-ink">
+                          {dealBadge(deal.discount, money)}
+                        </span>
+                      )}
                     </div>
                     <div className="flex flex-col flex-1 gap-1.5 px-4 py-3.5">
                       <div className="text-[15px] font-semibold leading-snug text-white">{name}</div>
@@ -290,8 +299,8 @@ export default function HomeClient({
                         {pr.priceCents !== null ? (
                           <span className="flex items-baseline gap-2">
                             {!!pr.options?.length && <span className="text-[12px] text-jb-muted">{st('from')}</span>}
-                            <span className="font-mono text-[16px] font-bold text-white">{money(pr.priceCents)}</span>
-                            {pr.compareAtCents ? <s className="font-mono text-[12px] text-jb-muted">{money(pr.compareAtCents)}</s> : null}
+                            <span className="font-mono text-[16px] font-bold text-white">{money(deal?.unitCents ?? pr.priceCents)}</span>
+                            {before ? <s className="font-mono text-[12px] text-jb-muted">{money(before)}</s> : null}
                           </span>
                         ) : (
                           <span className="text-[13px] text-jb-soft">{st('askPrice')}</span>

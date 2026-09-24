@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { Plus, PauseCircle, SlidersHorizontal } from 'lucide-react';
-import { Shot, localized, btnPrimary, usePrefix, type PublicProduct, type PublicStore } from '@/app/component';
+import { Shot, localized, bestDeal, dealBadge, btnPrimary, usePrefix, type PublicProduct, type PublicStore } from '@/app/component';
 import { Stepper, useCart, useMoney } from './cart';
 import CartDrawer from './CartDrawer';
 
@@ -50,6 +50,8 @@ export default function StoreClient({
                 // Products with options are added from their page, where the buyer picks them
                 const line = hasOptions ? undefined : lines.find((l) => l.key === keyOf(p.id, []));
                 const href = `${prefix}/store/${p.slug}`;
+                const deal = p.priceCents !== null ? bestDeal(p.priceCents, p.discounts) : null;
+                const before = deal ? p.priceCents : p.compareAtCents;
                 return (
                   <article key={p.id} id={p.slug} className="group flex flex-col overflow-hidden rounded-2xl bg-jb-card border border-white/[.08] hover:border-white/[.16] transition">
                     <Link href={href} className="relative block overflow-hidden">
@@ -73,6 +75,11 @@ export default function StoreClient({
                           </span>
                         )
                       )}
+                      {deal && (
+                        <span className="absolute top-3 right-3 px-2.5 py-1 rounded-md bg-jb-accent font-mono text-[11px] font-bold tracking-[.06em] text-jb-ink">
+                          {dealBadge(deal.discount, money)}
+                        </span>
+                      )}
                     </Link>
                     <div className="flex flex-col flex-1 gap-2 p-5">
                       <h2 className="m-0 text-[17px] font-bold leading-snug text-balance">
@@ -85,8 +92,8 @@ export default function StoreClient({
                         {p.priceCents !== null ? (
                           <span className="flex items-baseline gap-2">
                             {hasOptions && <span className="text-[12.5px] text-jb-muted">{t('from')}</span>}
-                            <span className="font-mono text-[20px] font-bold text-white">{money(p.priceCents)}</span>
-                            {p.compareAtCents ? <s className="font-mono text-[13px] text-jb-muted">{money(p.compareAtCents)}</s> : null}
+                            <span className="font-mono text-[20px] font-bold text-white">{money(deal?.unitCents ?? p.priceCents)}</span>
+                            {before ? <s className="font-mono text-[13px] text-jb-muted">{money(before)}</s> : null}
                           </span>
                         ) : (
                           <span className="text-[13.5px] text-jb-soft">{t('askPrice')}</span>

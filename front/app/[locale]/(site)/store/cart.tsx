@@ -9,7 +9,7 @@
 import { useMemo, useSyncExternalStore } from 'react';
 import { useLocale } from 'next-intl';
 import { Minus, Plus } from 'lucide-react';
-import type { PublicProduct } from '@/app/component';
+import { bestDeal, type PublicDiscount, type PublicProduct } from '@/app/component';
 
 const CART_KEY = 'jbskylens_cart';
 const CART_EVENT = 'jbskylens:cart';
@@ -67,13 +67,21 @@ const lineKey = (productId: string, options: ChosenOption[]) => `${productId}|${
 /** Most units of a product the cart may hold (all its lines together) */
 export const maxUnits = (p: PublicProduct) => Math.min(p.stock ?? 99, 99);
 
-/** Base price + the extras of the chosen values; null while prices are hidden */
-export function unitPrice(p: PublicProduct, options: ChosenOption[]) {
+/** Base price + the extras of the chosen values, before promotions; null while prices are hidden */
+export function listPrice(p: PublicProduct, options: ChosenOption[]) {
   if (p.priceCents === null) return null;
   return options.reduce((sum, c) => {
     const value = p.options?.find((o) => o.name === c.name)?.values.find((v) => v.label === c.value);
     return sum + (value?.priceCents ?? 0);
   }, p.priceCents);
+}
+
+/** What the buyer pays per unit: list price with the best running promotion (the API prices it the same way) */
+export function unitPrice(p: PublicProduct, options: ChosenOption[]) {
+  const list = listPrice(p, options);
+  if (list === null) return { unitCents: null, listCents: null, discount: null };
+  const deal = bestDeal(list, p.discounts);
+  return { unitCents: deal?.unitCents ?? list, listCents: list, discount: deal?.discount ?? null };
 }
 
 /** True when `options` answers every option of the product with a value that still exists */
@@ -88,6 +96,9 @@ export interface CartLine {
   quantity: number;
   /** null while prices are hidden */
   unitCents: number | null;
+  /** Price before the promotion; equals unitCents without one */
+  listCents: number | null;
+  discount: PublicDiscount | null;
 }
 
 /**
@@ -113,7 +124,7 @@ export function useCart(products: PublicProduct[], showPrices: boolean) {
       const key = lineKey(product.id, options);
       const existing = merged.get(key);
       if (existing) existing.quantity += qty;
-      else merged.set(key, { key, product, options, quantity: qty, unitCents: unitPrice(product, options) });
+      else merged.set(key, { key, product, options, quantity: qty, ...unitPrice(product, options) });
     }
     return [...merged.values()];
   }, [raw, products]);
@@ -139,7 +150,7 @@ export function useCart(products: PublicProduct[], showPrices: boolean) {
     if (existing) return setLineQty(key, existing.quantity + qty);
     const room = maxUnits(product) - unitsOf(product.id);
     if (room <= 0) return;
-    save([...lines, { key, product, options, quantity: Math.min(qty, room), unitCents: unitPrice(product, options) }]);
+    save([...lines, { key, product, options, quantity: Math.min(qty, room), ...unitPrice(product, options) }]);
   };
 
   const pricesKnown = showPrices && lines.every((l) => l.unitCents !== null);
