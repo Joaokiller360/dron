@@ -21,5 +21,10 @@ RUN npm ci --omit=dev && npx prisma generate
 
 COPY --from=builder /app/dist ./dist
 
+# Winston writes to logs/; create it for the unprivileged "node" user (app files stay root-owned)
+RUN mkdir -p logs && chown node:node logs
+USER node
+
 EXPOSE 3001
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main"]
+# exec: node replaces the shell as PID 1 so it receives SIGTERM on redeploys
+CMD ["sh", "-c", "npx prisma migrate deploy && exec node dist/main"]
