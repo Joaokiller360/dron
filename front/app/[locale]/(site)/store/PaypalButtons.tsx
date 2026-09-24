@@ -117,8 +117,9 @@ export default function PaypalButtons({
             setError('');
             explained = false;
             const { ok, data } = await post<{ paypalOrderId: string }>('/orders', latest.current.order);
-            latest.current.onStockChanged();
             if (!ok) {
+              // e.g. someone else bought the last units: show the real stock
+              latest.current.onStockChanged();
               setError(apiMessage(data) ?? latest.current.texts.failed);
               explained = true;
               throw new Error('checkout refused');

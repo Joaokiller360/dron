@@ -1,5 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
+  ArrayMaxSize,
+  ArrayMinSize,
   IsArray,
   IsBoolean,
   IsInt,
@@ -10,8 +13,55 @@ import {
   Max,
   MaxLength,
   Min,
+  MinLength,
   ValidateIf,
+  ValidateNested,
 } from 'class-validator';
+
+/** One row of the product details table */
+export class ProductSpecDto {
+  @ApiProperty({ example: 'Medidas' })
+  @IsString()
+  @MaxLength(60)
+  label: string;
+
+  @ApiProperty({ example: '30 × 40 cm' })
+  @IsString()
+  @MaxLength(200)
+  value: string;
+}
+
+/** One value of an option and what it adds to the base price */
+export class ProductOptionValueDto {
+  @ApiProperty({ example: '50 × 70 cm' })
+  @IsString()
+  @MinLength(1)
+  @MaxLength(60)
+  label: string;
+
+  @ApiProperty({ example: 1500, description: 'Added to the base price, in cents (0 = same price)' })
+  @IsInt()
+  @Min(0)
+  @Max(100_000_000)
+  priceCents: number;
+}
+
+/** A choice that changes the price: size, color, material… */
+export class ProductOptionDto {
+  @ApiProperty({ example: 'Medida' })
+  @IsString()
+  @MinLength(1)
+  @MaxLength(40)
+  name: string;
+
+  @ApiProperty({ type: [ProductOptionValueDto] })
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(20)
+  @ValidateNested({ each: true })
+  @Type(() => ProductOptionValueDto)
+  values: ProductOptionValueDto[];
+}
 
 export class CreateProductDto {
   @ApiProperty({ example: 'foto-aerea-impresa-a3' })
@@ -69,11 +119,31 @@ export class CreateProductDto {
   @IsUrl()
   coverUrl?: string;
 
-  @ApiPropertyOptional({ type: [String] })
+  @ApiPropertyOptional({ type: [String], description: 'Extra gallery photos' })
   @IsOptional()
   @IsArray()
+  @ArrayMaxSize(12)
   @IsUrl({}, { each: true })
   mediaUrls?: string[];
+
+  @ApiPropertyOptional({ type: [ProductSpecDto], description: 'Measurements and other details' })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(20)
+  @ValidateNested({ each: true })
+  @Type(() => ProductSpecDto)
+  specs?: ProductSpecDto[];
+
+  @ApiPropertyOptional({
+    type: [ProductOptionDto],
+    description: 'Options that change the price (size, color, material…)',
+  })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(5)
+  @ValidateNested({ each: true })
+  @Type(() => ProductOptionDto)
+  options?: ProductOptionDto[];
 
   @ApiPropertyOptional({ default: true })
   @IsOptional()

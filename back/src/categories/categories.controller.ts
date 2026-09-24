@@ -8,6 +8,7 @@ import {
   Post,
   Query,
   UseGuards,
+  ParseEnumPipe,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { CategoryType } from '@prisma/client';
@@ -27,7 +28,7 @@ export class CategoriesController {
     summary:
       'List categories, optionally filtered by type (public - needed to populate create forms)',
   })
-  findAll(@Query('type') type?: CategoryType) {
+  findAll(@Query('type', new ParseEnumPipe(CategoryType, { optional: true })) type?: CategoryType) {
     return this.categoriesService.findAll(type);
   }
 

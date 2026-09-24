@@ -229,10 +229,15 @@ export default function OrdersPanel() {
                     <div className="flex flex-col gap-4 pt-3">
                       <table className="w-full text-[13.5px] border-collapse">
                         <tbody>
-                          {o.items.map((l) => (
-                            <tr key={l.productId} className="border-b border-white/[.06]">
+                          {o.items.map((l, i) => (
+                            <tr key={i} className="border-b border-white/[.06]">
                               <td className="py-2 pr-3 font-mono text-jb-muted whitespace-nowrap">{l.quantity} ×</td>
-                              <td className="py-2 pr-3 text-jb-text">{l.name}</td>
+                              <td className="py-2 pr-3 text-jb-text">
+                                {l.name}
+                                {l.options?.length ? (
+                                  <span className="block text-[12.5px] text-jb-muted">{l.options.map((o) => `${o.name}: ${o.value}`).join(' · ')}</span>
+                                ) : null}
+                              </td>
                               <td className="py-2 font-mono text-right text-jb-soft whitespace-nowrap">{formatMoney(l.unitCents * l.quantity)}</td>
                             </tr>
                           ))}

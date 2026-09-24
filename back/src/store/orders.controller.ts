@@ -6,6 +6,7 @@ import {
   Headers,
   HttpCode,
   Param,
+  ParseEnumPipe,
   Patch,
   Post,
   Query,
@@ -72,7 +73,9 @@ export class OrdersController {
   @ApiBearerAuth()
   @ApiQuery({ name: 'status', enum: OrderStatus, required: false })
   @ApiOperation({ summary: 'Admin: list orders, newest first' })
-  findAll(@Query('status') status?: OrderStatus) {
+  findAll(
+    @Query('status', new ParseEnumPipe(OrderStatus, { optional: true })) status?: OrderStatus,
+  ) {
     return this.orders.findAll(status);
   }
 

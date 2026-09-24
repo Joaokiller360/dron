@@ -233,8 +233,23 @@ export interface Product {
   stock: number | null;
   coverUrl: string;
   mediaUrls: string[];
+  /** Details table on the product page (measurements, material…) */
+  specs: ProductSpec[];
+  /** Choices that change the price (size, color…) */
+  options: ProductOption[];
   published: boolean;
   sortOrder: number;
+}
+
+/** e.g. Medida → 30 × 40 cm (+0), 50 × 70 cm (+1500) */
+export interface ProductOption {
+  name: string;
+  values: { label: string; priceCents: number }[];
+}
+
+export interface ProductSpec {
+  label: string;
+  value: string;
 }
 
 export interface StoreSettings {
@@ -257,6 +272,8 @@ export type OrderStatus = 'PENDING_PAYMENT' | 'PAID' | 'SHIPPED' | 'COMPLETED' |
 export interface OrderLine {
   productId: string;
   name: string;
+  /** Options the buyer picked, already included in unitCents */
+  options?: { name: string; value: string }[];
   unitCents: number;
   quantity: number;
 }

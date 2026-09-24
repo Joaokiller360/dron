@@ -1,5 +1,14 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsIn, IsOptional, IsString, Matches, MaxLength } from 'class-validator';
+import {
+  IsBoolean,
+  IsEmail,
+  IsIn,
+  IsOptional,
+  IsString,
+  Matches,
+  MaxLength,
+  ValidateIf,
+} from 'class-validator';
 
 /** Site-wide switches for the store (stored in site_settings under "store") */
 export class StoreSettingsDto {
@@ -70,7 +79,8 @@ export class StoreSettingsDto {
     description: 'Where buyers can send the receipt',
   })
   @IsOptional()
-  @IsString()
+  @ValidateIf((o: StoreSettingsDto) => !!o.transferEmail)
+  @IsEmail()
   @MaxLength(120)
   transferEmail?: string;
 }

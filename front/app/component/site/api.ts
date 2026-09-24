@@ -74,6 +74,12 @@ export interface PublicProduct {
   /** null = unlimited */
   stock: number | null;
   coverUrl: string;
+  /** Extra photos for the product page gallery */
+  mediaUrls?: string[];
+  /** Details table (measurements, material…) */
+  specs?: { label: string; value: string }[];
+  /** Choices that add to the price (priceCents null while prices are hidden) */
+  options?: { name: string; values: { label: string; priceCents: number | null }[] }[];
 }
 
 export interface PublicStore {

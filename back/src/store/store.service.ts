@@ -1,5 +1,5 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, Product } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -10,6 +10,7 @@ import {
   transferReady,
 } from './dto/store-settings.dto';
 import { PaypalService } from './paypal.service';
+import { optionsOf, type ChosenOption } from './product-options';
 
 const SETTINGS_KEY = 'store';
 
@@ -17,6 +18,8 @@ const SETTINGS_KEY = 'store';
 export interface OrderLine {
   productId: string;
   name: string;
+  /** Options the buyer picked (size, color…), already priced into unitCents */
+  options?: ChosenOption[];
   unitCents: number;
   quantity: number;
 }
@@ -95,10 +98,18 @@ export class StoreService {
     return {
       settings,
       payments,
-      products: settings.showPrices
-        ? products
-        : products.map((p) => ({ ...p, priceCents: null, compareAtCents: null })),
+      products: products.map((p) => this.publicProduct(p, settings.showPrices)),
     };
+  }
+
+  private publicProduct(p: Product, showPrices: boolean) {
+    if (showPrices) return p;
+    // Hidden prices: option extras would give them away too
+    const options = optionsOf(p).map((o) => ({
+      ...o,
+      values: o.values.map((v) => ({ label: v.label, priceCents: null })),
+    }));
+    return { ...p, priceCents: null, compareAtCents: null, options };
   }
 
   // ── Products ──────────────────────────────────────────────────────────────
@@ -109,13 +120,28 @@ export class StoreService {
 
   async createProduct(dto: CreateProductDto) {
     await this.ensureSlugFree(dto.slug);
-    return this.prisma.product.create({ data: { ...dto, coverUrl: dto.coverUrl ?? '' } });
+    return this.prisma.product.create({
+      data: {
+        ...dto,
+        coverUrl: dto.coverUrl ?? '',
+        specs: (dto.specs ?? []) as unknown as Prisma.InputJsonValue,
+        options: (dto.options ?? []) as unknown as Prisma.InputJsonValue,
+      },
+    });
   }
 
   async updateProduct(id: string, dto: UpdateProductDto) {
     await this.ensureProduct(id);
     if (dto.slug) await this.ensureSlugFree(dto.slug, id);
-    return this.prisma.product.update({ where: { id }, data: dto });
+    const { specs, options, ...rest } = dto;
+    return this.prisma.product.update({
+      where: { id },
+      data: {
+        ...rest,
+        ...(specs ? { specs: specs as unknown as Prisma.InputJsonValue } : {}),
+        ...(options ? { options: options as unknown as Prisma.InputJsonValue } : {}),
+      },
+    });
   }
 
   async removeProduct(id: string) {

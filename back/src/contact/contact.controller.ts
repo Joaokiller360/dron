@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseEnumPipe,
   Patch,
   Post,
   Query,
@@ -35,7 +36,9 @@ export class ContactController {
   @ApiBearerAuth()
   @ApiQuery({ name: 'status', enum: ContactStatus, required: false })
   @ApiOperation({ summary: 'Admin: list contact messages' })
-  findAll(@Query('status') status?: ContactStatus) {
+  findAll(
+    @Query('status', new ParseEnumPipe(ContactStatus, { optional: true })) status?: ContactStatus,
+  ) {
     return this.contactService.findAll(status);
   }
 

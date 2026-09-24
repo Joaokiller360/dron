@@ -24,10 +24,30 @@ import {
   TEXT_PATTERN,
 } from '../../common/text-patterns';
 
+export class OrderLineOptionDto {
+  @ApiProperty({ example: 'Medida' })
+  @IsString()
+  @MaxLength(40)
+  name: string;
+
+  @ApiProperty({ example: '50 × 70 cm' })
+  @IsString()
+  @MaxLength(60)
+  value: string;
+}
+
 export class OrderLineDto {
   @ApiProperty()
   @IsUUID()
   productId: string;
+
+  @ApiPropertyOptional({ type: [OrderLineOptionDto], description: 'One value per product option' })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(5)
+  @ValidateNested({ each: true })
+  @Type(() => OrderLineOptionDto)
+  options?: OrderLineOptionDto[];
 
   @ApiProperty({ example: 1 })
   @IsInt()

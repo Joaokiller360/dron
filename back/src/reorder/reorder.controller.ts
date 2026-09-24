@@ -35,7 +35,10 @@ export class ReorderController {
   @Patch(':resource')
   @ApiOperation({ summary: 'Admin: set sortOrder of a resource from the given id order' })
   async reorder(@Param('resource') resource: string, @Body() dto: ReorderDto) {
-    const model = RESOURCES[resource as keyof typeof RESOURCES];
+    // Own keys only: "__proto__", "constructor"… must not resolve to Object.prototype members
+    const model = Object.prototype.hasOwnProperty.call(RESOURCES, resource)
+      ? RESOURCES[resource as keyof typeof RESOURCES]
+      : undefined;
     if (!model) throw new NotFoundException(`Cannot reorder ${resource}`);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const delegate = (this.prisma as any)[model];

@@ -8,6 +8,7 @@ import {
   Post,
   Query,
   UseGuards,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ProjectsService } from './projects.service';
@@ -23,7 +24,7 @@ export class ProjectsController {
   @Get()
   @ApiQuery({ name: 'categoryId', required: false })
   @ApiOperation({ summary: 'Public: list published portfolio projects' })
-  findPublished(@Query('categoryId') categoryId?: string) {
+  findPublished(@Query('categoryId', new ParseUUIDPipe({ optional: true })) categoryId?: string) {
     return this.projectsService.findPublished(categoryId);
   }
 
@@ -32,7 +33,7 @@ export class ProjectsController {
   @ApiBearerAuth()
   @ApiQuery({ name: 'categoryId', required: false })
   @ApiOperation({ summary: 'Admin: list all projects, published or not' })
-  findAllForAdmin(@Query('categoryId') categoryId?: string) {
+  findAllForAdmin(@Query('categoryId', new ParseUUIDPipe({ optional: true })) categoryId?: string) {
     return this.projectsService.findAllForAdmin(categoryId);
   }
 

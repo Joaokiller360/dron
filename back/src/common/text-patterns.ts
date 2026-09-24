@@ -14,3 +14,9 @@ export const PLACE_PATTERN = /^[\p{L}\p{M}0-9 .,'()-]+$/u;
  * Rejects markup and symbols such as < > { } [ ] \ | ^ ~ ` * = # & @ and emoji.
  */
 export const TEXT_PATTERN = /^[\p{L}\p{M}0-9\s.,;:¿?¡!()'"%$/+-]+$/u;
+
+/**
+ * Links rendered on the site: absolute http(s) URLs or internal paths ("/contact").
+ * Rejects javascript:, data: and protocol-relative ("//evil.com") links.
+ */
+export const SAFE_HREF_PATTERN = /^(https?:\/\/[^\s]+|\/(?!\/)[^\s]*)$/i;

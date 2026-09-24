@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
@@ -26,6 +26,7 @@ import { VenuesModule } from './venues/venues.module';
 import { SettingsModule } from './settings/settings.module';
 import { UploadsModule } from './uploads/uploads.module';
 import { StoreModule } from './store/store.module';
+import { SafeInputMiddleware } from './common/middleware/safe-input.middleware';
 
 @Module({
   imports: [
@@ -64,4 +65,8 @@ import { StoreModule } from './store/store.module';
     { provide: APP_INTERCEPTOR, useClass: ChangeEventsInterceptor },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(SafeInputMiddleware).forRoutes('*');
+  }
+}

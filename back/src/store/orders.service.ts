@@ -20,6 +20,7 @@ import { CreateTransferOrderDto } from './dto/create-transfer-order.dto';
 import { transferReady } from './dto/store-settings.dto';
 import { ShipOrderDto } from './dto/ship-order.dto';
 import { StoreService, OrderLine } from './store.service';
+import { lineTitle, priceWithOptions } from './product-options';
 import { PaypalError, PaypalOrder, PaypalService } from './paypal.service';
 import { StoreMailService } from './store-mail.service';
 
@@ -32,6 +33,11 @@ const PAID_STATES: OrderStatus[] = [PAID, SHIPPED, COMPLETED];
 
 /** Unpaid checkouts give their units back after this long */
 const CHECKOUT_TTL_MS = 30 * 60_000;
+/**
+ * Reported transfers the owner hasn't confirmed are cancelled after this long,
+ * so fake reports can't keep stock reserved forever
+ */
+const TRANSFER_TTL_MS = 72 * 60 * 60_000;
 /** How often the background tasks run */
 const TASK_INTERVAL_MS = 2 * 60_000;
 /** Emails that keep failing stop being retried after this long */
@@ -96,7 +102,11 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
       const pp = await this.paypal.createOrder({
         orderId: order.id,
         code: order.code,
-        items: order.items as unknown as OrderLine[],
+        items: (order.items as unknown as OrderLine[]).map((l) => ({
+          name: lineTitle(l.name, l.options),
+          unitCents: l.unitCents,
+          quantity: l.quantity,
+        })),
         totalCents: order.totalCents,
       });
       await this.prisma.order.update({ where: { id: order.id }, data: { paypalOrderId: pp.id } });
@@ -153,25 +163,30 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
     dto: CreateOrderDto,
     extra: { paymentMethod: PaymentMethod; transferBank?: string; transferReference?: string },
   ) {
-    // Merge repeated products into one line
-    const wanted = new Map<string, number>();
-    for (const line of dto.items) {
-      wanted.set(line.productId, (wanted.get(line.productId) ?? 0) + line.quantity);
-    }
-
     const order = await this.prisma.$transaction(async (tx) => {
-      const products = await tx.product.findMany({
-        where: { id: { in: [...wanted.keys()] }, published: true },
-      });
-      if (products.length !== wanted.size) {
+      const ids = [...new Set(dto.items.map((l) => l.productId))];
+      const products = await tx.product.findMany({ where: { id: { in: ids }, published: true } });
+      if (products.length !== ids.length) {
         throw new BadRequestException('Algún producto del carrito ya no está disponible');
       }
-      const lines: OrderLine[] = products.map((p) => ({
-        productId: p.id,
-        name: p.nameEs,
-        unitCents: p.priceCents,
-        quantity: wanted.get(p.id)!,
-      }));
+      // Price every line from the database; same product + same options = one line
+      const byKey = new Map<string, OrderLine>();
+      for (const item of dto.items) {
+        const product = products.find((p) => p.id === item.productId)!;
+        const { unitCents, options } = priceWithOptions(product, item.options);
+        const key = `${product.id}|${JSON.stringify(options)}`;
+        const line = byKey.get(key);
+        if (line) line.quantity += item.quantity;
+        else
+          byKey.set(key, {
+            productId: product.id,
+            name: product.nameEs,
+            ...(options.length ? { options } : {}),
+            unitCents,
+            quantity: item.quantity,
+          });
+      }
+      const lines = [...byKey.values()];
       const totalCents = lines.reduce((sum, l) => sum + l.unitCents * l.quantity, 0);
       if (totalCents <= 0) throw new BadRequestException('El total del pedido debe ser mayor a 0');
       await this.reserve(tx, lines);
@@ -238,11 +253,24 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
       this.logger.warn(`Rejected PayPal webhook ${event?.id ?? '?'} (${event?.event_type ?? '?'})`);
       throw new UnauthorizedException('Invalid webhook signature');
     }
-    const r = event.resource ?? {};
+    // Signed by PayPal, but still only strings reach the database queries
+    const raw = event.resource ?? {};
+    const str = (v: unknown) => (typeof v === 'string' && v.length <= 64 ? v : undefined);
+    const r = {
+      id: str(raw.id),
+      links: Array.isArray(raw.links)
+        ? raw.links.filter((l) => typeof l?.rel === 'string' && typeof l?.href === 'string')
+        : undefined,
+      supplementary_data: {
+        related_ids: { order_id: str(raw.supplementary_data?.related_ids?.order_id) },
+      },
+    };
     switch (event.event_type) {
       case 'CHECKOUT.ORDER.APPROVED': {
         // Approved but the buyer's browser never reached /capture (closed tab…)
-        const order = await this.prisma.order.findUnique({ where: { paypalOrderId: r.id } });
+        const order = r.id
+          ? await this.prisma.order.findUnique({ where: { paypalOrderId: r.id } })
+          : null;
         if (order?.status === PENDING_PAYMENT && !order.paypalCaptureId) await this.capture(r.id!);
         break;
       }
@@ -376,6 +404,7 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
 
   runTasks() {
     this.kick('checkouts', () => this.reconcileCheckouts());
+    this.kick('transfers', () => this.expireTransfers());
     this.kick('emails', () => this.sendPendingEmails());
   }
 
@@ -417,6 +446,25 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
         if (err instanceof PaypalError && err.status === 404) await this.cancelUnpaid(order.id);
         else this.logger.warn(`Could not reconcile ${order.code}: ${err}`);
       }
+    }
+  }
+
+  /** Unconfirmed transfer reports older than the TTL: cancel, release stock, tell the buyer */
+  private async expireTransfers() {
+    const stale = await this.prisma.order.findMany({
+      where: {
+        status: PENDING_PAYMENT,
+        paymentMethod: PaymentMethod.TRANSFER,
+        createdAt: { lt: new Date(Date.now() - TRANSFER_TTL_MS) },
+      },
+      take: 50,
+    });
+    for (const order of stale) {
+      await this.cancelUnpaid(order.id);
+      this.logger.log(`Transfer ${order.code} expired without confirmation`);
+      this.mail
+        .transferRejected(order)
+        .catch((err) => this.logger.error(`Transfer expired email ${order.code}: ${err}`));
     }
   }
 

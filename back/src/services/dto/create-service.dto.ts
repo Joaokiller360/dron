@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { SAFE_HREF_PATTERN } from '../../common/text-patterns';
 import {
   IsArray,
   IsBoolean,
@@ -56,6 +57,8 @@ export class CreateServiceDto {
   })
   @IsOptional()
   @IsString()
+  @MaxLength(500)
+  @Matches(SAFE_HREF_PATTERN, { message: 'href must be an http(s) URL or a path starting with /' })
   href?: string;
 
   @ApiPropertyOptional({ default: true })

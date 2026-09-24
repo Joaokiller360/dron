@@ -256,7 +256,14 @@ model Product {
   // null = unlimited stock
   stock          Int?
   coverUrl       String   @map("cover_url")
+  // Extra photos shown in the product page gallery
   mediaUrls      String[] @default([]) @map("media_urls")
+  // Details table on the product page: { label, value }[] (e.g. Material: aluminio)
+  specs          Json     @default("[]")
+  // Choices that change the price: { name, values: { label, priceCents }[] }[]
+  // (e.g. Medida: 30 × 40 cm +0, 50 × 70 cm +1500). Buyers pick one value per
+  // option; unit price = priceCents + the chosen values' priceCents.
+  options        Json     @default("[]")
   published      Boolean  @default(true)
   sortOrder      Int      @default(0) @map("sort_order")
   createdAt      DateTime @default(now()) @map("created_at")

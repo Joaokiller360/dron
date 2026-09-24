@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { Order } from '@prisma/client';
 import { SettingsService } from '../settings/settings.service';
 import type { OrderLine } from './store.service';
+import { lineTitle } from './product-options';
 
 const money = (cents: number) => `$${(cents / 100).toFixed(2)}`;
 const esc = (s: string) =>
@@ -181,7 +182,7 @@ export class StoreMailService {
     const rows = lines
       .map(
         (l) =>
-          `<tr><td style="padding:6px 12px 6px 0">${l.quantity} × ${esc(l.name)}</td><td style="padding:6px 0;text-align:right">${money(l.unitCents * l.quantity)}</td></tr>`,
+          `<tr><td style="padding:6px 12px 6px 0">${l.quantity} × ${esc(lineTitle(l.name, l.options))}</td><td style="padding:6px 0;text-align:right">${money(l.unitCents * l.quantity)}</td></tr>`,
       )
       .join('');
     return `<p style="margin:20px 0 6px;font-weight:700">${c.order} ${order.code}</p>

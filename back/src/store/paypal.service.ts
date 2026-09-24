@@ -7,6 +7,7 @@ const API_BASE = {
 };
 
 export interface PaypalItem {
+  /** Title shown in PayPal, e.g. "Foto A3 (50 × 70 cm)" */
   name: string;
   unitCents: number;
   quantity: number;
