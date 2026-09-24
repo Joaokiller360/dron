@@ -82,6 +82,21 @@ export interface PublicProduct {
   options?: { name: string; values: { label: string; priceCents: number | null }[] }[];
 }
 
+/** Delivery zone the buyer picks at checkout */
+export interface ShippingZone {
+  id: string;
+  name: string;
+  priceCents: number;
+  /** Orders from this subtotal ship free; null = never */
+  freeFromCents: number | null;
+  /** e.g. "24 a 48 horas" */
+  deliveryTime: string;
+}
+
+/** What a zone charges for an order of `subtotalCents` (same rule as the API) */
+export const shippingFor = (zone: ShippingZone, subtotalCents: number) =>
+  zone.freeFromCents != null && subtotalCents >= zone.freeFromCents ? 0 : zone.priceCents;
+
 export interface PublicStore {
   settings: {
     enabled: boolean;
@@ -97,6 +112,8 @@ export interface PublicStore {
     heroTitleEn: string;
     heroIntroEs: string;
     heroIntroEn: string;
+    /** Empty = no shipping cost or zone to pick */
+    shippingZones: ShippingZone[];
   };
   /** paypalClientId is null while PayPal isn't configured on the API */
   payments: {

@@ -16,6 +16,8 @@ export class CreateTransferOrderDto extends CreateOrderDto {
   @IsString()
   @MinLength(4)
   @MaxLength(40)
-  @Matches(/^[A-Za-z0-9-]+$/, { message: 'El código de la transferencia solo admite letras, números y guiones' })
+  @Matches(/^[A-Za-z0-9-]+$/, {
+    message: 'El código de la transferencia solo admite letras, números y guiones',
+  })
   transferReference: string;
 }

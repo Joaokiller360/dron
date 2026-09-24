@@ -98,6 +98,7 @@ export class PaypalService {
     orderId: string;
     code: string;
     items: PaypalItem[];
+    shippingCents: number;
     totalCents: number;
   }): Promise<PaypalOrder> {
     return this.request<PaypalOrder>('POST', '/v2/checkout/orders', {
@@ -113,7 +114,14 @@ export class PaypalService {
             amount: {
               currency_code: 'USD',
               value: toValue(opts.totalCents),
-              breakdown: { item_total: { currency_code: 'USD', value: toValue(opts.totalCents) } },
+              // PayPal rejects the order unless item_total + shipping = value
+              breakdown: {
+                item_total: {
+                  currency_code: 'USD',
+                  value: toValue(opts.totalCents - opts.shippingCents),
+                },
+                shipping: { currency_code: 'USD', value: toValue(opts.shippingCents) },
+              },
             },
             items: opts.items.map((i) => ({
               name: i.name.slice(0, 127),

@@ -1,10 +1,10 @@
 'use client'
 
 import { useCallback, useEffect, useState, FormEvent } from 'react';
-import { ExternalLink, CreditCard, AlertTriangle, Landmark } from 'lucide-react';
-import { apiFetch, errorMessage, PaymentStatus, StoreSettings } from './lib/api';
+import { ExternalLink, CreditCard, AlertTriangle, Landmark, Plus, Truck, X } from 'lucide-react';
+import { apiFetch, errorMessage, PaymentStatus, ShippingZone, StoreSettings } from './lib/api';
 import { useLive } from './lib/live';
-import { Card, ErrorNote, Field, PanelHeader, Pill, SkeletonList, Toggle, btn, inputCls, useToast } from './ui';
+import { Card, ErrorNote, Field, PanelHeader, Pill, SkeletonList, Toggle, btn, iconBtnCls, inputCls, useToast } from './ui';
 
 type TransferForm = Pick<
   StoreSettings,
@@ -150,6 +150,100 @@ function HeaderCard({ settings, onSave }: { settings: StoreSettings; onSave: (pa
   );
 }
 
+/** Zone as typed in the form: money as text ("3.50"), id empty until the API assigns one */
+type ZoneRow = { key: string; id: string; name: string; price: string; freeFrom: string; deliveryTime: string };
+const centsText = (c: number | null) => (c == null ? '' : (c / 100).toFixed(2));
+const parseCents = (v: string) => {
+  const n = parseFloat(v.replace(',', '.'));
+  return Number.isFinite(n) ? Math.round(n * 100) : NaN;
+};
+let rowSeq = 0;
+const toRow = (z?: ShippingZone): ZoneRow => ({
+  key: `z${rowSeq++}`,
+  id: z?.id ?? '',
+  name: z?.name ?? '',
+  price: z ? centsText(z.priceCents) : '',
+  freeFrom: z ? centsText(z.freeFromCents) : '',
+  deliveryTime: z?.deliveryTime ?? '',
+});
+
+/** Delivery zones the buyer picks at checkout, each with its own price */
+function ShippingCard({ settings, onSave }: { settings: StoreSettings; onSave: (patch: Partial<StoreSettings>) => Promise<boolean | undefined> }) {
+  const toast = useToast();
+  const initial = settings.shippingZones ?? [];
+  const [rows, setRows] = useState<ZoneRow[]>(() => initial.map(toRow));
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+  const setRow = (key: string, patch: Partial<ZoneRow>) => setRows((rs) => rs.map((r) => (r.key === key ? { ...r, ...patch } : r)));
+
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
+    const zones: Partial<ShippingZone>[] = [];
+    for (const r of rows) {
+      const name = r.name.trim();
+      const priceCents = r.price.trim() ? parseCents(r.price) : 0;
+      const freeFromCents = r.freeFrom.trim() ? parseCents(r.freeFrom) : null;
+      if (name.length < 2) return setError('Cada zona necesita un nombre (mínimo 2 letras).');
+      if (Number.isNaN(priceCents) || priceCents < 0) return setError(`Revisa el precio de «${name}».`);
+      if (freeFromCents !== null && (Number.isNaN(freeFromCents) || freeFromCents <= 0)) return setError(`Revisa el «gratis desde» de «${name}».`);
+      zones.push({ ...(r.id ? { id: r.id } : {}), name, priceCents, freeFromCents, deliveryTime: r.deliveryTime.trim() });
+    }
+    setError('');
+    setSaving(true);
+    if (await onSave({ shippingZones: zones as ShippingZone[] })) toast.success(zones.length ? 'Zonas de envío guardadas' : 'Envío sin costo (sin zonas)');
+    setSaving(false);
+  };
+
+  return (
+    <Card className="p-5">
+      <form onSubmit={submit} className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1">
+          <span className="inline-flex items-center gap-2 text-[13.5px] font-semibold text-white">
+            <Truck size={15} className="text-jb-accent" /> Envíos por zona
+          </span>
+          <span className="text-[12.5px] text-jb-muted">
+            El cliente elige su zona al comprar y el envío se suma al total. Sin zonas, los pedidos no cobran envío. Usa precio 0 para «Retiro en persona».
+          </span>
+        </div>
+
+        {rows.length > 0 && (
+          <div className="flex flex-col gap-3">
+            {rows.map((r) => (
+              <div key={r.key} className="grid gap-3 p-3.5 rounded-xl border border-white/[.08] bg-white/[.02] sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.4fr)_auto] sm:items-end">
+                <Field label="Zona">
+                  <input required maxLength={80} value={r.name} onChange={(e) => setRow(r.key, { name: e.target.value })} placeholder="Esmeraldas (ciudad)" className={inputCls} />
+                </Field>
+                <Field label="Precio (USD)">
+                  <input inputMode="decimal" value={r.price} onChange={(e) => setRow(r.key, { price: e.target.value })} placeholder="0.00" className={`${inputCls} font-mono`} />
+                </Field>
+                <Field label="Gratis desde" hint="Opcional">
+                  <input inputMode="decimal" value={r.freeFrom} onChange={(e) => setRow(r.key, { freeFrom: e.target.value })} placeholder="—" className={`${inputCls} font-mono`} />
+                </Field>
+                <Field label="Tiempo de entrega" hint="Opcional">
+                  <input maxLength={60} value={r.deliveryTime} onChange={(e) => setRow(r.key, { deliveryTime: e.target.value })} placeholder="24 a 48 horas" className={inputCls} />
+                </Field>
+                <button type="button" title="Quitar zona" aria-label="Quitar zona" onClick={() => setRows((rs) => rs.filter((x) => x.key !== r.key))} className={`${iconBtnCls} self-end mb-1.5 hover:!text-red-300 hover:!bg-red-500/15`}>
+                  <X size={15} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {error && <ErrorNote>{error}</ErrorNote>}
+        <div className="flex flex-wrap justify-between gap-2">
+          <button type="button" disabled={rows.length >= 30} onClick={() => setRows((rs) => [...rs, toRow()])} className={btn.ghost}>
+            <Plus size={15} /> Agregar zona
+          </button>
+          <button type="submit" disabled={saving} className={btn.primary}>
+            {saving ? 'Guardando…' : 'Guardar zonas'}
+          </button>
+        </div>
+      </form>
+    </Card>
+  );
+}
+
 /** Store switches, payments, texts and the landing section (products are edited in #tienda) */
 export default function StoreSettingsPanel() {
   const toast = useToast();
@@ -265,6 +359,7 @@ export default function StoreSettingsPanel() {
         ))}
 
       {settings?.enabled && <HeaderCard key={HEADER_FIELDS.map((k) => settings[k]).join('|')} settings={settings} onSave={saveSetting} />}
+      {settings && <ShippingCard key={JSON.stringify(settings.shippingZones ?? [])} settings={settings} onSave={saveSetting} />}
       {settings && <TransferCard key={TRANSFER_FIELDS.map((k) => settings[k]).join('|')} settings={settings} onSave={saveSetting} />}
 
     </div>

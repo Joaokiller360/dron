@@ -252,6 +252,17 @@ export interface ProductSpec {
   value: string;
 }
 
+/** Delivery zone (same shape as the API's) */
+export interface ShippingZone {
+  id: string;
+  name: string;
+  priceCents: number;
+  /** Orders from this subtotal ship free; null = never */
+  freeFromCents: number | null;
+  /** e.g. "24 a 48 horas" */
+  deliveryTime: string;
+}
+
 export interface StoreSettings {
   enabled: boolean;
   sales: boolean;
@@ -266,6 +277,8 @@ export interface StoreSettings {
   heroTitleEn: string;
   heroIntroEs: string;
   heroIntroEn: string;
+  /** Delivery zones the buyer picks from; empty = no shipping charge */
+  shippingZones: ShippingZone[];
   transferEnabled: boolean;
   bankName: string;
   accountType: 'AHORROS' | 'CORRIENTE';
@@ -298,6 +311,10 @@ export interface Order {
   note?: string | null;
   locale: string;
   items: OrderLine[];
+  /** Zone name picked at checkout; null on orders without zones */
+  shippingZone?: string | null;
+  shippingCents: number;
+  /** Items + shipping */
   totalCents: number;
   status: OrderStatus;
   paymentMethod: 'PAYPAL' | 'TRANSFER';

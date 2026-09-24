@@ -1,4 +1,5 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { randomUUID } from 'crypto';
 import { Prisma, Product } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -40,9 +41,19 @@ export class StoreService {
 
   async updateSettings(dto: StoreSettingsDto) {
     // Optional fields accept null in the DTO; null must never overwrite a setting
-    const patch = Object.fromEntries(
+    const patch: Partial<StoreSettings> = Object.fromEntries(
       Object.entries(dto).filter(([, v]) => v !== null && v !== undefined),
     );
+    // Zones keep their id across edits (orders and carts point at it); new ones get one
+    if (dto.shippingZones) {
+      patch.shippingZones = dto.shippingZones.map((z) => ({
+        id: z.id || randomUUID().slice(0, 8),
+        name: z.name.trim(),
+        priceCents: z.priceCents,
+        freeFromCents: z.freeFromCents ?? null,
+        deliveryTime: z.deliveryTime?.trim() ?? '',
+      }));
+    }
     const value = { ...(await this.getSettings()), ...patch };
     await this.prisma.siteSetting.upsert({
       where: { key: SETTINGS_KEY },
@@ -86,6 +97,7 @@ export class StoreService {
       heroTitleEn: all.heroTitleEn,
       heroIntroEs: all.heroIntroEs,
       heroIntroEn: all.heroIntroEn,
+      shippingZones: all.shippingZones,
     };
     const payments = {
       paypalClientId: this.paypal.clientId,

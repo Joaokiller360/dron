@@ -1,14 +1,63 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
+  ArrayMaxSize,
+  IsArray,
   IsBoolean,
   IsEmail,
   IsIn,
+  IsInt,
   IsOptional,
   IsString,
   Matches,
+  Max,
   MaxLength,
+  Min,
+  MinLength,
   ValidateIf,
+  ValidateNested,
 } from 'class-validator';
+
+/** A delivery zone the buyer picks at checkout, with its own price */
+export class ShippingZoneDto {
+  @ApiPropertyOptional({ description: 'Assigned by the API when missing' })
+  @IsOptional()
+  @IsString()
+  @Matches(/^[a-z0-9-]{1,40}$/, { message: 'El identificador de la zona no es válido' })
+  id?: string;
+
+  @ApiPropertyOptional({ example: 'Esmeraldas (ciudad)' })
+  @IsString()
+  @MinLength(2)
+  @MaxLength(80)
+  name: string;
+
+  @ApiPropertyOptional({ example: 300, description: 'Shipping price in cents (0 = free)' })
+  @IsInt()
+  @Min(0)
+  @Max(100000)
+  priceCents: number;
+
+  @ApiPropertyOptional({
+    example: 5000,
+    description: 'Orders from this subtotal ship free; null = never',
+  })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(10000000)
+  freeFromCents?: number | null;
+
+  @ApiPropertyOptional({ example: '24 a 48 horas' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(60)
+  deliveryTime?: string;
+}
+
+export type ShippingZone = Required<Omit<ShippingZoneDto, 'freeFromCents'>> & {
+  freeFromCents: number | null;
+};
 
 /** Site-wide switches for the store (stored in site_settings under "store") */
 export class StoreSettingsDto {
@@ -80,6 +129,17 @@ export class StoreSettingsDto {
   @MaxLength(300)
   heroIntroEn?: string;
 
+  @ApiPropertyOptional({
+    type: [ShippingZoneDto],
+    description: 'Delivery zones; empty = orders carry no shipping cost',
+  })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(30)
+  @ValidateNested({ each: true })
+  @Type(() => ShippingZoneDto)
+  shippingZones?: ShippingZoneDto[];
+
   @ApiPropertyOptional({ description: 'Offer bank transfer as a payment method' })
   @IsOptional()
   @IsBoolean()
@@ -127,7 +187,9 @@ export class StoreSettingsDto {
   transferEmail?: string;
 }
 
-export type StoreSettings = Required<StoreSettingsDto>;
+export type StoreSettings = Required<Omit<StoreSettingsDto, 'shippingZones'>> & {
+  shippingZones: ShippingZone[];
+};
 
 export const DEFAULT_STORE_SETTINGS: StoreSettings = {
   enabled: false,
@@ -141,6 +203,7 @@ export const DEFAULT_STORE_SETTINGS: StoreSettings = {
   heroTitleEn: '',
   heroIntroEs: '',
   heroIntroEn: '',
+  shippingZones: [],
   transferEnabled: false,
   bankName: '',
   accountType: 'AHORROS',
@@ -153,3 +216,7 @@ export const DEFAULT_STORE_SETTINGS: StoreSettings = {
 /** Transfer is only offered once the account details are complete */
 export const transferReady = (s: StoreSettings) =>
   s.transferEnabled && !!(s.bankName && s.accountNumber && s.accountHolder && s.holderId);
+
+/** What a zone charges for an order of `subtotalCents` (free above its threshold) */
+export const shippingFor = (zone: ShippingZone, subtotalCents: number) =>
+  zone.freeFromCents != null && subtotalCents >= zone.freeFromCents ? 0 : zone.priceCents;

@@ -29,6 +29,7 @@ const COPY = {
     rejectedIntro: (name: string) =>
       `Hola ${name}, no encontramos tu transferencia en nuestra cuenta, así que cancelamos el pedido. Si ya transferiste, responde a este correo con el comprobante y lo revisamos.`,
     order: 'Pedido',
+    shippingCost: 'Envío',
     total: 'Total',
     shipTo: 'Envío a',
     carrier: 'Empresa de envío',
@@ -56,6 +57,7 @@ const COPY = {
     rejectedIntro: (name: string) =>
       `Hi ${name}, we couldn't find your transfer in our account, so the order was cancelled. If you already paid, reply to this email with the receipt and we'll look into it.`,
     order: 'Order',
+    shippingCost: 'Shipping',
     total: 'Total',
     shipTo: 'Ship to',
     carrier: 'Carrier',
@@ -185,8 +187,12 @@ export class StoreMailService {
           `<tr><td style="padding:6px 12px 6px 0">${l.quantity} × ${esc(lineTitle(l.name, l.options))}</td><td style="padding:6px 0;text-align:right">${money(l.unitCents * l.quantity)}</td></tr>`,
       )
       .join('');
+    // Orders from before zones (or a store without zones) have no shipping row
+    const shipping = order.shippingZone
+      ? `<tr><td style="padding:6px 12px 6px 0">${c.shippingCost} · ${esc(order.shippingZone)}</td><td style="padding:6px 0;text-align:right">${money(order.shippingCents)}</td></tr>`
+      : '';
     return `<p style="margin:20px 0 6px;font-weight:700">${c.order} ${order.code}</p>
-<table style="border-collapse:collapse;width:100%;max-width:460px">${rows}
+<table style="border-collapse:collapse;width:100%;max-width:460px">${rows}${shipping}
 <tr><td style="padding:10px 12px 0 0;font-weight:700;border-top:1px solid #ddd">${c.total}</td><td style="padding:10px 0 0;text-align:right;font-weight:700;border-top:1px solid #ddd">${money(order.totalCents)}</td></tr></table>`;
   }
 

@@ -104,6 +104,15 @@ export class CreateOrderDto {
   @Matches(TEXT_PATTERN, { message: 'La nota tiene caracteres no permitidos' })
   note?: string;
 
+  @ApiPropertyOptional({
+    example: 'a1b2c3d4',
+    description: 'Delivery zone id; required once the store has zones',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(40)
+  shippingZoneId?: string;
+
   @ApiPropertyOptional({ example: 'es', enum: ['es', 'en'] })
   @IsOptional()
   @IsIn(['es', 'en'])

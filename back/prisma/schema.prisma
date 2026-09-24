@@ -304,6 +304,10 @@ model Order {
   locale     String      @default("es")
   // Snapshot of what was bought: { productId, name, unitCents, quantity }[]
   items      Json
+  // Delivery zone picked at checkout (name snapshot) and what it charged;
+  // totalCents = items + shippingCents
+  shippingZone  String? @map("shipping_zone")
+  shippingCents Int     @default(0) @map("shipping_cents")
   totalCents Int         @map("total_cents")
   status     OrderStatus @default(PENDING_PAYMENT)
   paymentMethod PaymentMethod @default(PAYPAL) @map("payment_method")

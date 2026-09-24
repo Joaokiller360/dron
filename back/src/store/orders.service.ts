@@ -17,7 +17,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { EventsService } from '../events/events.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { CreateTransferOrderDto } from './dto/create-transfer-order.dto';
-import { transferReady } from './dto/store-settings.dto';
+import { StoreSettings, shippingFor, transferReady } from './dto/store-settings.dto';
 import { ShipOrderDto } from './dto/ship-order.dto';
 import { StoreService, OrderLine } from './store.service';
 import { lineTitle, priceWithOptions } from './product-options';
@@ -92,11 +92,11 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
 
   /** Validates the cart against live prices/stock, reserves units and opens a PayPal order */
   async checkout(dto: CreateOrderDto) {
-    await this.ensureSelling();
+    const settings = await this.ensureSelling();
     if (!this.paypal.configured) {
       throw new ServiceUnavailableException('Los pagos no están disponibles en este momento');
     }
-    const order = await this.createReserved(dto, { paymentMethod: PaymentMethod.PAYPAL });
+    const order = await this.createReserved(dto, settings, { paymentMethod: PaymentMethod.PAYPAL });
 
     try {
       const pp = await this.paypal.createOrder({
@@ -107,6 +107,7 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
           unitCents: l.unitCents,
           quantity: l.quantity,
         })),
+        shippingCents: order.shippingCents,
         totalCents: order.totalCents,
       });
       await this.prisma.order.update({ where: { id: order.id }, data: { paypalOrderId: pp.id } });
@@ -139,7 +140,7 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
     if (reused) {
       throw new ConflictException('Ese código de transferencia ya fue usado en otro pedido');
     }
-    const order = await this.createReserved(dto, {
+    const order = await this.createReserved(dto, settings, {
       paymentMethod: PaymentMethod.TRANSFER,
       transferBank: dto.transferBank.trim(),
       transferReference: reference,
@@ -158,11 +159,27 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
     return settings;
   }
 
-  /** Prices the cart from the database, reserves the units and stores the order */
+  /** Zone the buyer picked; none needed while the store has no zones */
+  private shippingZone(dto: CreateOrderDto, settings: StoreSettings) {
+    if (!settings.shippingZones.length) return null;
+    const zone = settings.shippingZones.find((z) => z.id === dto.shippingZoneId);
+    if (!zone) {
+      throw new BadRequestException(
+        dto.shippingZoneId
+          ? 'La zona de envío ya no está disponible. Elige otra.'
+          : 'Elige una zona de envío',
+      );
+    }
+    return zone;
+  }
+
+  /** Prices the cart (and shipping) from the database, reserves the units and stores the order */
   private async createReserved(
     dto: CreateOrderDto,
+    settings: StoreSettings,
     extra: { paymentMethod: PaymentMethod; transferBank?: string; transferReference?: string },
   ) {
+    const zone = this.shippingZone(dto, settings);
     const order = await this.prisma.$transaction(async (tx) => {
       const ids = [...new Set(dto.items.map((l) => l.productId))];
       const products = await tx.product.findMany({ where: { id: { in: ids }, published: true } });
@@ -187,8 +204,9 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
           });
       }
       const lines = [...byKey.values()];
-      const totalCents = lines.reduce((sum, l) => sum + l.unitCents * l.quantity, 0);
-      if (totalCents <= 0) throw new BadRequestException('El total del pedido debe ser mayor a 0');
+      const itemsCents = lines.reduce((sum, l) => sum + l.unitCents * l.quantity, 0);
+      if (itemsCents <= 0) throw new BadRequestException('El total del pedido debe ser mayor a 0');
+      const shippingCents = zone ? shippingFor(zone, itemsCents) : 0;
       await this.reserve(tx, lines);
 
       return tx.order.create({
@@ -202,7 +220,9 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
           note: dto.note || null,
           locale: dto.locale ?? 'es',
           items: lines as unknown as Prisma.InputJsonValue,
-          totalCents,
+          shippingZone: zone?.name ?? null,
+          shippingCents,
+          totalCents: itemsCents + shippingCents,
           ...extra,
         },
       });
