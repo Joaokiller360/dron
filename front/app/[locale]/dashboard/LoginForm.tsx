@@ -3,7 +3,7 @@
 import { useState, FormEvent } from 'react';
 import { LockKeyhole, LogIn } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { apiFetch, ApiError, TOKEN_KEY } from './lib/api';
+import { apiFetch, ApiError, setAccessToken } from './lib/api';
 
 interface LoginResponse {
   accessToken: string;
@@ -26,11 +26,8 @@ export default function LoginForm({ onSuccess }: { onSuccess: (email: string) =>
         method: 'POST',
         body: JSON.stringify({ email, password }),
       });
-      try {
-        window.localStorage.setItem(TOKEN_KEY, data.accessToken);
-      } catch {
-        // localStorage blocked -> still let this session through, just won't persist on reload
-      }
+      // The refresh cookie set by the API keeps the session across reloads
+      setAccessToken(data.accessToken);
       onSuccess(data.user.email);
     } catch (err) {
       if (err instanceof ApiError) {

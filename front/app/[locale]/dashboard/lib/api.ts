@@ -1,6 +1,7 @@
 export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api';
 
-export const TOKEN_KEY = 'jbskylens_dashboard_token';
+/** Where older builds kept a long-lived token; only read to delete it */
+export const LEGACY_TOKEN_KEY = 'jbskylens_dashboard_token';
 
 /** Fired on window when an authenticated request comes back 401 */
 export const UNAUTHORIZED_EVENT = 'jbskylens:unauthorized';
@@ -396,13 +397,64 @@ export class ApiError extends Error {
   }
 }
 
-function getToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  return window.localStorage.getItem(TOKEN_KEY);
+export interface SessionUser {
+  id: string;
+  email: string;
+  name: string;
 }
 
-export async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const token = getToken();
+// Short-lived access token, kept in memory only (never in storage, out of
+// reach of injected scripts that outlive the tab). The long-lived refresh
+// token is an httpOnly cookie the API sets on /auth/*.
+let accessToken: string | null = null;
+let refreshing: Promise<SessionUser | null> | null = null;
+
+export function setAccessToken(token: string | null) {
+  accessToken = token;
+}
+
+async function requestRefresh(): Promise<Response> {
+  return fetch(`${API_URL}/auth/refresh`, { method: 'POST', credentials: 'include' });
+}
+
+/**
+ * Trades the refresh cookie for a new access token (the cookie rotates too).
+ * Concurrent callers share one request. Resolves null when there's no valid session.
+ */
+export function refreshSession(): Promise<SessionUser | null> {
+  refreshing ??= (async () => {
+    try {
+      let res = await requestRefresh();
+      // Another tab may have rotated the cookie at the same instant: its
+      // replacement is already in the cookie jar, so one retry settles it
+      if (res.status === 401) {
+        await new Promise((r) => setTimeout(r, 800));
+        res = await requestRefresh();
+      }
+      if (!res.ok) {
+        accessToken = null;
+        return null;
+      }
+      const data = (await res.json()) as { accessToken: string; user: SessionUser };
+      accessToken = data.accessToken;
+      return data.user;
+    } catch {
+      return null;
+    } finally {
+      refreshing = null;
+    }
+  })();
+  return refreshing;
+}
+
+/** Ends the session on the API (revokes the refresh token) and forgets the access token */
+export async function logoutSession() {
+  accessToken = null;
+  await fetch(`${API_URL}/auth/logout`, { method: 'POST', credentials: 'include' }).catch(() => undefined);
+}
+
+export async function apiFetch<T>(path: string, options: RequestInit = {}, retried = false): Promise<T> {
+  const token = accessToken;
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(options.headers as Record<string, string>),
@@ -411,7 +463,13 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
     headers.Authorization = `Bearer ${token}`;
   }
 
-  const res = await fetch(`${API_URL}${path}`, { ...options, headers });
+  // credentials: the auth routes set and read the refresh cookie
+  const res = await fetch(`${API_URL}${path}`, { ...options, headers, credentials: 'include' });
+
+  // Access token expired: renew it once and replay the request
+  if (res.status === 401 && token && !retried && !/^\/auth\/(login|refresh|logout)/.test(path)) {
+    if (await refreshSession()) return apiFetch<T>(path, options, true);
+  }
 
   if (!res.ok) {
     const body = await res.json().catch(() => null);
@@ -429,6 +487,7 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
             : `La solicitud falló (código ${res.status})`;
     // Expired/invalid session: let the dashboard shell drop back to the login
     if (res.status === 401 && token && !path.startsWith('/auth/login')) {
+      accessToken = null;
       window.dispatchEvent(new Event(UNAUTHORIZED_EVENT));
     }
     throw new ApiError(message, res.status);

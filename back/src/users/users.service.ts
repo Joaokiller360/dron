@@ -12,4 +12,11 @@ export class UsersService {
   findById(id: string) {
     return this.prisma.adminUser.findUnique({ where: { id } });
   }
+
+  setPassword(id: string, passwordHash: string) {
+    return this.prisma.adminUser.update({
+      where: { id },
+      data: { passwordHash, passwordChangedAt: new Date() },
+    });
+  }
 }

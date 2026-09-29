@@ -16,6 +16,15 @@ services:
       timeout: 5s
       retries: 10
 
+  # Antivirus for dashboard uploads (the API refuses uploads in production without it).
+  # Needs ~2-3 GB RAM for the signatures. For videos over 100 MB raise clamd's
+  # StreamMaxLength, MaxFileSize and MaxScanSize (e.g. 1100M) in clamd.conf.
+  clamav:
+    image: clamav/clamav:stable
+    restart: unless-stopped
+    volumes:
+      - clamdb:/var/lib/clamav
+
   api:
     build:
       context: .
@@ -23,6 +32,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      clamav:
+        condition: service_started
     environment:
       NODE_ENV: production
       PORT: 3001
@@ -30,11 +41,16 @@ services:
       CORS_ORIGIN: ${CORS_ORIGIN:-*}
       DATABASE_URL: postgresql://${POSTGRES_USER:-jbskylens}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-jbskylens}?schema=public
       JWT_SECRET: ${JWT_SECRET}
-      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1d}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-15m}
       LOG_LEVEL: ${LOG_LEVEL:-info}
+      CLAMAV_HOST: clamav
+      # Behind Cloudflare: CLIENT_IP_HEADER=cf-connecting-ip (only if the origin is reachable through Cloudflare alone)
+      CLIENT_IP_HEADER: ${CLIENT_IP_HEADER:-}
+      TRUST_PROXY: ${TRUST_PROXY:-loopback, linklocal, uniquelocal}
     ports:
       - "3001:3001"
     command: sh -c "npx prisma migrate deploy && node dist/main"
 
 volumes:
   pgdata:
+  clamdb:

@@ -1,7 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerModule } from '@nestjs/throttler';
 import configuration from './config/configuration';
 import { validate } from './config/env.validation';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
@@ -27,6 +27,7 @@ import { SettingsModule } from './settings/settings.module';
 import { UploadsModule } from './uploads/uploads.module';
 import { StoreModule } from './store/store.module';
 import { SafeInputMiddleware } from './common/middleware/safe-input.middleware';
+import { ClientIpThrottlerGuard } from './common/guards/client-ip-throttler.guard';
 
 @Module({
   imports: [
@@ -35,8 +36,10 @@ import { SafeInputMiddleware } from './common/middleware/safe-input.middleware';
       load: [configuration],
       validate,
     }),
+    // 100 requests per minute per client IP on every route (stricter per-route limits
+    // are set with @Throttle, e.g. the login)
     ThrottlerModule.forRoot({
-      throttlers: [{ ttl: 60_000, limit: 60 }],
+      throttlers: [{ ttl: 60_000, limit: 100 }],
     }),
     PrismaModule,
     AuthModule,
@@ -60,7 +63,7 @@ import { SafeInputMiddleware } from './common/middleware/safe-input.middleware';
     StoreModule,
   ],
   providers: [
-    { provide: APP_GUARD, useClass: ThrottlerGuard },
+    { provide: APP_GUARD, useClass: ClientIpThrottlerGuard },
     { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor },
     { provide: APP_INTERCEPTOR, useClass: ChangeEventsInterceptor },
   ],

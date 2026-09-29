@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { WinstonModule } from 'nest-winston';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
@@ -10,9 +11,17 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { spanishValidationErrors } from './common/validation/validation-es';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: WinstonModule.createLogger(winstonLoggerOptions),
   });
+
+  // req.ip must be the client, not Traefik/Cloudflare, or every visitor shares
+  // one rate-limit bucket. Numbers are hop counts; anything else is subnets.
+  const trustProxy = process.env.TRUST_PROXY ?? 'loopback, linklocal, uniquelocal';
+  app.set(
+    'trust proxy',
+    /^\d+$/.test(trustProxy) ? Number(trustProxy) : trustProxy === 'false' ? false : trustProxy,
+  );
 
   app.use(helmet());
   app.enableCors({

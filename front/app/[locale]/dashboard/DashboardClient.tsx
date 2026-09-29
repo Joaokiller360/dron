@@ -22,6 +22,7 @@ import {
   ShoppingBag,
   Receipt,
   Settings2,
+  KeyRound,
 } from 'lucide-react';
 import LoginForm from './LoginForm';
 import OverviewPanel from './OverviewPanel';
@@ -39,8 +40,16 @@ import VenuesPanel from './VenuesPanel';
 import ContactPanel from './ContactPanel';
 import StorePanel from './StorePanel';
 import StoreSettingsPanel from './StoreSettingsPanel';
+import AccountPanel from './AccountPanel';
 import OrdersPanel from './OrdersPanel';
-import { apiFetch, Stats, TOKEN_KEY, UNAUTHORIZED_EVENT } from './lib/api';
+import {
+  apiFetch,
+  LEGACY_TOKEN_KEY,
+  logoutSession,
+  refreshSession,
+  Stats,
+  UNAUTHORIZED_EVENT,
+} from './lib/api';
 import { LiveProvider, useLive, useLiveStatus } from './lib/live';
 import { Toaster, useToast } from './ui';
 
@@ -60,7 +69,8 @@ export type Tab =
   | 'pedidos'
   | 'legal'
   | 'categorias'
-  | 'estado';
+  | 'estado'
+  | 'cuenta';
 
 interface NavItem {
   id: Tab;
@@ -101,7 +111,10 @@ const NAV: { group: string; items: NavItem[] }[] = [
   },
   {
     group: 'Sistema',
-    items: [{ id: 'estado', label: 'Estado del backend', icon: <Activity size={17} /> }],
+    items: [
+      { id: 'estado', label: 'Estado del backend', icon: <Activity size={17} /> },
+      { id: 'cuenta', label: 'Mi cuenta', icon: <KeyRound size={17} /> },
+    ],
   },
 ];
 
@@ -118,31 +131,20 @@ export default function DashboardClient() {
   const [email, setEmail] = useState<string | null>(null);
 
   useEffect(() => {
-    let token: string | null = null;
+    // Older builds stored a long-lived token here
     try {
-      token = window.localStorage.getItem(TOKEN_KEY);
+      window.localStorage.removeItem(LEGACY_TOKEN_KEY);
     } catch {
-      // localStorage blocked (private browsing, disabled storage) -> just show login
+      // storage blocked: nothing to clean up
     }
-    if (!token) return;
-    // Validate the saved session and show who is logged in
-    apiFetch<{ email?: string }>('/auth/me')
-      .then((me) => setEmail(me.email ?? 'admin'))
-      .catch(() => {
-        try {
-          window.localStorage.removeItem(TOKEN_KEY);
-        } catch {
-          // ignore
-        }
-      });
+    // Resume the session from the refresh cookie, if there is one
+    refreshSession().then((user) => {
+      if (user) setEmail(user.email);
+    });
   }, []);
 
   const logout = useCallback(() => {
-    try {
-      window.localStorage.removeItem(TOKEN_KEY);
-    } catch {
-      // ignore
-    }
+    void logoutSession();
     setEmail(null);
   }, []);
 
@@ -326,6 +328,7 @@ function Shell({ email, onLogout }: { email: string; onLogout: () => void }) {
           {tab === 'legal' && <LegalPanel />}
           {tab === 'categorias' && <CategoriesPanel />}
           {tab === 'estado' && <HealthPanel />}
+          {tab === 'cuenta' && <AccountPanel email={email} />}
         </main>
       </div>
     </div>

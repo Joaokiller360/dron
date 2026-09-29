@@ -19,6 +19,7 @@ import * as sharp from 'sharp';
 import { slugify } from '../common/slugify';
 import { CompleteUploadDto, PresignUploadDto, UPLOAD_FOLDERS } from './dto/presign-upload.dto';
 import { SHARP_FORMAT, UPLOAD_TYPES, UploadType } from './upload-types';
+import { MalwareScannerService } from './malware-scanner.service';
 
 const MB = 1024 * 1024;
 const MAX_BYTES = { image: 20 * MB, video: 1024 * MB };
@@ -53,7 +54,10 @@ export class UploadsService {
   private readonly s3: S3Config;
   private readonly client: S3Client | null;
 
-  constructor(config: ConfigService) {
+  constructor(
+    config: ConfigService,
+    private readonly scanner: MalwareScannerService,
+  ) {
     this.s3 = config.get<S3Config>('s3')!;
     const { bucket, accessKeyId, secretAccessKey, region, endpoint, forcePathStyle } = this.s3;
     this.client =
@@ -104,10 +108,10 @@ export class UploadsService {
   }
 
   /**
-   * Checks an upload's real content and publishes it. Images are decoded and
-   * re-encoded (drops anything appended or hidden in the file, plus EXIF/GPS
-   * metadata); videos must have a valid container header. Whatever happens,
-   * the incoming copy is deleted.
+   * Checks an upload's real content and publishes it. Every file is scanned by
+   * ClamAV first; images are then decoded and re-encoded (drops anything
+   * appended or hidden in the file, plus EXIF/GPS metadata); videos must have a
+   * valid container header. Whatever happens, the incoming copy is deleted.
    */
   async complete(dto: CompleteUploadDto) {
     const client = this.requireClient();
@@ -161,6 +165,8 @@ export class UploadsService {
     if (!type.sniff(input)) {
       throw new BadRequestException('El contenido no corresponde a una imagen válida');
     }
+    // Before any decoder touches the bytes
+    await this.scanner.assertClean([input], source);
 
     let output: Buffer;
     try {
@@ -217,6 +223,10 @@ export class UploadsService {
       this.logger.warn(`Rejected video ${source}: header does not match ${contentType}`);
       throw new BadRequestException('El contenido no corresponde a un video válido');
     }
+
+    // The whole file, streamed from the bucket to ClamAV (never held in memory)
+    const full = await client.send(new GetObjectCommand({ Bucket: bucket, Key: source }));
+    await this.scanner.assertClean(full.Body as AsyncIterable<Uint8Array>, source);
 
     await client.send(
       new CopyObjectCommand({

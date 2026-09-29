@@ -1,8 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
+import { unsafePageLinks } from './page-links';
 
 @Injectable()
 export class ServicesService {
@@ -19,6 +20,13 @@ export class ServicesService {
   // Prisma JSON input type without dragging the rest of the DTO through `any`.
   private toPrismaData<T extends { page?: Record<string, unknown> }>(dto: T) {
     const { page, ...rest } = dto;
+    // The blob skips DTO validation, so its links are checked here
+    const bad = page ? unsafePageLinks(page) : [];
+    if (bad.length) {
+      throw new BadRequestException(
+        `Enlaces no válidos en la página (usa https://… o una ruta que empiece con /): ${bad.join(', ')}`,
+      );
+    }
     return {
       ...rest,
       ...(page !== undefined ? { page: page as unknown as Prisma.InputJsonValue } : {}),
