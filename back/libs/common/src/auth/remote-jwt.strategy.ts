@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { InternalCallError, InternalClient } from '../internal/internal-client';
+import { JWT_ALGORITHM, jwtPublicKey } from './jwt-keys';
 
 export interface JwtPayload {
   sub: string;
@@ -30,9 +31,10 @@ const CACHE_MS = 30_000;
 
 /**
  * JWT check for every service except auth: the signature is verified here with
- * the shared JWT_SECRET, then the auth service confirms the admin still exists
- * and the token predates no password change (answers cached 30 s, so a sign-out
- * by password change reaches every service within that time).
+ * the auth service's public key (this service can verify tokens, never mint
+ * them), then the auth service confirms the admin still exists and the token
+ * predates no password change (answers cached 30 s, so a sign-out by password
+ * change reaches every service within that time).
  */
 @Injectable()
 export class RemoteJwtStrategy extends PassportStrategy(Strategy) {
@@ -46,8 +48,8 @@ export class RemoteJwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      algorithms: ['HS256'],
-      secretOrKey: config.getOrThrow<string>('jwt.secret'),
+      algorithms: [JWT_ALGORITHM],
+      secretOrKey: jwtPublicKey({ publicKey: config.getOrThrow<string>('jwt.publicKey') }),
     });
   }
 

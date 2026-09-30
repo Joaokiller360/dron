@@ -10,7 +10,7 @@ import { StoreModule } from './store/store.module';
   imports: [
     CoreModule.forRoot({
       service: 'store',
-      requiredEnv: ['DATABASE_URL', 'JWT_SECRET'],
+      requiredEnv: ['DATABASE_URL', 'JWT_PUBLIC_KEY'],
       changeEvents: true,
     }),
     AuthClientModule,

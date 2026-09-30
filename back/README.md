@@ -36,6 +36,10 @@ Cloudflare → gateway ──┼─ /api/products|orders|store/*,
 
 La API pública no cambió: el front sigue usando `NEXT_PUBLIC_API_URL=https://apidron.joaobarres.dev/api` (ahora apunta al gateway) y la cookie de refresh sigue en `/api/auth`.
 
+### Tokens de admin
+
+`auth` firma los access tokens con ES256 (`JWT_PRIVATE_KEY`, solo en auth). `content`, `store` y `media` solo tienen la clave pública (`JWT_PUBLIC_KEY`): pueden verificar tokens pero no fabricarlos, así que comprometer uno de ellos no da acceso de admin a los demás.
+
 ### Cómo se hablan entre sí
 
 Rutas `/api/internal/*` protegidas con el header `x-internal-token` (= `INTERNAL_TOKEN`, igual en todos). El gateway nunca las deja pasar y sin token responden 404.
@@ -76,7 +80,7 @@ npm install
 npm run prisma:generate
 ```
 
-Variables comunes en `.env` (`JWT_SECRET`, `INTERNAL_TOKEN`, `API_PREFIX`, `CORS_ORIGIN`, `AUTH_URL`, `CONTENT_URL`, `STORE_URL`, `MEDIA_URL`, `EVENTS_URL`, `RESEND_*`…). Lo propio de cada servicio en `.env.<servicio>` (gana sobre `.env`):
+Variables comunes en `.env` (`INTERNAL_TOKEN`, `JWT_PUBLIC_KEY`, `API_PREFIX`, `CORS_ORIGIN`, `AUTH_URL`, `CONTENT_URL`, `STORE_URL`, `MEDIA_URL`, `EVENTS_URL`, `RESEND_*`…). Lo propio de cada servicio en `.env.<servicio>` (gana sobre `.env`):
 
 ```bash
 # .env
@@ -87,8 +91,9 @@ STORE_URL=http://localhost:3003/api
 MEDIA_URL=http://localhost:3004/api
 EVENTS_URL=http://localhost:3005/api
 
-# .env.auth
+# .env.auth  (JWT_PRIVATE_KEY solo aquí: los demás servicios se niegan a arrancar si lo ven)
 PORT=3001
+JWT_PRIVATE_KEY=<npm run jwt:keys>
 DATABASE_URL=postgresql://svc_auth:<pwd>@localhost:5432/jbskylens?schema=auth
 # .env.content → PORT=3002 + svc_content ?schema=content   ·   .env.store → PORT=3003 + svc_store ?schema=store
 # .env.media   → PORT=3004 + S3_*/CLAMAV_*                  ·   .env.events → PORT=3005
@@ -106,7 +111,7 @@ Arrancar cada uno en su terminal: `npm run start:auth`, `start:content`, `start:
 ## Correr todo con Docker
 
 ```bash
-POSTGRES_PASSWORD=… JWT_SECRET=… INTERNAL_TOKEN=… \
+POSTGRES_PASSWORD=… INTERNAL_TOKEN=… JWT_PRIVATE_KEY=… JWT_PUBLIC_KEY=… \
 AUTH_DB_PASSWORD=… CONTENT_DB_PASSWORD=… STORE_DB_PASSWORD=… \
 docker compose up -d --build
 ```
@@ -121,7 +126,7 @@ Hoy corre el monolito (`jbskylens-backdron-uiceke`, rama `remaster`). Pasos para
 2. **Crear 6 apps** en Dokploy, todas con: Build Path `/`, Docker File `back/Dockerfile`, Docker Context Path `back`, rama `microservices`, Build arg `APP=<servicio>`, env `PORT=3000`. Solo `gateway` lleva dominio (Container Port **3000**).
 3. **Env por app** (secretos solo en Dokploy):
    - todas: `INTERNAL_TOKEN` (mismo valor), `API_PREFIX`, `CORS_ORIGIN`, `CLIENT_IP_HEADER=cf-connecting-ip`, `AUTH_URL`/`CONTENT_URL`/`STORE_URL`/`MEDIA_URL`/`EVENTS_URL` = `http://<App Name de Dokploy>:3000/api`
-   - `auth`, `content`, `store`, `media`: `JWT_SECRET` (el mismo de hoy)
+   - claves JWT nuevas con `npm run jwt:keys` (ES256): `JWT_PRIVATE_KEY` **solo** en `auth`; `JWT_PUBLIC_KEY` en `content`, `store`, `media`. `JWT_SECRET` ya no se usa. Al cambiar, los tokens de acceso viejos (HS256) dejan de valer, pero el dashboard se renueva solo con la cookie de refresh.
    - `auth`: `DATABASE_URL=postgresql://svc_auth:<pwd>@jbskylens-jbskylensdb-umndpt:5432/<db>?schema=auth`, `JWT_EXPIRES_IN`, `JWT_REFRESH_TTL_DAYS`, `JWT_SESSION_MAX_DAYS`
    - `content`: `DATABASE_URL` con `svc_content` y `?schema=content`, `RESEND_*`
    - `store`: `DATABASE_URL` con `svc_store` y `?schema=store`, `RESEND_*`, `PAYPAL_*`

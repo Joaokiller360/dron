@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UsersService } from '../../users/users.service';
+import { JWT_ALGORITHM, jwtPublicKey } from '@app/common/auth/jwt-keys';
 
 interface JwtPayload {
   sub: string;
@@ -20,9 +21,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      algorithms: ['HS256'],
-      // Same source as the signing side (auth.module); required at boot by env.validation
-      secretOrKey: config.getOrThrow<string>('jwt.secret'),
+      algorithms: [JWT_ALGORITHM],
+      // Public half of the signing key (auth.module); required at boot by env.validation
+      secretOrKey: jwtPublicKey({ privateKey: config.getOrThrow<string>('jwt.privateKey') }),
     });
   }
 

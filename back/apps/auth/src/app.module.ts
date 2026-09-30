@@ -11,7 +11,7 @@ import { SessionsController } from './internal/sessions.controller';
   imports: [
     CoreModule.forRoot({
       service: 'auth',
-      requiredEnv: ['DATABASE_URL', 'JWT_SECRET', 'INTERNAL_TOKEN'],
+      requiredEnv: ['DATABASE_URL', 'JWT_PRIVATE_KEY', 'INTERNAL_TOKEN'],
     }),
     PrismaModule,
     AuthModule,

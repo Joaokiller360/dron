@@ -7,7 +7,7 @@ import { UploadsModule } from './uploads/uploads.module';
 /** Media service: dashboard uploads to S3, scanned by ClamAV before publishing */
 @Module({
   imports: [
-    CoreModule.forRoot({ service: 'media', requiredEnv: ['JWT_SECRET', 'INTERNAL_TOKEN'] }),
+    CoreModule.forRoot({ service: 'media', requiredEnv: ['JWT_PUBLIC_KEY', 'INTERNAL_TOKEN'] }),
     AuthClientModule,
     ProcessHealthModule,
     UploadsModule,

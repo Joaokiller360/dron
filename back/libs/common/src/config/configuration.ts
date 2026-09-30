@@ -22,7 +22,9 @@ export default () => ({
     url: process.env.DATABASE_URL,
   },
   jwt: {
-    secret: process.env.JWT_SECRET,
+    // ES256 keys (see auth/jwt-keys.ts): the private one only in the auth service
+    privateKey: process.env.JWT_PRIVATE_KEY,
+    publicKey: process.env.JWT_PUBLIC_KEY,
     // Access tokens are short-lived; the dashboard renews them with the refresh token
     expiresIn: accessTokenTtl(process.env.JWT_EXPIRES_IN),
     // Refresh token (httpOnly cookie): idle lifetime, and hard session limit

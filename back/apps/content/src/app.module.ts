@@ -23,7 +23,7 @@ import { ContentInternalController } from './internal/content-internal.controlle
   imports: [
     CoreModule.forRoot({
       service: 'content',
-      requiredEnv: ['DATABASE_URL', 'JWT_SECRET'],
+      requiredEnv: ['DATABASE_URL', 'JWT_PUBLIC_KEY'],
       changeEvents: true,
     }),
     AuthClientModule,

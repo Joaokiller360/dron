@@ -7,6 +7,7 @@ import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { RefreshTokensService } from './refresh-tokens.service';
 import { UsersModule } from '../users/users.module';
+import { JWT_ALGORITHM, jwtPrivateKey, jwtPublicKey } from '@app/common/auth/jwt-keys';
 
 @Module({
   imports: [
@@ -15,10 +16,15 @@ import { UsersModule } from '../users/users.module';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        secret: config.get<string>('jwt.secret'),
-        signOptions: { expiresIn: config.get<number>('jwt.expiresIn') },
-      }),
+      useFactory: (config: ConfigService) => {
+        const privateKey = config.getOrThrow<string>('jwt.privateKey');
+        return {
+          privateKey: jwtPrivateKey(privateKey),
+          publicKey: jwtPublicKey({ privateKey }),
+          signOptions: { algorithm: JWT_ALGORITHM, expiresIn: config.get<number>('jwt.expiresIn') },
+          verifyOptions: { algorithms: [JWT_ALGORITHM] },
+        };
+      },
     }),
   ],
   controllers: [AuthController],

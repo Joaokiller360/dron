@@ -32,7 +32,8 @@
     "prisma:migrate:content": "prisma migrate deploy --schema apps/content/prisma/schema.prisma",
     "prisma:migrate:store": "prisma migrate deploy --schema apps/store/prisma/schema.prisma",
     "prisma:seed": "ts-node apps/auth/prisma/seed.ts && ts-node apps/content/prisma/seed-content.ts",
-    "admin:password": "node apps/auth/prisma/set-admin-password.js"
+    "admin:password": "node apps/auth/prisma/set-admin-password.js",
+    "jwt:keys": "node scripts/generate-jwt-keys.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1138.0",
