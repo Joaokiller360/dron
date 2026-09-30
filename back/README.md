@@ -123,7 +123,7 @@ El primer arranque de Postgres crea los roles/schemas (`db/compose-init.sh`) y c
 Hoy corre el monolito (`jbskylens-backdron-uiceke`, rama `remaster`). Pasos para pasar a microservicios:
 
 1. **Backup**: `pg_dump` completo de la DB de producción.
-2. **Crear 6 apps** en Dokploy, todas con: Build Path `/`, Docker File `back/Dockerfile`, Docker Context Path `back`, rama `microservices`, Build arg `APP=<servicio>`, env `PORT=3000`. Solo `gateway` lleva dominio (Container Port **3000**).
+2. **Crear 6 apps** en Dokploy, todas con: rama `microservices`, Build Path `/`, Docker File **`back/apps/<servicio>/Dockerfile`** (ya trae el servicio fijado, sin build args), Docker Context Path `back`, env `PORT=3000`. Solo `gateway` lleva dominio (Container Port **3000**). Esos Dockerfiles se generan desde `back/Dockerfile` con `npm run dockerfiles`.
 3. **Env por app** (secretos solo en Dokploy):
    - todas: `INTERNAL_TOKEN` (mismo valor), `API_PREFIX`, `CORS_ORIGIN`, `CLIENT_IP_HEADER=cf-connecting-ip`, `AUTH_URL`/`CONTENT_URL`/`STORE_URL`/`MEDIA_URL`/`EVENTS_URL` = `http://<App Name de Dokploy>:3000/api`
    - claves JWT nuevas con `npm run jwt:keys` (ES256): `JWT_PRIVATE_KEY` **solo** en `auth`; `JWT_PUBLIC_KEY` en `content`, `store`, `media`. `JWT_SECRET` ya no se usa. Al cambiar, los tokens de acceso viejos (HS256) dejan de valer, pero el dashboard se renueva solo con la cookie de refresh.

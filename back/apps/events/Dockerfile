@@ -1,10 +1,11 @@
+# GENERATED from back/Dockerfile by `npm run dockerfiles`: edit that file instead.
 # One recipe for every service. Pick it with the APP build arg:
 #   docker build --build-arg APP=store -t jbskylens-store .
 # APP = gateway | auth | content | store | media | events
 # apps/<service>/Dockerfile are copies of this file with APP preset, for hosts
 # that can't pass build args (Dokploy: Docker File = back/apps/<service>/Dockerfile).
 # Edit this file, then run `npm run dockerfiles`.
-ARG APP
+ARG APP=events
 
 FROM node:20-alpine AS builder
 ARG APP
