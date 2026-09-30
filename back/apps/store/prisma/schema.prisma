@@ -1,0 +1,122 @@
+// store service: only its own tables, in the "store" Postgres schema
+// (DATABASE_URL must end in ?schema=store). Other services' data is reached
+// through their /internal HTTP routes, never through this database.
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../node_modules/@jbskylens/prisma-store"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Online store. Switches (store visible, sales open) live in site_settings
+// under key "store".
+model Product {
+  id             String   @id @default(uuid())
+  slug           String   @unique
+  nameEs         String   @map("name_es")
+  nameEn         String?  @map("name_en")
+  descriptionEs  String?  @map("description_es")
+  descriptionEn  String?  @map("description_en")
+  // Prices in cents (USD) to avoid float rounding
+  priceCents     Int      @map("price_cents")
+  // Crossed-out "before" price, optional
+  compareAtCents Int?     @map("compare_at_cents")
+  // null = unlimited stock
+  stock          Int?
+  coverUrl       String   @map("cover_url")
+  // Extra photos shown in the product page gallery
+  mediaUrls      String[] @default([]) @map("media_urls")
+  // Details table on the product page: { label, value }[] (e.g. Material: aluminio)
+  specs          Json     @default("[]")
+  // Choices that change the price: { name, values: { label, priceCents }[] }[]
+  // (e.g. Medida: 30 × 40 cm +0, 50 × 70 cm +1500). Buyers pick one value per
+  // option; unit price = priceCents + the chosen values' priceCents.
+  options        Json     @default("[]")
+  published      Boolean  @default(true)
+  sortOrder      Int      @default(0) @map("sort_order")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@index([published])
+  @@map("products")
+}
+
+enum PaymentMethod {
+  PAYPAL
+  TRANSFER
+}
+
+// PENDING_PAYMENT → PAID (PayPal capture verified) → SHIPPED (carrier + tracking)
+// → COMPLETED. Unpaid orders expire to CANCELLED; paid ones end in REFUNDED.
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAID
+  SHIPPED
+  COMPLETED
+  CANCELLED
+  REFUNDED
+}
+
+// Order placed from the store and paid through PayPal
+model Order {
+  id            String        @id @default(uuid())
+  // Short human reference shown to the buyer (e.g. "JB-7K2Q9M")
+  code          String        @unique
+  name          String
+  email         String
+  phone         String
+  // Delivery address typed at checkout
+  address       String
+  city          String
+  note          String?
+  locale        String        @default("es")
+  // Snapshot of what was bought: { productId, name, unitCents, quantity }[]
+  items         Json
+  // Shipping city whose rate was charged (null = store without shipping
+  // cities) and what it charged; totalCents = items + shippingCents
+  shippingCity  String?       @map("shipping_city")
+  shippingCents Int           @default(0) @map("shipping_cents")
+  totalCents    Int           @map("total_cents")
+  status        OrderStatus   @default(PENDING_PAYMENT)
+  paymentMethod PaymentMethod @default(PAYPAL) @map("payment_method")
+
+  // Bank transfer: bank the buyer paid from and the transfer code; the owner
+  // checks it against the bank statement and confirms in the dashboard
+  transferBank      String? @map("transfer_bank")
+  transferReference String? @map("transfer_reference")
+
+  // PayPal: order created at checkout, capture made (and verified) on approval
+  paypalOrderId   String?   @unique @map("paypal_order_id")
+  paypalCaptureId String?   @unique @map("paypal_capture_id")
+  paidAt          DateTime? @map("paid_at")
+  refundedAt      DateTime? @map("refunded_at")
+
+  // Shipping, set by the owner in the dashboard
+  carrier        String?
+  trackingNumber String?   @map("tracking_number")
+  trackingUrl    String?   @map("tracking_url")
+  shippedAt      DateTime? @map("shipped_at")
+
+  // Buyer emails are sent by a background task; null = still to send (retried)
+  paidEmailAt    DateTime? @map("paid_email_at")
+  shippedEmailAt DateTime? @map("shipped_email_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@index([transferReference])
+  @@map("orders")
+}
+
+// Store switches, payments and shipping, under key "store"
+model SiteSetting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("site_settings")
+}

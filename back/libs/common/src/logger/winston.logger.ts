@@ -1,0 +1,27 @@
+import { WinstonModuleOptions, utilities } from 'nest-winston';
+import * as winston from 'winston';
+
+/** Console + files; lines are labelled with the service (SERVICE_NAME) */
+export const winstonLoggerOptions = (): WinstonModuleOptions => ({
+  level: process.env.LOG_LEVEL ?? 'info',
+  transports: [
+    new winston.transports.Console({
+      format: winston.format.combine(
+        winston.format.timestamp(),
+        utilities.format.nestLike(process.env.SERVICE_NAME ?? 'jbskylens', {
+          colors: process.env.NODE_ENV !== 'production',
+          prettyPrint: true,
+        }),
+      ),
+    }),
+    new winston.transports.File({
+      filename: 'logs/error.log',
+      level: 'error',
+      format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
+    }),
+    new winston.transports.File({
+      filename: 'logs/combined.log',
+      format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
+    }),
+  ],
+});

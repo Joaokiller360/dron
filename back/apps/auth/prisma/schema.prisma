@@ -1,0 +1,46 @@
+// auth service: only its own tables, in the "auth" Postgres schema
+// (DATABASE_URL must end in ?schema=auth). Other services' data is reached
+// through their /internal HTTP routes, never through this database.
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../node_modules/@jbskylens/prisma-auth"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AdminUser {
+  id                String         @id @default(uuid())
+  email             String         @unique
+  passwordHash      String         @map("password_hash")
+  // Sessions (JWTs) issued before this moment are rejected
+  passwordChangedAt DateTime?      @map("password_changed_at")
+  name              String
+  createdAt         DateTime       @default(now()) @map("created_at")
+  updatedAt         DateTime       @updatedAt @map("updated_at")
+  refreshTokens     RefreshToken[]
+
+  @@map("admin_users")
+}
+
+// Long-lived half of a dashboard session. Only a SHA-256 of the token is kept;
+// each refresh revokes the used row and issues the next one in its family, and
+// presenting a revoked token revokes the whole family (stolen-token reuse).
+model RefreshToken {
+  id               String    @id @default(uuid())
+  userId           String    @map("user_id")
+  user             AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash        String    @unique @map("token_hash")
+  familyId         String    @map("family_id")
+  expiresAt        DateTime  @map("expires_at")
+  // Hard limit for the whole family: refreshing never extends past it
+  sessionExpiresAt DateTime  @map("session_expires_at")
+  revokedAt        DateTime? @map("revoked_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([familyId])
+  @@map("refresh_tokens")
+}

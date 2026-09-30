@@ -18,7 +18,16 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@/*": ["src/*"]
-    }
+      "@app/common": [
+        "libs/common/src"
+      ],
+      "@app/common/*": [
+        "libs/common/src/*"
+      ]
+    },
+    "types": [
+      "node",
+      "jest"
+    ]
   }
 }

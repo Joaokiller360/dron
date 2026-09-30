@@ -1,33 +1,38 @@
 {
   "name": "jbskylens-back",
-  "version": "0.1.0",
-  "description": "JB.SKYLENS backend API (NestJS + Prisma + PostgreSQL)",
+  "version": "0.2.0",
+  "description": "JB.SKYLENS backend: NestJS microservices (gateway, auth, content, store, media, events) + Prisma + PostgreSQL",
   "private": true,
   "license": "UNLICENSED",
   "engines": {
     "node": ">=20 <21"
   },
   "scripts": {
-    "build": "nest build",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start",
-    "start:dev": "nest start --watch",
-    "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
-    "lint": "eslint \"{src,test}/**/*.ts\" --fix",
+    "build": "nest build gateway && nest build auth && nest build content && nest build store && nest build media && nest build events",
+    "build:gateway": "nest build gateway",
+    "build:auth": "nest build auth",
+    "build:content": "nest build content",
+    "build:store": "nest build store",
+    "build:media": "nest build media",
+    "build:events": "nest build events",
+    "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
+    "start:gateway": "nest start gateway --watch",
+    "start:auth": "nest start auth --watch",
+    "start:content": "nest start content --watch",
+    "start:store": "nest start store --watch",
+    "start:media": "nest start media --watch",
+    "start:events": "nest start events --watch",
+    "start:prod": "node dist/apps/$APP/main",
+    "lint": "eslint \"{apps,libs}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate:dev": "prisma migrate dev",
-    "prisma:migrate:deploy": "prisma migrate deploy",
-    "prisma:studio": "prisma studio",
-    "prisma:seed": "ts-node prisma/seed.ts",
-    "admin:password": "node prisma/set-admin-password.js"
-  },
-  "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+    "prisma:generate": "prisma generate --schema apps/auth/prisma/schema.prisma && prisma generate --schema apps/content/prisma/schema.prisma && prisma generate --schema apps/store/prisma/schema.prisma",
+    "prisma:migrate:auth": "prisma migrate deploy --schema apps/auth/prisma/schema.prisma",
+    "prisma:migrate:content": "prisma migrate deploy --schema apps/content/prisma/schema.prisma",
+    "prisma:migrate:store": "prisma migrate deploy --schema apps/store/prisma/schema.prisma",
+    "prisma:seed": "ts-node apps/auth/prisma/seed.ts && ts-node apps/content/prisma/seed-content.ts",
+    "admin:password": "node apps/auth/prisma/set-admin-password.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1138.0",
@@ -85,15 +90,23 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
+    "rootDir": ".",
+    "roots": [
+      "<rootDir>/apps",
+      "<rootDir>/libs",
+      "<rootDir>/db"
+    ],
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
+    "moduleNameMapper": {
+      "^@app/common(|/.*)$": "<rootDir>/libs/common/src$1"
+    },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "{apps,libs}/**/*.(t|j)s"
     ],
-    "coverageDirectory": "../coverage",
+    "coverageDirectory": "./coverage",
     "testEnvironment": "node"
   }
 }

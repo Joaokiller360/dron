@@ -1,0 +1,114 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import {
+  ArrayMaxSize,
+  ArrayMinSize,
+  IsArray,
+  IsEmail,
+  IsIn,
+  IsInt,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Matches,
+  Max,
+  MaxLength,
+  Min,
+  MinLength,
+  ValidateNested,
+} from 'class-validator';
+import {
+  NAME_PATTERN,
+  PHONE_PATTERN,
+  PLACE_PATTERN,
+  TEXT_PATTERN,
+} from '@app/common/text-patterns';
+
+export class OrderLineOptionDto {
+  @ApiProperty({ example: 'Medida' })
+  @IsString()
+  @MaxLength(40)
+  name: string;
+
+  @ApiProperty({ example: '50 × 70 cm' })
+  @IsString()
+  @MaxLength(60)
+  value: string;
+}
+
+export class OrderLineDto {
+  @ApiProperty()
+  @IsUUID()
+  productId: string;
+
+  @ApiPropertyOptional({ type: [OrderLineOptionDto], description: 'One value per product option' })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(5)
+  @ValidateNested({ each: true })
+  @Type(() => OrderLineOptionDto)
+  options?: OrderLineOptionDto[];
+
+  @ApiProperty({ example: 1 })
+  @IsInt()
+  @Min(1)
+  @Max(99)
+  quantity: number;
+}
+
+export class CreateOrderDto {
+  @ApiProperty({ type: [OrderLineDto] })
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(50)
+  @ValidateNested({ each: true })
+  @Type(() => OrderLineDto)
+  items: OrderLineDto[];
+
+  @ApiProperty({ example: 'Joao Barres' })
+  @IsString()
+  @MinLength(2)
+  @MaxLength(100)
+  @Matches(NAME_PATTERN, { message: 'El nombre tiene caracteres no permitidos' })
+  name: string;
+
+  @ApiProperty({ example: '0987654321' })
+  @IsString()
+  @MinLength(7)
+  @MaxLength(20)
+  @Matches(PHONE_PATTERN, { message: 'El teléfono tiene caracteres no permitidos' })
+  phone: string;
+
+  @ApiProperty({ example: 'joao@example.com' })
+  @IsEmail()
+  email: string;
+
+  @ApiProperty({ example: 'Av. Libertad y Manabí, casa 12' })
+  @IsString()
+  @MinLength(5)
+  @MaxLength(200)
+  @Matches(TEXT_PATTERN, { message: 'La dirección tiene caracteres no permitidos' })
+  address: string;
+
+  @ApiProperty({
+    example: 'Esmeraldas',
+    description: 'Once the store lists shipping cities, one of them (it sets the shipping cost)',
+  })
+  @IsString()
+  @MinLength(2)
+  @MaxLength(80)
+  @Matches(PLACE_PATTERN, { message: 'La ciudad tiene caracteres no permitidos' })
+  city: string;
+
+  @ApiPropertyOptional({ example: 'Entregar por la tarde, por favor.' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(1000)
+  @Matches(TEXT_PATTERN, { message: 'La nota tiene caracteres no permitidos' })
+  note?: string;
+
+  @ApiPropertyOptional({ example: 'es', enum: ['es', 'en'] })
+  @IsOptional()
+  @IsIn(['es', 'en'])
+  locale?: string;
+}

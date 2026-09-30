@@ -18,6 +18,8 @@ Antes todo vivía en la raíz (Next.js directo). Se separó en `front/`/`back/` 
 
 Stack: Node 20, NestJS 10, TypeScript 5, Prisma 5, JWT + bcrypt, Swagger, Winston, Docker.
 
+> **Rama `microservices` (2026-09-30):** el back se dividió en 6 servicios — `gateway`, `auth`, `content`, `store`, `media`, `events` — con un schema de Postgres y un rol de DB por servicio (`db/split-schemas.sql` mueve los datos del monolito; `db/unsplit-schemas.sql` revierte). Arquitectura, variables y pasos de deploy en Dokploy: `back/README.md`. Lo de abajo describe el monolito (rama `remaster`, lo que está en producción hasta el cutover); las rutas públicas son las mismas.
+
 - Corre en `PORT=8008`, prefijo `api/v1` (ej. `http://localhost:8008/api/v1/health`).
 - `Dockerfile` + `docker-compose.yml` listos (postgres + api) pero nunca probados con Docker real en esta máquina (no había Docker instalado) — sí se probó todo el flujo (migrate + seed + start) corriendo el proceso directo.
 - Swagger en `/api/v1/docs`.
