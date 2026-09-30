@@ -9,7 +9,7 @@ ARG APP=auth
 
 FROM node:20-alpine AS builder
 ARG APP
-RUN test -n "$APP" || (echo "Build arg APP is required (gateway|auth|content|store|media|events)" && exit 1)
+RUN test -n "$APP" || (echo "No service selected. Use Docker File back/apps/<service>/Dockerfile (gateway|auth|content|store|media|events), or pass --build-arg APP=<service>" && exit 1)
 WORKDIR /app
 RUN apk add --no-cache openssl
 
