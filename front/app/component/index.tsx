@@ -24,6 +24,7 @@ import { btnPrimary, btnGhost, inputClass } from './site/styles';
 import { videoSource, videoThumbnail, projectVideoUrl, projectCover } from './site/video';
 import type { VideoSource } from './site/video';
 import ProjectShot from './site/ProjectShot';
+import TestimonialCard from './site/TestimonialCard';
 
 export {
   Footer,
@@ -62,6 +63,7 @@ export {
   projectVideoUrl,
   projectCover,
   ProjectShot,
+  TestimonialCard,
 };
 
 export type { VideoSource, ContactInfo, PublicService, PublicProject, PublicClient, PublicPromotions, PublicTestimonial, PublicProduct, PublicStore, ShippingCity, PublicDiscount };

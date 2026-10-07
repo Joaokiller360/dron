@@ -16,6 +16,7 @@ import {
   btnGhost,
   useContactInfo,
   ProjectShot,
+  TestimonialCard,
   storeHeader,
   bestDeal,
   dealBadge,
@@ -23,6 +24,7 @@ import {
   type PublicProject,
   type PublicPromotions,
   type PublicStore,
+  type PublicTestimonial,
 } from '@/app/component';
 import { useMoney } from './(site)/store/cart';
 
@@ -41,11 +43,14 @@ export default function HomeClient({
   services,
   projects,
   promotions,
+  testimonials,
   store,
 }: {
   services: PublicService[];
   projects: PublicProject[];
   promotions: PublicPromotions | null;
+  /** Published testimonials; empty hides the section */
+  testimonials: PublicTestimonial[];
   /** Store settings and the first products; null hides the section */
   store: Pick<PublicStore, 'settings' | 'products'> | null;
 }) {
@@ -360,6 +365,26 @@ export default function HomeClient({
                   </Link>
                 );
               })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* TESTIMONIOS */}
+      {testimonials.length > 0 && (
+        <section id="testimonios" className="px-6 py-[86px] bg-jb-band border-t border-white/[.06]">
+          <div className="max-w-[1180px] mx-auto">
+            <Eyebrow className="mb-3">{t('testimonialsEyebrow')}</Eyebrow>
+            <div className="flex flex-wrap items-end justify-between gap-4 mb-9">
+              <SectionTitle>{t('testimonialsTitle')}</SectionTitle>
+              <Link href={`${prefix}/clients`} className="font-mono text-xs tracking-[.08em] uppercase text-jb-mint hover:text-jb-accent-hi">
+                {t('testimonialsAll')}
+              </Link>
+            </div>
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(min(290px,100%),1fr))] gap-4">
+              {testimonials.map((q) => (
+                <TestimonialCard key={q.id} testimonial={q} />
+              ))}
             </div>
           </div>
         </section>
