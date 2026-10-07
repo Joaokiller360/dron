@@ -40,6 +40,8 @@ USER node
 
 # Every service listens on $PORT (3000 in docker-compose and Dokploy)
 EXPOSE 3000
-# Apply this service's migrations (if it has a database), then run it.
-# exec: node replaces the shell as PID 1 so it receives SIGTERM on redeploys
-CMD ["sh", "-c", "if [ -f prisma/schema.prisma ]; then npx prisma migrate deploy --schema prisma/schema.prisma; fi && exec node dist/main"]
+# Apply this service's migrations (if it has a database, and only through its
+# own svc_<APP> role and schema), then run it
+ENV APP=$APP
+COPY scripts/start.sh ./start.sh
+CMD ["sh", "start.sh"]
