@@ -1,9 +1,10 @@
 'use client'
 
 import { useEffect, useMemo, useState, FormEvent } from 'react';
-import { Receipt, ChevronDown, Mail, Phone, MapPin, Truck, CreditCard, CheckCheck, Undo2, Ban, Check, Clock, Landmark, BadgeCheck } from 'lucide-react';
+import { Receipt, ChevronRight, Mail, Phone, MapPin, Truck, CreditCard, CheckCheck, Undo2, Ban, Check, Clock, Landmark, BadgeCheck } from 'lucide-react';
 import { apiFetch, errorMessage, formatMoney, Order, OrderStatus } from './lib/api';
 import { useCollection } from './lib/useCollection';
+import Modal from './Modal';
 import { Card, ConfirmDelete, EmptyState, ErrorNote, Field, PanelHeader, Pill, SearchInput, SkeletonList, btn, inputCls, useToast } from './ui';
 
 const STATUSES: { id: OrderStatus; label: string; tone: 'on' | 'muted' | 'warn' | 'info' }[] = [
@@ -124,6 +125,9 @@ export default function OrdersPanel() {
     return !q || [o.code, o.name, o.email, o.phone, o.trackingNumber ?? '', o.transferReference ?? ''].some((f) => f.toLowerCase().includes(q));
   });
 
+  // Looked up from the live list so the open order reflects realtime updates (and closes if deleted)
+  const current = items.find((o) => o.id === openId) ?? null;
+
   const replace = (o: Order) => setItems(items.map((x) => (x.id === o.id ? o : x)));
 
   const act = async (o: Order, key: string, fn: () => Promise<Order>, ok: string, fail: string) => {
@@ -197,161 +201,199 @@ export default function OrdersPanel() {
       ) : visible.length === 0 ? (
         <Card className="px-5 py-10 text-center text-[13.5px] text-jb-muted">Nada con este filtro.</Card>
       ) : (
-        <ul className="flex flex-col gap-2 p-0 m-0 list-none">
+        <ul className="grid grid-flow-dense gap-3 p-0 m-0 list-none sm:grid-cols-2 xl:grid-cols-3">
           {visible.map((o) => {
-            const open = openId === o.id;
             const st = statusOf(o.status);
             const units = o.items.reduce((n, l) => n + l.quantity, 0);
-            const paid = o.status === 'PAID' || o.status === 'SHIPPED' || o.status === 'COMPLETED';
-            const isBusy = (key: string) => busy === `${o.id}:${key}`;
+            // Orders waiting on the admin get a double-width tile so they stand out
+            const needsAction = o.status === 'PAID' || (o.paymentMethod === 'TRANSFER' && o.status === 'PENDING_PAYMENT');
+            const faded = o.status === 'CANCELLED' || o.status === 'REFUNDED';
             return (
-              <li key={o.id} className="rounded-2xl border border-white/[.08] bg-jb-card overflow-hidden">
+              <li key={o.id} className={needsAction ? 'sm:col-span-2' : ''}>
                 <button
                   type="button"
-                  onClick={() => setOpenId(open ? null : o.id)}
-                  aria-expanded={open}
-                  className="flex flex-wrap items-center w-full gap-x-4 gap-y-1 px-4 py-3.5 text-left bg-transparent border-0 cursor-pointer hover:bg-white/[.03]"
+                  onClick={() => setOpenId(o.id)}
+                  aria-haspopup="dialog"
+                  className={`group flex flex-col w-full h-full gap-4 p-4 text-left rounded-2xl border cursor-pointer transition hover:-translate-y-0.5 hover:border-white/[.18] ${
+                    needsAction
+                      ? 'border-[rgba(52,209,122,.3)] bg-[linear-gradient(135deg,rgba(52,209,122,.1),rgba(52,209,122,.02)_60%)]'
+                      : 'border-white/[.08] bg-jb-card'
+                  } ${faded ? 'opacity-70 hover:opacity-100' : ''}`}
                 >
-                  <span className="font-mono text-[13px] font-bold text-white">{o.code}</span>
-                  {o.paymentMethod === 'TRANSFER' && o.status === 'PENDING_PAYMENT' ? <Pill tone="warn">Transferencia por verificar</Pill> : <Pill tone={st.tone}>{st.label}</Pill>}
-                  {o.paymentMethod === 'TRANSFER' && o.status !== 'PENDING_PAYMENT' && <Pill>Transferencia</Pill>}
-                  <span className="flex-1 min-w-[140px] text-[14px] text-jb-text truncate">{o.name}</span>
-                  <span className="text-[12.5px] text-jb-muted">
-                    {units} {units === 1 ? 'unidad' : 'unidades'}
-                  </span>
-                  <span className="font-mono text-[14px] font-bold text-white">{formatMoney(o.totalCents)}</span>
-                  <span className="font-mono text-[11.5px] text-jb-muted">{formatDate(o.createdAt)}</span>
-                  <ChevronDown size={16} className={`text-jb-muted transition ${open ? 'rotate-180' : ''}`} />
-                </button>
-
-                {open && (
-                  <div className="grid gap-5 px-4 pt-1 pb-4 border-t border-white/[.07] lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-                    <div className="flex flex-col gap-4 pt-3">
-                      <table className="w-full text-[13.5px] border-collapse">
-                        <tbody>
-                          {o.items.map((l, i) => (
-                            <tr key={i} className="border-b border-white/[.06]">
-                              <td className="py-2 pr-3 font-mono text-jb-muted whitespace-nowrap">{l.quantity} ×</td>
-                              <td className="py-2 pr-3 text-jb-text">
-                                {l.name}
-                                {l.options?.length ? (
-                                  <span className="block text-[12.5px] text-jb-muted">{l.options.map((o) => `${o.name}: ${o.value}`).join(' · ')}</span>
-                                ) : null}
-                                {l.promotion && <span className="block text-[12.5px] font-semibold text-jb-mint">{l.promotion}</span>}
-                              </td>
-                              <td className="py-2 font-mono text-right text-jb-soft whitespace-nowrap">
-                                {formatMoney(l.unitCents * l.quantity)}
-                                {l.listCents ? <s className="block text-[11.5px] text-jb-muted">{formatMoney(l.listCents * l.quantity)}</s> : null}
-                              </td>
-                            </tr>
-                          ))}
-                          {o.shippingCity && (
-                            <tr className="border-b border-white/[.06]">
-                              <td />
-                              <td className="py-2 text-jb-soft">
-                                Envío <span className="text-jb-muted">· {o.shippingCity}</span>
-                              </td>
-                              <td className="py-2 font-mono text-right text-jb-soft whitespace-nowrap">{o.shippingCents ? formatMoney(o.shippingCents) : 'Gratis'}</td>
-                            </tr>
-                          )}
-                          <tr>
-                            <td />
-                            <td className="pt-2.5 font-semibold text-white">Total</td>
-                            <td className="pt-2.5 font-mono font-bold text-right text-white">{formatMoney(o.totalCents)}</td>
-                          </tr>
-                        </tbody>
-                      </table>
-
-                      <div className="flex flex-col gap-1.5 text-[13.5px]">
-                        <span className="inline-flex items-start gap-2 text-jb-text">
-                          <MapPin size={14} className="flex-none mt-[3px] text-jb-muted" /> {o.address}, {o.city}
-                        </span>
-                        <a href={`mailto:${o.email}?subject=${encodeURIComponent(`Tu pedido ${o.code}`)}`} className="inline-flex items-center gap-2 text-jb-soft hover:text-white">
-                          <Mail size={14} className="text-jb-muted" /> {o.email}
-                        </a>
-                        <a href={whatsappUrl(o.phone)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-jb-soft hover:text-white">
-                          <Phone size={14} className="text-jb-muted" /> {o.phone}
-                        </a>
-                      </div>
-                      {o.note && <p className="m-0 px-3 py-2.5 rounded-lg bg-white/[.04] text-[13.5px] text-jb-soft whitespace-pre-wrap">{o.note}</p>}
-                    </div>
-
-                    <div className="flex flex-col gap-3 pt-3">
-                      <div className="flex flex-col gap-1.5 p-4 rounded-xl border border-white/[.08] bg-white/[.02] text-[13px]">
-                        <span className="inline-flex items-center gap-2 text-[13.5px] font-semibold text-white">
-                          {o.paymentMethod === 'TRANSFER' ? <Landmark size={15} className="text-jb-accent" /> : <CreditCard size={15} className="text-jb-accent" />}
-                          {o.paymentMethod === 'TRANSFER' ? 'Transferencia bancaria' : 'Pago PayPal'}
-                        </span>
-                        {o.paymentMethod === 'TRANSFER' && (
-                          <span className="text-jb-soft">
-                            Desde <strong className="text-white">{o.transferBank}</strong> · código{' '}
-                            <strong className="font-mono text-white">{o.transferReference}</strong>
-                          </span>
-                        )}
-                        {o.paymentMethod === 'TRANSFER' && o.status === 'PENDING_PAYMENT' ? (
-                          <>
-                            <span className="text-amber-300">Revisa tu cuenta: confirma el pago si llegó {formatMoney(o.totalCents)}, o recházalo (el stock vuelve y se avisa al cliente).</span>
-                            <div className="flex flex-wrap gap-2 pt-1.5">
-                              <button type="button" disabled={isBusy('confirm')} onClick={() => confirmTransfer(o)} className={btn.primary}>
-                                <BadgeCheck size={15} /> Confirmar pago
-                              </button>
-                              <button type="button" disabled={isBusy('CANCELLED')} onClick={() => setStatus(o, 'CANCELLED', `Transferencia de ${o.code} rechazada`)} className={btn.ghost}>
-                                <Ban size={15} /> Rechazar
-                              </button>
-                            </div>
-                          </>
-                        ) : o.paidAt ? (
-                          <>
-                            <span className="text-jb-soft">Verificado el {formatDate(o.paidAt)}</span>
-                            {o.paypalCaptureId && <span className="font-mono text-[12px] text-jb-muted break-all">Captura {o.paypalCaptureId}</span>}
-                            <EmailState sent={o.paidEmailAt} label="Correo de compra" />
-                          </>
-                        ) : o.status === 'PENDING_PAYMENT' ? (
-                          <span className="text-jb-muted">
-                            {o.paypalCaptureId ? 'PayPal está procesando el pago (se revisa solo).' : 'El cliente aún no paga. Si no paga en 30 min, se cancela y el stock vuelve.'}
-                          </span>
-                        ) : (
-                          <span className="text-jb-muted">Sin pago.</span>
-                        )}
-                        {o.refundedAt && <span className="text-amber-300">Reembolsado el {formatDate(o.refundedAt)}</span>}
-                      </div>
-
-                      {(o.status === 'PAID' || o.status === 'SHIPPED') && <ShipForm key={`${o.carrier}|${o.trackingNumber}|${o.trackingUrl}`} order={o} onSaved={replace} />}
-                      {o.status === 'COMPLETED' && o.carrier && (
-                        <span className="text-[13px] text-jb-soft">
-                          Enviado por {o.carrier} · guía <span className="font-mono">{o.trackingNumber}</span>
-                        </span>
-                      )}
-
-                      <div className="flex flex-wrap items-center justify-end gap-2">
-                        {(o.status === 'PAID' || o.status === 'SHIPPED') && (
-                          <button type="button" disabled={isBusy('COMPLETED')} onClick={() => setStatus(o, 'COMPLETED', `Pedido ${o.code} entregado`)} className={btn.ghost}>
-                            <CheckCheck size={15} /> Marcar entregado
-                          </button>
-                        )}
-                        {paid && (o.paypalCaptureId || o.paymentMethod === 'TRANSFER') && (
-                          <RefundButton
-                            busy={isBusy('refund')}
-                            amount={formatMoney(o.totalCents)}
-                            manual={o.paymentMethod === 'TRANSFER'}
-                            onConfirm={() => refund(o)}
-                          />
-                        )}
-                        {o.status === 'PENDING_PAYMENT' && o.paymentMethod === 'PAYPAL' && !o.paypalCaptureId && (
-                          <button type="button" disabled={isBusy('CANCELLED')} onClick={() => setStatus(o, 'CANCELLED', `Pedido ${o.code} cancelado`)} className={btn.ghost}>
-                            <Ban size={15} /> Cancelar
-                          </button>
-                        )}
-                        {(o.status === 'PENDING_PAYMENT' || o.status === 'CANCELLED') && <ConfirmDelete onConfirm={() => del(o)} />}
-                      </div>
-                    </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-mono text-[13px] font-bold text-white">{o.code}</span>
+                    {o.paymentMethod === 'TRANSFER' && o.status === 'PENDING_PAYMENT' ? <Pill tone="warn">Transferencia por verificar</Pill> : <Pill tone={st.tone}>{st.label}</Pill>}
+                    {o.paymentMethod === 'TRANSFER' && o.status !== 'PENDING_PAYMENT' && <Pill>Transferencia</Pill>}
+                    <ChevronRight size={16} className="ml-auto transition text-jb-muted group-hover:translate-x-0.5 group-hover:text-white" />
                   </div>
-                )}
+
+                  <div className="flex flex-col flex-1 min-w-0 gap-1">
+                    <span className="text-[15px] font-semibold text-white truncate">{o.name}</span>
+                    <span className="text-[12.5px] text-jb-muted truncate">
+                      {o.items.map((l) => `${l.quantity}× ${l.name}`).join(' · ')}
+                    </span>
+                  </div>
+
+                  <div className="flex items-end justify-between gap-3 pt-3 border-t border-white/[.07]">
+                    <span className={`font-mono font-bold text-white ${needsAction ? 'text-[22px]' : 'text-[18px]'}`}>{formatMoney(o.totalCents)}</span>
+                    <span className="flex flex-col items-end gap-0.5 text-right">
+                      <span className="text-[12px] text-jb-soft">
+                        {units} {units === 1 ? 'unidad' : 'unidades'}
+                      </span>
+                      <span className="font-mono text-[11px] text-jb-muted">{formatDate(o.createdAt)}</span>
+                    </span>
+                  </div>
+                </button>
               </li>
             );
           })}
         </ul>
       )}
+
+      <Modal
+        open={current !== null}
+        onClose={() => setOpenId(null)}
+        title={current ? `Pedido ${current.code}` : ''}
+        subtitle={current ? `${current.name} · ${formatDate(current.createdAt)}` : undefined}
+        icon={<Receipt size={19} />}
+        size="xl"
+      >
+        {current &&
+          (() => {
+            const o = current;
+            const paid = o.status === 'PAID' || o.status === 'SHIPPED' || o.status === 'COMPLETED';
+            const isBusy = (key: string) => busy === `${o.id}:${key}`;
+            return (
+              <div className="flex flex-col gap-5">
+                <div className="flex flex-wrap items-center gap-2">
+                  {o.paymentMethod === 'TRANSFER' && o.status === 'PENDING_PAYMENT' ? <Pill tone="warn">Transferencia por verificar</Pill> : <Pill tone={statusOf(o.status).tone}>{statusOf(o.status).label}</Pill>}
+                  {o.paymentMethod === 'TRANSFER' && o.status !== 'PENDING_PAYMENT' && <Pill>Transferencia</Pill>}
+                </div>
+                <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+                  <div className="flex flex-col gap-4">
+                    <table className="w-full text-[13.5px] border-collapse">
+                      <tbody>
+                        {o.items.map((l, i) => (
+                          <tr key={i} className="border-b border-white/[.06]">
+                            <td className="py-2 pr-3 font-mono text-jb-muted whitespace-nowrap">{l.quantity} ×</td>
+                            <td className="py-2 pr-3 text-jb-text">
+                              {l.name}
+                              {l.options?.length ? (
+                                <span className="block text-[12.5px] text-jb-muted">{l.options.map((o) => `${o.name}: ${o.value}`).join(' · ')}</span>
+                              ) : null}
+                              {l.promotion && <span className="block text-[12.5px] font-semibold text-jb-mint">{l.promotion}</span>}
+                            </td>
+                            <td className="py-2 font-mono text-right text-jb-soft whitespace-nowrap">
+                              {formatMoney(l.unitCents * l.quantity)}
+                              {l.listCents ? <s className="block text-[11.5px] text-jb-muted">{formatMoney(l.listCents * l.quantity)}</s> : null}
+                            </td>
+                          </tr>
+                        ))}
+                        {o.shippingCity && (
+                          <tr className="border-b border-white/[.06]">
+                            <td />
+                            <td className="py-2 text-jb-soft">
+                              Envío <span className="text-jb-muted">· {o.shippingCity}</span>
+                            </td>
+                            <td className="py-2 font-mono text-right text-jb-soft whitespace-nowrap">{o.shippingCents ? formatMoney(o.shippingCents) : 'Gratis'}</td>
+                          </tr>
+                        )}
+                        <tr>
+                          <td />
+                          <td className="pt-2.5 font-semibold text-white">Total</td>
+                          <td className="pt-2.5 font-mono font-bold text-right text-white">{formatMoney(o.totalCents)}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                    <div className="flex flex-col gap-1.5 text-[13.5px]">
+                      <span className="inline-flex items-start gap-2 text-jb-text">
+                        <MapPin size={14} className="flex-none mt-[3px] text-jb-muted" /> {o.address}, {o.city}
+                      </span>
+                      <a href={`mailto:${o.email}?subject=${encodeURIComponent(`Tu pedido ${o.code}`)}`} className="inline-flex items-center gap-2 text-jb-soft hover:text-white">
+                        <Mail size={14} className="text-jb-muted" /> {o.email}
+                      </a>
+                      <a href={whatsappUrl(o.phone)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-jb-soft hover:text-white">
+                        <Phone size={14} className="text-jb-muted" /> {o.phone}
+                      </a>
+                    </div>
+                    {o.note && <p className="m-0 px-3 py-2.5 rounded-lg bg-white/[.04] text-[13.5px] text-jb-soft whitespace-pre-wrap">{o.note}</p>}
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-1.5 p-4 rounded-xl border border-white/[.08] bg-white/[.02] text-[13px]">
+                      <span className="inline-flex items-center gap-2 text-[13.5px] font-semibold text-white">
+                        {o.paymentMethod === 'TRANSFER' ? <Landmark size={15} className="text-jb-accent" /> : <CreditCard size={15} className="text-jb-accent" />}
+                        {o.paymentMethod === 'TRANSFER' ? 'Transferencia bancaria' : 'Pago PayPal'}
+                      </span>
+                      {o.paymentMethod === 'TRANSFER' && (
+                        <span className="text-jb-soft">
+                          Desde <strong className="text-white">{o.transferBank}</strong> · código{' '}
+                          <strong className="font-mono text-white">{o.transferReference}</strong>
+                        </span>
+                      )}
+                      {o.paymentMethod === 'TRANSFER' && o.status === 'PENDING_PAYMENT' ? (
+                        <>
+                          <span className="text-amber-300">Revisa tu cuenta: confirma el pago si llegó {formatMoney(o.totalCents)}, o recházalo (el stock vuelve y se avisa al cliente).</span>
+                          <div className="flex flex-wrap gap-2 pt-1.5">
+                            <button type="button" disabled={isBusy('confirm')} onClick={() => confirmTransfer(o)} className={btn.primary}>
+                              <BadgeCheck size={15} /> Confirmar pago
+                            </button>
+                            <button type="button" disabled={isBusy('CANCELLED')} onClick={() => setStatus(o, 'CANCELLED', `Transferencia de ${o.code} rechazada`)} className={btn.ghost}>
+                              <Ban size={15} /> Rechazar
+                            </button>
+                          </div>
+                        </>
+                      ) : o.paidAt ? (
+                        <>
+                          <span className="text-jb-soft">Verificado el {formatDate(o.paidAt)}</span>
+                          {o.paypalCaptureId && <span className="font-mono text-[12px] text-jb-muted break-all">Captura {o.paypalCaptureId}</span>}
+                          <EmailState sent={o.paidEmailAt} label="Correo de compra" />
+                        </>
+                      ) : o.status === 'PENDING_PAYMENT' ? (
+                        <span className="text-jb-muted">
+                          {o.paypalCaptureId ? 'PayPal está procesando el pago (se revisa solo).' : 'El cliente aún no paga. Si no paga en 30 min, se cancela y el stock vuelve.'}
+                        </span>
+                      ) : (
+                        <span className="text-jb-muted">Sin pago.</span>
+                      )}
+                      {o.refundedAt && <span className="text-amber-300">Reembolsado el {formatDate(o.refundedAt)}</span>}
+                    </div>
+
+                    {(o.status === 'PAID' || o.status === 'SHIPPED') && <ShipForm key={`${o.carrier}|${o.trackingNumber}|${o.trackingUrl}`} order={o} onSaved={replace} />}
+                    {o.status === 'COMPLETED' && o.carrier && (
+                      <span className="text-[13px] text-jb-soft">
+                        Enviado por {o.carrier} · guía <span className="font-mono">{o.trackingNumber}</span>
+                      </span>
+                    )}
+
+                    <div className="flex flex-wrap items-center justify-end gap-2">
+                      {(o.status === 'PAID' || o.status === 'SHIPPED') && (
+                        <button type="button" disabled={isBusy('COMPLETED')} onClick={() => setStatus(o, 'COMPLETED', `Pedido ${o.code} entregado`)} className={btn.ghost}>
+                          <CheckCheck size={15} /> Marcar entregado
+                        </button>
+                      )}
+                      {paid && (o.paypalCaptureId || o.paymentMethod === 'TRANSFER') && (
+                        <RefundButton
+                          busy={isBusy('refund')}
+                          amount={formatMoney(o.totalCents)}
+                          manual={o.paymentMethod === 'TRANSFER'}
+                          onConfirm={() => refund(o)}
+                        />
+                      )}
+                      {o.status === 'PENDING_PAYMENT' && o.paymentMethod === 'PAYPAL' && !o.paypalCaptureId && (
+                        <button type="button" disabled={isBusy('CANCELLED')} onClick={() => setStatus(o, 'CANCELLED', `Pedido ${o.code} cancelado`)} className={btn.ghost}>
+                          <Ban size={15} /> Cancelar
+                        </button>
+                      )}
+                      {(o.status === 'PENDING_PAYMENT' || o.status === 'CANCELLED') && <ConfirmDelete onConfirm={() => del(o)} />}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+      </Modal>
     </div>
   );
 }
