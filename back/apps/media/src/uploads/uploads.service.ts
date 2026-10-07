@@ -271,8 +271,8 @@ export class UploadsService {
   }
 
   private publicBase() {
-    const { publicUrl, bucket, region } = this.s3;
-    if (publicUrl) return publicUrl.replace(/\/+$/, '');
-    return `https://${bucket}.s3.${region}.amazonaws.com`;
+  const { publicUrl, bucket } = this.s3;
+  if (publicUrl) return publicUrl.replace(/\/+$/, '');
+  return `${publicUrl}/${bucket}`;
   }
 }
