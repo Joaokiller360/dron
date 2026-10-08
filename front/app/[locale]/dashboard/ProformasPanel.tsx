@@ -81,6 +81,25 @@ interface Draft {
   notes: string;
 }
 
+type ClientField = 'clientName' | 'clientEmail' | 'clientPhone' | 'clientTaxId';
+
+/** Comparable form of a client field ('' = too short to match anyone) */
+function clientKey(field: ClientField, value: string) {
+  if (field === 'clientPhone') {
+    let digits = value.replace(/\D/g, '');
+    if (digits.startsWith('0')) digits = `593${digits.slice(1)}`;
+    return digits.length >= 9 ? digits : '';
+  }
+  const v = value.trim().toLowerCase();
+  return v.length >= 3 ? v : '';
+}
+
+/** Result of the automatic email after creating a quote */
+interface EmailOutcome {
+  to?: string;
+  error?: string;
+}
+
 const emptyItem = (): ItemDraft => ({ description: '', quantity: '1', price: '' });
 
 function draftOf(q: Quote | null): Draft {
@@ -158,9 +177,13 @@ function QuoteEditor({
   quote: Quote | null;
   quotes: Quote[];
   catalog: { label: string; cents: number | null }[];
-  onSaved: (q: Quote, created: boolean) => void;
+  onSaved: (q: Quote, created: boolean, email?: EmailOutcome) => void;
 }) {
   const [d, setD] = useState<Draft>(() => draftOf(quote));
+  // New quotes go to the client's email as soon as they're created
+  const [sendNow, setSendNow] = useState(true);
+  // Draft before an earlier client's details were filled in, for "Deshacer"
+  const [autofill, setAutofill] = useState<{ code: string; before: Draft } | null>(null);
   // Accepted by the client: what they signed can't change
   const locked = !!quote?.acceptedAt;
   const [saving, setSaving] = useState(false);
@@ -174,7 +197,7 @@ function QuoteEditor({
   const t = computeTotals(items, discountCents, d.taxPercent);
   const dirty = JSON.stringify(payloadOf(d)) !== JSON.stringify(payloadOf(draftOf(quote)));
 
-  // Earlier clients, newest first, to fill their details again
+  // Earlier clients (latest quote of each), newest first, to fill their details again
   const pastClients = useMemo(() => {
     const seen = new Map<string, Quote>();
     quotes.forEach((q) => {
@@ -184,19 +207,34 @@ function QuoteEditor({
     return [...seen.values()];
   }, [quotes]);
 
-  const onClientName = (name: string) => {
-    const past = pastClients.find((q) => q.clientName.toLowerCase() === name.trim().toLowerCase());
-    setD((prev) => ({
-      ...prev,
-      clientName: name,
-      // Only fills empty fields, never overwrites what was typed
-      ...(past && {
-        clientCompany: prev.clientCompany || past.clientCompany || '',
-        clientTaxId: prev.clientTaxId || past.clientTaxId || '',
-        clientEmail: prev.clientEmail || past.clientEmail || '',
-        clientPhone: prev.clientPhone || past.clientPhone || '',
+  /**
+   * Leaving a field with a known client's name, email, WhatsApp or RUC (new
+   * quotes only; on blur so a half-typed name doesn't match someone else)
+   * fills the empty client fields and, while no item was written yet, the
+   * items, discount, IVA and conditions of their latest proforma.
+   */
+  const autofillFrom = (field: ClientField) => {
+    const key = clientKey(field, d[field]);
+    const past = !quote && key ? quotes.find((q) => clientKey(field, q[field] ?? '') === key) : undefined;
+    if (!past) return;
+    const blankItems = d.items.every((l) => !l.description.trim());
+    const filled: Draft = {
+      ...d,
+      clientName: d.clientName || past.clientName,
+      clientCompany: d.clientCompany || past.clientCompany || '',
+      clientTaxId: d.clientTaxId || past.clientTaxId || '',
+      clientEmail: d.clientEmail || past.clientEmail || '',
+      clientPhone: d.clientPhone || past.clientPhone || '',
+      ...(blankItems && {
+        items: draftOf(past).items,
+        discount: fromCents(past.discountCents),
+        taxPercent: past.taxPercent,
+        notes: past.notes ?? '',
       }),
-    }));
+    };
+    if (JSON.stringify(filled) === JSON.stringify(d)) return;
+    setAutofill({ code: past.code, before: d });
+    setD(filled);
   };
 
   const onDescription = (i: number, description: string) => {
@@ -217,10 +255,23 @@ function QuoteEditor({
     setError('');
     try {
       const body = JSON.stringify(payloadOf(d));
-      const saved = quote
+      let saved = quote
         ? await apiFetch<Quote>(`/quotes/${quote.id}`, { method: 'PATCH', body })
         : await apiFetch<Quote>('/quotes', { method: 'POST', body });
-      onSaved(saved, !quote);
+      let email: EmailOutcome | undefined;
+      if (!quote && sendNow && saved.clientEmail) {
+        // The quote exists already; a failed email is reported, not a failed save
+        try {
+          saved = await apiFetch<Quote>(`/quotes/${saved.id}/email`, {
+            method: 'POST',
+            body: JSON.stringify({ origin: window.location.origin }),
+          });
+          email = { to: saved.clientEmail! };
+        } catch (err) {
+          email = { error: errorMessage(err, 'No se pudo enviar el correo.') };
+        }
+      }
+      onSaved(saved, !quote, email);
     } catch (err) {
       setError(errorMessage(err, 'No se pudo guardar la proforma.'));
     } finally {
@@ -234,7 +285,7 @@ function QuoteEditor({
       <fieldset className="grid gap-3 p-0 m-0 border-0 sm:grid-cols-2">
         <legend className="mb-3 text-[13.5px] font-semibold text-white">Cliente</legend>
         <Field label="Nombre">
-          <input required minLength={2} maxLength={120} list="quote-clients" value={d.clientName} onChange={(e) => onClientName(e.target.value)} className={inputCls} />
+          <input required minLength={2} maxLength={120} list="quote-clients" value={d.clientName} onChange={(e) => set('clientName', e.target.value)} onBlur={() => autofillFrom('clientName')} className={inputCls} />
           <datalist id="quote-clients">
             {pastClients.map((q) => (
               <option key={q.id} value={q.clientName}>
@@ -247,15 +298,31 @@ function QuoteEditor({
           <input maxLength={120} value={d.clientCompany} onChange={(e) => set('clientCompany', e.target.value)} className={inputCls} />
         </Field>
         <Field label="Cédula o RUC" hint="Opcional">
-          <input maxLength={20} pattern="[0-9A-Za-z\-]{5,20}" value={d.clientTaxId} onChange={(e) => set('clientTaxId', e.target.value)} className={`${inputCls} font-mono`} />
+          <input maxLength={20} pattern="[0-9A-Za-z\-]{5,20}" value={d.clientTaxId} onChange={(e) => set('clientTaxId', e.target.value)} onBlur={() => autofillFrom('clientTaxId')} className={`${inputCls} font-mono`} />
         </Field>
         <Field label="Correo">
-          <input type="email" maxLength={120} value={d.clientEmail} onChange={(e) => set('clientEmail', e.target.value)} className={inputCls} />
+          <input type="email" maxLength={120} value={d.clientEmail} onChange={(e) => set('clientEmail', e.target.value)} onBlur={() => autofillFrom('clientEmail')} className={inputCls} />
         </Field>
         <Field label="WhatsApp" hint="Ej. 099 123 4567 o +593 99 123 4567">
-          <input type="tel" minLength={7} maxLength={20} pattern="\+?[0-9 ()\-]+" value={d.clientPhone} onChange={(e) => set('clientPhone', e.target.value)} className={inputCls} />
+          <input type="tel" minLength={7} maxLength={20} pattern="\+?[0-9 ()\-]+" value={d.clientPhone} onChange={(e) => set('clientPhone', e.target.value)} onBlur={() => autofillFrom('clientPhone')} className={inputCls} />
         </Field>
       </fieldset>
+      {autofill && (
+        <p className="flex flex-wrap items-center gap-2 m-0 px-3.5 py-2.5 rounded-[10px] border border-[rgba(52,209,122,.3)] bg-[rgba(52,209,122,.08)] text-[13px] text-jb-soft">
+          <BadgeCheck size={15} className="text-jb-accent" />
+          Cliente conocido: rellené sus datos y la proforma con su última ({autofill.code}). Revisa precios y fechas.
+          <button
+            type="button"
+            onClick={() => {
+              setD(autofill.before);
+              setAutofill(null);
+            }}
+            className="ml-auto font-semibold text-white underline cursor-pointer"
+          >
+            Deshacer
+          </button>
+        </p>
+      )}
 
       <div className="flex flex-col gap-2">
         <span className="text-[13.5px] font-semibold text-white">Ítems</span>
@@ -354,9 +421,15 @@ function QuoteEditor({
       </fieldset>
       {error && <ErrorNote>{error}</ErrorNote>}
       {!locked && (
-        <div className="flex justify-end">
+        <div className="flex flex-wrap items-center justify-end gap-3">
+          {!quote && (
+            <label className={`inline-flex items-center gap-2 mr-auto text-[13px] cursor-pointer ${d.clientEmail.trim() ? 'text-jb-soft' : 'text-jb-muted'}`}>
+              <input type="checkbox" checked={sendNow} onChange={(e) => setSendNow(e.target.checked)} className="w-4 h-4 accent-[#34d17a]" />
+              {d.clientEmail.trim() ? `Enviar a ${d.clientEmail.trim()} al crear` : 'Enviar por correo al crear (falta el correo)'}
+            </label>
+          )}
           <button type="submit" disabled={saving || (!!quote && !dirty)} className={btn.primary}>
-            <Save size={15} /> {saving ? 'Guardando…' : quote ? 'Guardar cambios' : 'Crear proforma'}
+            <Save size={15} /> {saving ? 'Guardando…' : quote ? 'Guardar cambios' : sendNow && d.clientEmail.trim() ? 'Crear y enviar' : 'Crear proforma'}
           </button>
         </div>
       )}
@@ -535,9 +608,12 @@ export default function ProformasPanel() {
 
   const upsert = (q: Quote) => setItems(items.some((x) => x.id === q.id) ? items.map((x) => (x.id === q.id ? q : x)) : [q, ...items]);
 
-  const onSaved = (q: Quote, created: boolean) => {
+  const onSaved = (q: Quote, created: boolean, email?: EmailOutcome) => {
     upsert(q);
-    toast.success(created ? `Proforma ${q.code} creada. Ya puedes enviarla.` : 'Cambios guardados');
+    if (!created) toast.success('Cambios guardados');
+    else if (email?.to) toast.success(`Proforma ${q.code} creada y enviada a ${email.to}`);
+    else toast.success(`Proforma ${q.code} creada. Ya puedes enviarla.`);
+    if (email?.error) toast.error(`La proforma se creó, pero el correo no salió: ${email.error}`);
     if (created) setOpenId(q.id);
   };
 
