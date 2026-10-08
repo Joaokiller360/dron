@@ -183,6 +183,10 @@ export interface Testimonial {
   quote: string;
   author: string;
   org?: string | null;
+  /** Own photo; when empty the site shows the linked client's photo */
+  photoUrl?: string | null;
+  clientId?: string | null;
+  client?: Pick<Client, 'id' | 'name' | 'photoUrl'> | null;
   published: boolean;
   sortOrder: number;
 }

@@ -143,6 +143,8 @@ model Client {
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
+  testimonials Testimonial[]
+
   @@index([categoryId])
   @@index([published])
   @@map("clients")
@@ -243,12 +245,17 @@ model Testimonial {
   quote     String
   author    String
   org       String?
+  // Own photo of the author; when empty the linked client's photo is shown
+  photoUrl  String?  @map("photo_url")
+  clientId  String?  @map("client_id")
+  client    Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
   published Boolean  @default(true)
   sortOrder Int      @default(0) @map("sort_order")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@index([published])
+  @@index([clientId])
   @@map("testimonials")
 }
 

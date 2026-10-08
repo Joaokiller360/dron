@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsInt, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsBoolean, IsInt, IsOptional, IsString, IsUrl, IsUUID, MaxLength, MinLength } from 'class-validator';
 
 export class CreateTestimonialDto {
   @ApiProperty({ example: 'Las tomas del hotel superaron lo que esperábamos.' })
@@ -18,6 +18,17 @@ export class CreateTestimonialDto {
   @IsString()
   @MaxLength(120)
   org?: string;
+
+  @ApiPropertyOptional({ example: 'https://cdn.example.com/maria.jpg', description: 'Own photo; when empty the linked client photo is used' })
+  @IsOptional()
+  @IsUrl()
+  @MaxLength(500)
+  photoUrl?: string | null;
+
+  @ApiPropertyOptional({ description: 'Existing client this testimonial comes from' })
+  @IsOptional()
+  @IsUUID()
+  clientId?: string | null;
 
   @ApiPropertyOptional({ default: true })
   @IsOptional()

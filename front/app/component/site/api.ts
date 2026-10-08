@@ -168,7 +168,10 @@ export interface PublicTestimonial {
   id: string;
   quote: string;
   author: string;
+  /** Falls back to the linked client's name */
   org?: string | null;
+  /** Own photo, else the linked client's */
+  photoUrl?: string | null;
 }
 
 export function localized(locale: string, es: string, en?: string | null) {
