@@ -386,39 +386,51 @@ enum QuoteStatus {
 // Proforma (price quote) made in the dashboard and sent to a client by email
 // or WhatsApp. The client opens it at /proforma/<token>, a printable page.
 model Quote {
-  id            String      @id @default(uuid())
+  id               String      @id @default(uuid())
   // Running number shown as "PF-0001"
-  number        Int         @unique @default(autoincrement())
+  number           Int         @unique @default(autoincrement())
   // Unguessable key of the public page; the only way to read a quote without logging in
-  token         String      @unique
-  clientName    String      @map("client_name")
-  clientCompany String?     @map("client_company")
+  token            String      @unique
+  clientName       String      @map("client_name")
+  clientCompany    String?     @map("client_company")
   // Cédula or RUC
-  clientTaxId   String?     @map("client_tax_id")
-  clientEmail   String?     @map("client_email")
-  clientPhone   String?     @map("client_phone")
+  clientTaxId      String?     @map("client_tax_id")
+  clientEmail      String?     @map("client_email")
+  clientPhone      String?     @map("client_phone")
   // { description, quantity, unitCents }[]
-  items         Json
+  items            Json
   // Amount off the subtotal, before tax
-  discountCents Int         @default(0) @map("discount_cents")
+  discountCents    Int         @default(0) @map("discount_cents")
   // IVA in percent (0 or 15); totals are computed by the API
-  taxPercent    Int         @default(0) @map("tax_percent")
-  subtotalCents Int         @map("subtotal_cents")
-  taxCents      Int         @map("tax_cents")
-  totalCents    Int         @map("total_cents")
+  taxPercent       Int         @default(0) @map("tax_percent")
+  subtotalCents    Int         @map("subtotal_cents")
+  taxCents         Int         @map("tax_cents")
+  totalCents       Int         @map("total_cents")
   // Payment terms, delivery time, what's included…
-  notes         String?
-  validUntil    DateTime?   @map("valid_until")
-  status        QuoteStatus @default(DRAFT)
-  emailedAt     DateTime?   @map("emailed_at")
-  whatsappAt    DateTime?   @map("whatsapp_at")
+  notes            String?
+  validUntil       DateTime?   @map("valid_until")
+  status           QuoteStatus @default(DRAFT)
+  emailedAt        DateTime?   @map("emailed_at")
+  whatsappAt       DateTime?   @map("whatsapp_at")
   // Client's acceptance on the public page (name typed as signature, terms
   // checked). Once set, the quote can no longer be edited.
-  acceptedAt    DateTime?   @map("accepted_at")
-  acceptedName  String?     @map("accepted_name")
-  acceptedIp    String?     @map("accepted_ip")
-  createdAt     DateTime    @default(now()) @map("created_at")
-  updatedAt     DateTime    @updatedAt @map("updated_at")
+  acceptedAt       DateTime?   @map("accepted_at")
+  acceptedName     String?     @map("accepted_name")
+  acceptedIp       String?     @map("accepted_ip")
+  // Invoice asked for when accepting (all invoices are issued at month end)
+  invoiceRequested Boolean     @default(false) @map("invoice_requested")
+  invoiceName      String?     @map("invoice_name")
+  // Cédula (10 digits) or RUC (13)
+  invoiceTaxId     String?     @map("invoice_tax_id")
+  invoiceEmail     String?     @map("invoice_email")
+  invoiceAddress   String?     @map("invoice_address")
+  // Client's rejection on the public page (optional reason); also locks it
+  rejectedAt       DateTime?   @map("rejected_at")
+  rejectReason     String?     @map("reject_reason")
+  // First time the client opened the link in a browser (not link previews)
+  viewedAt         DateTime?   @map("viewed_at")
+  createdAt        DateTime    @default(now()) @map("created_at")
+  updatedAt        DateTime    @updatedAt @map("updated_at")
 
   @@index([status])
   @@map("quotes")

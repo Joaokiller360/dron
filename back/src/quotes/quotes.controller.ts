@@ -19,6 +19,7 @@ import { CreateQuoteDto } from './dto/create-quote.dto';
 import { UpdateQuoteDto } from './dto/update-quote.dto';
 import { SendQuoteEmailDto } from './dto/send-quote-email.dto';
 import { AcceptQuoteDto } from './dto/accept-quote.dto';
+import { RejectQuoteDto } from './dto/reject-quote.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('quotes')
@@ -39,6 +40,22 @@ export class QuotesController {
   @ApiOperation({ summary: 'Public: the client accepts the proforma and its terms' })
   accept(@Param('token') token: string, @Body() dto: AcceptQuoteDto, @Req() req: Request) {
     return this.quotes.accept(token, dto, clientIp(req));
+  }
+
+  @Post('public/:token/reject')
+  @HttpCode(200)
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  @ApiOperation({ summary: 'Public: the client rejects the proforma (optional reason)' })
+  reject(@Param('token') token: string, @Body() dto: RejectQuoteDto) {
+    return this.quotes.reject(token, dto);
+  }
+
+  @Post('public/:token/view')
+  @HttpCode(204)
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
+  @ApiOperation({ summary: 'Public: page opened in a browser (the first time emails the shop)' })
+  markViewed(@Param('token') token: string) {
+    return this.quotes.markViewed(token);
   }
 
   @Get()

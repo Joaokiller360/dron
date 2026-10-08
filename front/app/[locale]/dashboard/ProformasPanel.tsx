@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState, FormEvent } from 'react';
-import { FileText, ChevronRight, Plus, Trash2, Mail, MessageCircle, ExternalLink, Copy, Check, Clock, Save, BadgeCheck, Ban, RefreshCw } from 'lucide-react';
+import { FileText, ChevronRight, Plus, Trash2, Mail, MessageCircle, ExternalLink, Copy, Check, Clock, Save, BadgeCheck, Ban, RefreshCw, Eye, XCircle } from 'lucide-react';
 import { apiFetch, errorMessage, formatMoney, Product, Quote, QuoteItem, QuoteStatus, Service } from './lib/api';
 import { useCollection } from './lib/useCollection';
 import Modal from './Modal';
@@ -15,7 +15,8 @@ const STATUSES: { id: QuoteStatus; label: string; tone: 'on' | 'muted' | 'warn' 
 ];
 const statusOf = (s: QuoteStatus) => STATUSES.find((x) => x.id === s)!;
 
-const TAX_OPTIONS = [0, 15];
+// IVA the client adds by asking for an invoice when accepting (same as the API)
+const INVOICE_TAX_PERCENT = 15;
 const DEFAULT_NOTES = 'Forma de pago: 50% de anticipo para reservar la fecha y 50% a la entrega del material.';
 const DEFAULT_VALID_DAYS = 15;
 // Same cap as the API ($10,000,000)
@@ -56,7 +57,8 @@ function whatsappText(q: Quote) {
     '',
     ...lines,
     '',
-    `*Total: ${formatMoney(q.totalCents)}*${q.taxPercent ? ` (IVA ${q.taxPercent}% incluido)` : ''}${valid}`,
+    `*Total: ${formatMoney(q.totalCents)}* (sin factura)`,
+    `Con factura se suma el IVA ${INVOICE_TAX_PERCENT}%: ${formatMoney(computeTotals(q.items, q.discountCents, INVOICE_TAX_PERCENT).totalCents)}. Las facturas se emiten a fin de mes.${valid}`,
     '',
     `Mírala completa y descárgala en PDF aquí: ${publicLink(q)}`,
   ].join('\n');
@@ -76,7 +78,6 @@ interface Draft {
   clientPhone: string;
   items: ItemDraft[];
   discount: string;
-  taxPercent: number;
   validUntil: string;
   notes: string;
 }
@@ -113,7 +114,6 @@ function draftOf(q: Quote | null): Draft {
       clientPhone: '',
       items: [emptyItem()],
       discount: '',
-      taxPercent: 15,
       validUntil: until.toISOString().slice(0, 10),
       notes: DEFAULT_NOTES,
     };
@@ -126,7 +126,6 @@ function draftOf(q: Quote | null): Draft {
     clientPhone: q.clientPhone ?? '',
     items: q.items.map((l) => ({ description: l.description, quantity: String(l.quantity), price: fromCents(l.unitCents) })),
     discount: fromCents(q.discountCents),
-    taxPercent: q.taxPercent,
     validUntil: q.validUntil ? q.validUntil.slice(0, 10) : '',
     notes: q.notes ?? '',
   };
@@ -152,7 +151,6 @@ function payloadOf(d: Draft) {
     clientPhone: d.clientPhone.trim() || null,
     items: parseItems(d.items),
     discountCents: toCents(d.discount) || 0,
-    taxPercent: d.taxPercent,
     validUntil: d.validUntil || null,
     notes: d.notes.trim() || null,
   };
@@ -184,8 +182,8 @@ function QuoteEditor({
   const [sendNow, setSendNow] = useState(true);
   // Draft before an earlier client's details were filled in, for "Deshacer"
   const [autofill, setAutofill] = useState<{ code: string; before: Draft } | null>(null);
-  // Accepted by the client: what they signed can't change
-  const locked = !!quote?.acceptedAt;
+  // Answered by the client (accepted or rejected): what they saw can't change
+  const locked = !!(quote?.acceptedAt || quote?.rejectedAt);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const set = <K extends keyof Draft>(key: K, value: Draft[K]) => setD((prev) => ({ ...prev, [key]: value }));
@@ -194,7 +192,9 @@ function QuoteEditor({
 
   const items = parseItems(d.items);
   const discountCents = toCents(d.discount) || 0;
-  const t = computeTotals(items, discountCents, d.taxPercent);
+  // Quoted without IVA; the client adds it by asking for an invoice
+  const t = computeTotals(items, discountCents, 0);
+  const withInvoice = computeTotals(items, discountCents, INVOICE_TAX_PERCENT);
   const dirty = JSON.stringify(payloadOf(d)) !== JSON.stringify(payloadOf(draftOf(quote)));
 
   // Earlier clients (latest quote of each), newest first, to fill their details again
@@ -211,7 +211,7 @@ function QuoteEditor({
    * Leaving a field with a known client's name, email, WhatsApp or RUC (new
    * quotes only; on blur so a half-typed name doesn't match someone else)
    * fills the empty client fields and, while no item was written yet, the
-   * items, discount, IVA and conditions of their latest proforma.
+   * items, discount and conditions of their latest proforma.
    */
   const autofillFrom = (field: ClientField) => {
     const key = clientKey(field, d[field]);
@@ -228,7 +228,6 @@ function QuoteEditor({
       ...(blankItems && {
         items: draftOf(past).items,
         discount: fromCents(past.discountCents),
-        taxPercent: past.taxPercent,
         notes: past.notes ?? '',
       }),
     };
@@ -371,18 +370,9 @@ function QuoteEditor({
         </button>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-3">
-        <Field label="Descuento ($)" hint="Se resta antes del IVA">
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Field label="Descuento ($)" hint="Opcional">
           <input inputMode="decimal" placeholder="0.00" value={d.discount} onChange={(e) => set('discount', e.target.value)} className={`${inputCls} font-mono`} />
-        </Field>
-        <Field label="IVA">
-          <select value={d.taxPercent} onChange={(e) => set('taxPercent', Number(e.target.value))} className={inputCls}>
-            {TAX_OPTIONS.map((p) => (
-              <option key={p} value={p}>
-                {p ? `${p}%` : 'Sin IVA'}
-              </option>
-            ))}
-          </select>
         </Field>
         <Field label="Válida hasta" hint="Opcional">
           <input type="date" value={d.validUntil} onChange={(e) => set('validUntil', e.target.value)} className={inputCls} />
@@ -405,16 +395,32 @@ function QuoteEditor({
               <td className="py-1 font-mono text-right text-jb-soft">−{formatMoney(discountCents)}</td>
             </tr>
           )}
-          {d.taxPercent > 0 && (
-            <tr>
-              <td className="py-1 text-jb-soft">IVA {d.taxPercent}%</td>
-              <td className="py-1 font-mono text-right text-jb-soft">{formatMoney(t.taxCents)}</td>
-            </tr>
+          {locked && quote && quote.taxPercent > 0 ? (
+            <>
+              {/* Accepted with invoice: the IVA the client added */}
+              <tr>
+                <td className="py-1 text-jb-soft">IVA {quote.taxPercent}% (factura)</td>
+                <td className="py-1 font-mono text-right text-jb-soft">{formatMoney(quote.taxCents)}</td>
+              </tr>
+              <tr className="border-t border-white/[.1]">
+                <td className="pt-2 font-semibold text-white">Total</td>
+                <td className="pt-2 font-mono text-[18px] font-bold text-right text-white">{formatMoney(quote.totalCents)}</td>
+              </tr>
+            </>
+          ) : (
+            <>
+              <tr className="border-t border-white/[.1]">
+                <td className="pt-2 font-semibold text-white">{locked ? 'Total' : 'Total sin factura'}</td>
+                <td className="pt-2 font-mono text-[18px] font-bold text-right text-white">{formatMoney(t.totalCents)}</td>
+              </tr>
+              {!locked && (
+                <tr>
+                  <td className="pt-1 text-[12.5px] text-jb-muted">Si pide factura (+IVA {INVOICE_TAX_PERCENT}%)</td>
+                  <td className="pt-1 font-mono text-[13px] text-right text-jb-soft">{formatMoney(withInvoice.totalCents)}</td>
+                </tr>
+              )}
+            </>
           )}
-          <tr className="border-t border-white/[.1]">
-            <td className="pt-2 font-semibold text-white">Total</td>
-            <td className="pt-2 font-mono text-[18px] font-bold text-right text-white">{formatMoney(t.totalCents)}</td>
-          </tr>
         </tbody>
       </table>
 
@@ -705,8 +711,10 @@ export default function ProformasPanel() {
                 >
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-mono text-[13px] font-bold text-white">{q.code}</span>
-                    <Pill tone={st.tone}>{q.acceptedAt ? 'Aceptada por el cliente' : st.label}</Pill>
+                    <Pill tone={st.tone}>{q.acceptedAt ? 'Aceptada por el cliente' : q.rejectedAt ? 'Rechazada por el cliente' : st.label}</Pill>
                     <span className="flex items-center gap-1.5 ml-auto text-jb-muted">
+                      {q.invoiceRequested && <Pill tone="warn">Factura</Pill>}
+                      {q.viewedAt && <Eye size={14} aria-label="El cliente la abrió" className="text-sky-300" />}
                       {q.emailedAt && <Mail size={14} aria-label="Enviada por correo" className="text-jb-mint" />}
                       {q.whatsappAt && <MessageCircle size={14} aria-label="Enviada por WhatsApp" className="text-jb-mint" />}
                       <ChevronRight size={16} className="transition group-hover:translate-x-0.5 group-hover:text-white" />
@@ -748,18 +756,35 @@ export default function ProformasPanel() {
               <div className="flex flex-wrap items-center gap-2">
                 <Pill tone={statusOf(current.status).tone}>{statusOf(current.status).label}</Pill>
                 <span className="ml-auto" />
-                {!current.acceptedAt && current.status !== 'ACCEPTED' && (
+                {!current.acceptedAt && !current.rejectedAt && current.status !== 'ACCEPTED' && (
                   <button type="button" onClick={() => setStatus(current, 'ACCEPTED')} className={btn.subtle}>
                     <BadgeCheck size={15} /> Aceptada
                   </button>
                 )}
-                {!current.acceptedAt && current.status !== 'REJECTED' && (
+                {!current.acceptedAt && !current.rejectedAt && current.status !== 'REJECTED' && (
                   <button type="button" onClick={() => setStatus(current, 'REJECTED')} className={btn.subtle}>
                     <Ban size={15} /> Rechazada
                   </button>
                 )}
                 <ConfirmDelete onConfirm={() => del(current)} />
               </div>
+              {current.rejectedAt && (
+                <div className="flex flex-col gap-1 p-4 rounded-xl border border-red-500/35 bg-red-500/[.08] text-[13px]">
+                  <span className="inline-flex items-center gap-2 text-[13.5px] font-semibold text-white">
+                    <XCircle size={15} className="text-red-300" /> Rechazada por el cliente
+                  </span>
+                  <span className="text-jb-soft">El {formatDate(current.rejectedAt)}</span>
+                  {current.rejectReason ? (
+                    <p className="m-0 mt-1 px-3 py-2 rounded-lg bg-white/[.04] text-[13px] text-jb-text whitespace-pre-wrap">{current.rejectReason}</p>
+                  ) : (
+                    <span className="text-jb-muted">No dejó un motivo.</span>
+                  )}
+                  <span className="text-[12px] text-jb-muted">Para ofrecer otra propuesta crea una nueva: al escribir su nombre se copian los ítems de esta.</span>
+                </div>
+              )}
+              <span className={`inline-flex items-center gap-1.5 text-[12px] ${current.viewedAt ? 'text-sky-300' : 'text-jb-muted'}`}>
+                <Eye size={13} /> {current.viewedAt ? `El cliente la abrió el ${formatDate(current.viewedAt)}` : 'El cliente aún no la abre'}
+              </span>
               {current.acceptedAt && (
                 <div className="flex flex-col gap-1 p-4 rounded-xl border border-[rgba(52,209,122,.35)] bg-[rgba(52,209,122,.08)] text-[13px]">
                   <span className="inline-flex items-center gap-2 text-[13.5px] font-semibold text-white">
@@ -769,6 +794,19 @@ export default function ProformasPanel() {
                     <strong className="text-white">{current.acceptedName}</strong> firmó y aceptó los términos el {formatDate(current.acceptedAt)}
                     {current.acceptedIp && <span className="font-mono text-[11.5px] text-jb-muted"> · IP {current.acceptedIp}</span>}
                   </span>
+                  {current.invoiceRequested ? (
+                    <div className="flex flex-col gap-0.5 mt-1.5 px-3 py-2 rounded-lg bg-white/[.04]">
+                      <span className="font-semibold text-white">Pidió factura · se emite a fin de mes</span>
+                      <span className="text-jb-soft">
+                        {current.invoiceName} · <span className="font-mono">{current.invoiceTaxId}</span>
+                      </span>
+                      <span className="text-jb-muted">
+                        {current.invoiceEmail} · {current.invoiceAddress}
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-jb-muted">No pidió factura.</span>
+                  )}
                   <span className="text-[12px] text-jb-muted">Ya no se puede editar. Si hay cambios, crea una proforma nueva.</span>
                 </div>
               )}

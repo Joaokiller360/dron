@@ -385,6 +385,17 @@ export interface Quote {
   acceptedAt?: string | null;
   acceptedName?: string | null;
   acceptedIp?: string | null;
+  /** Invoice asked for when accepting (issued at month end) */
+  invoiceRequested?: boolean;
+  invoiceName?: string | null;
+  invoiceTaxId?: string | null;
+  invoiceEmail?: string | null;
+  invoiceAddress?: string | null;
+  /** Client rejected on the public page (optional reason); also locks the quote */
+  rejectedAt?: string | null;
+  rejectReason?: string | null;
+  /** First time the client opened the link in a browser */
+  viewedAt?: string | null;
   createdAt: string;
   updatedAt: string;
 }

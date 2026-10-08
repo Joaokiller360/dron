@@ -8,15 +8,19 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Prisma, Quote } from '@prisma/client';
-import { randomBytes } from 'crypto';
+import { createHash, randomBytes } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { SettingsService } from '../settings/settings.service';
 import { CreateQuoteDto, QuoteItemDto } from './dto/create-quote.dto';
 import { UpdateQuoteDto } from './dto/update-quote.dto';
 import { SendQuoteEmailDto } from './dto/send-quote-email.dto';
 import { AcceptQuoteDto } from './dto/accept-quote.dto';
+import { RejectQuoteDto } from './dto/reject-quote.dto';
 
 export type QuoteItem = Pick<QuoteItemDto, 'description' | 'quantity' | 'unitCents'>;
+
+/** IVA added when the client asks for an invoice (prices are quoted without it) */
+export const INVOICE_TAX_PERCENT = 15;
 
 /** $10,000,000; with 30% tax it still fits a 32-bit cents column */
 const MAX_SUBTOTAL_CENTS = 1_000_000_000;
@@ -58,7 +62,29 @@ const isExpired = (q: Quote) =>
   q.validUntil ? q.validUntil.getTime() + 86_400_000 < Date.now() : false;
 
 const LOCKED =
-  'El cliente ya aceptó esta proforma: no se puede cambiar. Crea una nueva si hace falta.';
+  'El cliente ya respondió esta proforma (aceptó o rechazó): no se puede cambiar. Crea una nueva si hace falta.';
+
+/**
+ * Fingerprint of what the client signs (who, what, how much, conditions).
+ * Sending, viewing or the status don't change it; any content edit does.
+ */
+const contentVersion = (q: Quote) =>
+  createHash('sha256')
+    .update(
+      JSON.stringify([
+        q.clientName,
+        q.clientCompany,
+        q.clientTaxId,
+        q.items,
+        q.discountCents,
+        q.taxPercent,
+        q.totalCents,
+        q.notes,
+        q.validUntil?.toISOString() ?? null,
+      ]),
+    )
+    .digest('base64url')
+    .slice(0, 22);
 
 /** Proformas: made in the dashboard, read by the client through a secret link */
 @Injectable()
@@ -94,14 +120,27 @@ export class QuotesService {
       subtotalCents: q.subtotalCents,
       taxCents: q.taxCents,
       totalCents: q.totalCents,
+      // Until the client answers, the total is without invoice; asking for one
+      // adds IVA, and these say how much it would be
+      invoiceTaxPercent: INVOICE_TAX_PERCENT,
+      invoiceTotalCents: totals(
+        q.items as unknown as QuoteItem[],
+        q.discountCents,
+        INVOICE_TAX_PERCENT,
+      ).totalCents,
       notes: q.notes,
       validUntil: q.validUntil,
       expired: isExpired(q),
       status: q.status,
       acceptedAt: q.acceptedAt,
       acceptedName: q.acceptedName,
+      rejectedAt: q.rejectedAt,
+      rejectReason: q.rejectReason,
+      invoiceRequested: q.invoiceRequested,
+      invoiceName: q.invoiceName,
+      invoiceTaxId: q.invoiceTaxId,
       // Sent back on accept, so the client signs exactly the version on screen
-      version: q.updatedAt.toISOString(),
+      version: contentVersion(q),
       createdAt: q.createdAt,
       contact,
     };
@@ -109,7 +148,8 @@ export class QuotesService {
 
   async create(dto: CreateQuoteDto) {
     const discountCents = dto.discountCents ?? 0;
-    const taxPercent = dto.taxPercent ?? 0;
+    // Quoted without IVA; it's added on acceptance only if the client wants an invoice
+    const taxPercent = 0;
     const created = await this.prisma.quote.create({
       data: {
         ...this.clientFields(dto),
@@ -127,14 +167,15 @@ export class QuotesService {
 
   async update(id: string, dto: UpdateQuoteDto) {
     const current = await this.ensureExists(id);
-    if (current.acceptedAt) throw new ConflictException(LOCKED);
+    if (current.acceptedAt || current.rejectedAt) throw new ConflictException(LOCKED);
     const items = dto.items ?? (current.items as unknown as QuoteItem[]);
     const discountCents = dto.discountCents ?? current.discountCents;
-    const taxPercent = dto.taxPercent ?? current.taxPercent;
+    // Open quotes are always without IVA (see create)
+    const taxPercent = 0;
     const updated = await this.prisma.quote
       .update({
-        // Not accepted in the meantime
-        where: { id, acceptedAt: null },
+        // Not answered by the client in the meantime
+        where: { id, acceptedAt: null, rejectedAt: null },
         data: {
           ...this.clientFields(dto),
           ...(dto.items && { items: dto.items as unknown as Prisma.InputJsonValue }),
@@ -158,48 +199,129 @@ export class QuotesService {
   }
 
   /**
-   * The client accepts on the public page: typed name + terms checkbox. Only
-   * once, and not after the quote expired or was marked rejected.
+   * The client accepts on the public page: typed name + terms checkbox, for
+   * exactly the version on screen. Only once, and not after it expired.
    */
   async accept(token: string, dto: AcceptQuoteDto, ip: string) {
-    const q = await this.prisma.quote.findUnique({ where: { token } });
-    if (!q) throw new NotFoundException('La proforma no existe');
-    if (q.acceptedAt) throw new ConflictException('Esta proforma ya fue aceptada');
-    if (q.status === 'REJECTED') throw new ConflictException('Esta proforma ya no está disponible');
-    if (isExpired(q)) {
-      throw new ConflictException('Esta proforma venció. Escríbenos para actualizarla.');
-    }
+    const q = await this.findOpen(token);
     const changed = new ConflictException(
       'La proforma cambió mientras la leías. Recarga la página para ver la versión actual.',
     );
-    if (q.updatedAt.getTime() !== new Date(dto.version).getTime()) throw changed;
-    // Conditional write: not accepted twice, and not edited since it was read
+    if (dto.version !== contentVersion(q)) throw changed;
+    const taxPercent = dto.invoice ? INVOICE_TAX_PERCENT : 0;
+    const final = totals(q.items as unknown as QuoteItem[], q.discountCents, taxPercent);
+    // Conditional write: not answered twice, and not edited since it was read
     const { count } = await this.prisma.quote.updateMany({
-      where: { id: q.id, acceptedAt: null, updatedAt: q.updatedAt },
+      where: { id: q.id, acceptedAt: null, rejectedAt: null, updatedAt: q.updatedAt },
       data: {
         acceptedAt: new Date(),
         acceptedName: dto.name,
         acceptedIp: ip.slice(0, 64),
         status: 'ACCEPTED',
+        taxPercent,
+        ...final,
+        invoiceRequested: !!dto.invoice,
+        invoiceName: dto.invoice?.name ?? null,
+        invoiceTaxId: dto.invoice?.taxId ?? null,
+        invoiceEmail: dto.invoice?.email ?? null,
+        invoiceAddress: dto.invoice?.address ?? null,
       },
     });
     if (!count) throw changed;
 
-    // Heads-up to the shop; the acceptance stands even if the email fails
-    const contact = await this.settings.getContact();
-    this.send(
-      contact.email,
-      `Proforma ${quoteCode(q.number)} aceptada · ${money(q.totalCents)}`,
-      [
-        `<p><strong>${esc(dto.name)}</strong> aceptó la proforma ${quoteCode(q.number)} de ${esc(q.clientName)}${q.clientCompany ? ` (${esc(q.clientCompany)})` : ''} por <strong>${money(q.totalCents)}</strong>, junto con sus condiciones y los términos y condiciones del sitio.</p>`,
-        '<p>Revísala en el dashboard (Proformas).</p>',
-      ].join('\n'),
-      q.clientEmail || contact.email,
-    ).catch((err: unknown) =>
-      this.logger.warn(`Acceptance email for ${quoteCode(q.number)} not sent: ${String(err)}`),
+    this.notifyShop(
+      q,
+      `Proforma ${quoteCode(q.number)} ACEPTADA · ${money(final.totalCents)}`,
+      `<p><strong>${esc(dto.name)}</strong> aceptó la proforma ${quoteCode(q.number)} por <strong>${money(final.totalCents)}</strong>${taxPercent ? ` (IVA ${taxPercent}% incluido)` : ''}, junto con sus condiciones y los términos y condiciones del sitio.</p>` +
+        (dto.invoice
+          ? `<p style="margin:16px 0 4px"><strong>Pidió factura</strong> (se emite a fin de mes):</p>
+<table style="border-collapse:collapse">
+<tr><td style="padding:3px 14px 3px 0;color:#555">Nombre / razón social</td><td>${esc(dto.invoice.name)}</td></tr>
+<tr><td style="padding:3px 14px 3px 0;color:#555">Cédula / RUC</td><td style="font-family:monospace">${esc(dto.invoice.taxId)}</td></tr>
+<tr><td style="padding:3px 14px 3px 0;color:#555">Correo</td><td>${esc(dto.invoice.email)}</td></tr>
+<tr><td style="padding:3px 14px 3px 0;color:#555">Dirección</td><td>${esc(dto.invoice.address)}</td></tr>
+</table>`
+          : '<p>No pidió factura.</p>'),
     );
-
     return this.findPublic(token);
+  }
+
+  /** The client turns the quote down on the public page, optionally saying why */
+  async reject(token: string, dto: RejectQuoteDto) {
+    const q = await this.findOpen(token);
+    const { count } = await this.prisma.quote.updateMany({
+      where: { id: q.id, acceptedAt: null, rejectedAt: null },
+      data: { rejectedAt: new Date(), rejectReason: dto.reason ?? null, status: 'REJECTED' },
+    });
+    if (!count) throw new ConflictException('Esta proforma ya fue respondida');
+
+    this.notifyShop(
+      q,
+      `Proforma ${quoteCode(q.number)} RECHAZADA · ${money(q.totalCents)}`,
+      `<p>El cliente rechazó la proforma ${quoteCode(q.number)} por ${money(q.totalCents)}.</p>` +
+        (dto.reason
+          ? `<p><strong>Motivo:</strong></p><p style="white-space:pre-wrap;padding:10px 14px;background:#f5f5f5;border-radius:8px">${esc(dto.reason)}</p>`
+          : '<p>No dejó un motivo.</p>'),
+    );
+    return this.findPublic(token);
+  }
+
+  /**
+   * The public page reports the first time it's opened in a browser (from
+   * script, so link previews in WhatsApp/email don't count). Raw SQL keeps
+   * updated_at, which the dashboard editor keys on.
+   */
+  async markViewed(token: string) {
+    const q = await this.prisma.quote.findUnique({ where: { token } });
+    if (!q) throw new NotFoundException('La proforma no existe');
+    const first = await this.prisma.$executeRaw`
+      UPDATE "quotes" SET "viewed_at" = NOW() WHERE "id" = ${q.id} AND "viewed_at" IS NULL`;
+    if (first) {
+      this.notifyShop(
+        q,
+        `Proforma ${quoteCode(q.number)} abierta por el cliente`,
+        `<p>El cliente abrió la proforma ${quoteCode(q.number)} (${money(q.totalCents)}) por primera vez. Aún no la acepta ni la rechaza.</p>`,
+      );
+    }
+  }
+
+  /** Quote the client can still answer: exists, not answered, not expired */
+  private async findOpen(token: string) {
+    const q = await this.prisma.quote.findUnique({ where: { token } });
+    if (!q) throw new NotFoundException('La proforma no existe');
+    if (q.acceptedAt) throw new ConflictException('Esta proforma ya fue aceptada');
+    if (q.rejectedAt || q.status === 'REJECTED') {
+      throw new ConflictException('Esta proforma ya no está disponible');
+    }
+    if (isExpired(q)) {
+      throw new ConflictException('Esta proforma venció. Escríbenos para actualizarla.');
+    }
+    return q;
+  }
+
+  /**
+   * Email to the shop about something the client did. Best effort: the
+   * client's action stands even if the email fails. Replies go to the client.
+   */
+  private notifyShop(q: Quote, subject: string, what: string) {
+    void (async () => {
+      const contact = await this.settings.getContact();
+      const who = `${esc(q.clientName)}${q.clientCompany ? ` (${esc(q.clientCompany)})` : ''}`;
+      const reach = [q.clientEmail, q.clientPhone]
+        .filter((v): v is string => !!v)
+        .map(esc)
+        .join(' · ');
+      await this.send(
+        contact.email,
+        subject,
+        [
+          `<p style="margin:0 0 4px;color:#555">Cliente: <strong style="color:#111">${who}</strong>${reach ? ` · ${reach}` : ''}</p>`,
+          what,
+          '<p style="margin-top:20px;color:#555">Revísala en el dashboard (Proformas).</p>',
+        ].join('\n'),
+        q.clientEmail || contact.email,
+      );
+    })().catch((err: unknown) => this.logger.warn(`Email "${subject}" not sent: ${String(err)}`));
   }
 
   async remove(id: string) {
@@ -293,8 +415,11 @@ export class QuotesService {
       row('Subtotal', money(q.subtotalCents)),
       q.discountCents ? row('Descuento', `−${money(q.discountCents)}`) : '',
       q.taxPercent ? row(`IVA ${q.taxPercent}%`, money(q.taxCents)) : '',
-      row('Total', money(q.totalCents), true),
+      row(q.acceptedAt ? 'Total' : 'Total sin factura', money(q.totalCents), true),
     ].join('');
+    const withInvoice = q.acceptedAt
+      ? ''
+      : `<p style="margin:12px 0 0;color:#555">Si necesitas factura se suma el IVA (${INVOICE_TAX_PERCENT}%): <strong style="color:#111">${money(totals(items, q.discountCents, INVOICE_TAX_PERCENT).totalCents)}</strong>. Todas las facturas se emiten a fin de mes.</p>`;
     const valid = q.validUntil
       ? `<p style="margin:12px 0 0;color:#555">Válida hasta el ${formatDate(q.validUntil)}.</p>`
       : '';
@@ -305,6 +430,7 @@ export class QuotesService {
         : '<p>Te enviamos la proforma que nos pediste. Puedes verla completa y descargarla en PDF desde el botón.</p>',
       `<p style="margin:20px 0 6px;font-weight:700">Proforma ${quoteCode(q.number)}</p>`,
       `<table style="border-collapse:collapse;width:100%;max-width:520px">${lines}${summary}</table>`,
+      withInvoice,
       valid,
       `<p style="margin:24px 0"><a href="${esc(link)}" style="display:inline-block;padding:11px 20px;background:#34d17a;color:#0a1c12;border-radius:8px;font-weight:700;text-decoration:none">Ver proforma y descargar PDF</a></p>`,
       '<p style="margin:24px 0 0;color:#555">Gracias por confiar en JB.SKYLENS.<br>Si tienes dudas o quieres ajustar algo, responde a este correo.</p>',

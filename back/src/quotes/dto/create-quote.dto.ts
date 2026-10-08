@@ -86,7 +86,12 @@ export class CreateQuoteDto {
   @Max(100_000_000)
   discountCents?: number;
 
-  @ApiPropertyOptional({ default: 0, example: 15, description: 'IVA percent' })
+  // Ignored: quotes are priced without IVA, which is added on acceptance when the
+  // client asks for an invoice. Still accepted so older dashboards keep working.
+  @ApiPropertyOptional({
+    deprecated: true,
+    description: 'Ignored (IVA comes from the invoice choice)',
+  })
   @IsOptional()
   @IsInt()
   @Min(0)
