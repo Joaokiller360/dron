@@ -381,6 +381,10 @@ export interface Quote {
   status: QuoteStatus;
   emailedAt?: string | null;
   whatsappAt?: string | null;
+  /** Client accepted on the public page (typed name as signature); locks the quote */
+  acceptedAt?: string | null;
+  acceptedName?: string | null;
+  acceptedIp?: string | null;
   createdAt: string;
   updatedAt: string;
 }

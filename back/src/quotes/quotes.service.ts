@@ -1,6 +1,8 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
+  Logger,
   NotFoundException,
   ServiceUnavailableException,
 } from '@nestjs/common';
@@ -12,6 +14,7 @@ import { SettingsService } from '../settings/settings.service';
 import { CreateQuoteDto, QuoteItemDto } from './dto/create-quote.dto';
 import { UpdateQuoteDto } from './dto/update-quote.dto';
 import { SendQuoteEmailDto } from './dto/send-quote-email.dto';
+import { AcceptQuoteDto } from './dto/accept-quote.dto';
 
 export type QuoteItem = Pick<QuoteItemDto, 'description' | 'quantity' | 'unitCents'>;
 
@@ -50,9 +53,18 @@ const newToken = () => randomBytes(18).toString('base64url');
 
 const withCode = (q: Quote) => ({ ...q, code: quoteCode(q.number) });
 
+/** Valid through the whole last day */
+const isExpired = (q: Quote) =>
+  q.validUntil ? q.validUntil.getTime() + 86_400_000 < Date.now() : false;
+
+const LOCKED =
+  'El cliente ya aceptó esta proforma: no se puede cambiar. Crea una nueva si hace falta.';
+
 /** Proformas: made in the dashboard, read by the client through a secret link */
 @Injectable()
 export class QuotesService {
+  private readonly logger = new Logger(QuotesService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly config: ConfigService,
@@ -84,9 +96,12 @@ export class QuotesService {
       totalCents: q.totalCents,
       notes: q.notes,
       validUntil: q.validUntil,
-      // Valid through the whole last day
-      expired: q.validUntil ? q.validUntil.getTime() + 86_400_000 < Date.now() : false,
+      expired: isExpired(q),
       status: q.status,
+      acceptedAt: q.acceptedAt,
+      acceptedName: q.acceptedName,
+      // Sent back on accept, so the client signs exactly the version on screen
+      version: q.updatedAt.toISOString(),
       createdAt: q.createdAt,
       contact,
     };
@@ -112,25 +127,79 @@ export class QuotesService {
 
   async update(id: string, dto: UpdateQuoteDto) {
     const current = await this.ensureExists(id);
+    if (current.acceptedAt) throw new ConflictException(LOCKED);
     const items = dto.items ?? (current.items as unknown as QuoteItem[]);
     const discountCents = dto.discountCents ?? current.discountCents;
     const taxPercent = dto.taxPercent ?? current.taxPercent;
-    const updated = await this.prisma.quote.update({
-      where: { id },
+    const updated = await this.prisma.quote
+      .update({
+        // Not accepted in the meantime
+        where: { id, acceptedAt: null },
+        data: {
+          ...this.clientFields(dto),
+          ...(dto.items && { items: dto.items as unknown as Prisma.InputJsonValue }),
+          discountCents,
+          taxPercent,
+          ...totals(items, discountCents, taxPercent),
+          ...(dto.notes !== undefined && { notes: dto.notes || null }),
+          ...(dto.validUntil !== undefined && {
+            validUntil: dto.validUntil ? new Date(dto.validUntil) : null,
+          }),
+          ...(dto.status && { status: dto.status }),
+        },
+      })
+      .catch((err: unknown) => {
+        if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
+          throw new ConflictException(LOCKED);
+        }
+        throw err;
+      });
+    return withCode(updated);
+  }
+
+  /**
+   * The client accepts on the public page: typed name + terms checkbox. Only
+   * once, and not after the quote expired or was marked rejected.
+   */
+  async accept(token: string, dto: AcceptQuoteDto, ip: string) {
+    const q = await this.prisma.quote.findUnique({ where: { token } });
+    if (!q) throw new NotFoundException('La proforma no existe');
+    if (q.acceptedAt) throw new ConflictException('Esta proforma ya fue aceptada');
+    if (q.status === 'REJECTED') throw new ConflictException('Esta proforma ya no está disponible');
+    if (isExpired(q)) {
+      throw new ConflictException('Esta proforma venció. Escríbenos para actualizarla.');
+    }
+    const changed = new ConflictException(
+      'La proforma cambió mientras la leías. Recarga la página para ver la versión actual.',
+    );
+    if (q.updatedAt.getTime() !== new Date(dto.version).getTime()) throw changed;
+    // Conditional write: not accepted twice, and not edited since it was read
+    const { count } = await this.prisma.quote.updateMany({
+      where: { id: q.id, acceptedAt: null, updatedAt: q.updatedAt },
       data: {
-        ...this.clientFields(dto),
-        ...(dto.items && { items: dto.items as unknown as Prisma.InputJsonValue }),
-        discountCents,
-        taxPercent,
-        ...totals(items, discountCents, taxPercent),
-        ...(dto.notes !== undefined && { notes: dto.notes || null }),
-        ...(dto.validUntil !== undefined && {
-          validUntil: dto.validUntil ? new Date(dto.validUntil) : null,
-        }),
-        ...(dto.status && { status: dto.status }),
+        acceptedAt: new Date(),
+        acceptedName: dto.name,
+        acceptedIp: ip.slice(0, 64),
+        status: 'ACCEPTED',
       },
     });
-    return withCode(updated);
+    if (!count) throw changed;
+
+    // Heads-up to the shop; the acceptance stands even if the email fails
+    const contact = await this.settings.getContact();
+    this.send(
+      contact.email,
+      `Proforma ${quoteCode(q.number)} aceptada · ${money(q.totalCents)}`,
+      [
+        `<p><strong>${esc(dto.name)}</strong> aceptó la proforma ${quoteCode(q.number)} de ${esc(q.clientName)}${q.clientCompany ? ` (${esc(q.clientCompany)})` : ''} por <strong>${money(q.totalCents)}</strong>, junto con sus condiciones y los términos y condiciones del sitio.</p>`,
+        '<p>Revísala en el dashboard (Proformas).</p>',
+      ].join('\n'),
+      q.clientEmail || contact.email,
+    ).catch((err: unknown) =>
+      this.logger.warn(`Acceptance email for ${quoteCode(q.number)} not sent: ${String(err)}`),
+    );
+
+    return this.findPublic(token);
   }
 
   async remove(id: string) {

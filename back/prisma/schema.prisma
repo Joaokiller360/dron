@@ -412,6 +412,11 @@ model Quote {
   status        QuoteStatus @default(DRAFT)
   emailedAt     DateTime?   @map("emailed_at")
   whatsappAt    DateTime?   @map("whatsapp_at")
+  // Client's acceptance on the public page (name typed as signature, terms
+  // checked). Once set, the quote can no longer be edited.
+  acceptedAt    DateTime?   @map("accepted_at")
+  acceptedName  String?     @map("accepted_name")
+  acceptedIp    String?     @map("accepted_ip")
   createdAt     DateTime    @default(now()) @map("created_at")
   updatedAt     DateTime    @updatedAt @map("updated_at")
 

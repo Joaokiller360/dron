@@ -161,6 +161,8 @@ function QuoteEditor({
   onSaved: (q: Quote, created: boolean) => void;
 }) {
   const [d, setD] = useState<Draft>(() => draftOf(quote));
+  // Accepted by the client: what they signed can't change
+  const locked = !!quote?.acceptedAt;
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const set = <K extends keyof Draft>(key: K, value: Draft[K]) => setD((prev) => ({ ...prev, [key]: value }));
@@ -228,6 +230,7 @@ function QuoteEditor({
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-5">
+      <fieldset disabled={locked} className="contents">
       <fieldset className="grid gap-3 p-0 m-0 border-0 sm:grid-cols-2">
         <legend className="mb-3 text-[13.5px] font-semibold text-white">Cliente</legend>
         <Field label="Nombre">
@@ -348,12 +351,15 @@ function QuoteEditor({
         </tbody>
       </table>
 
+      </fieldset>
       {error && <ErrorNote>{error}</ErrorNote>}
-      <div className="flex justify-end">
-        <button type="submit" disabled={saving || (!!quote && !dirty)} className={btn.primary}>
-          <Save size={15} /> {saving ? 'Guardando…' : quote ? 'Guardar cambios' : 'Crear proforma'}
-        </button>
-      </div>
+      {!locked && (
+        <div className="flex justify-end">
+          <button type="submit" disabled={saving || (!!quote && !dirty)} className={btn.primary}>
+            <Save size={15} /> {saving ? 'Guardando…' : quote ? 'Guardar cambios' : 'Crear proforma'}
+          </button>
+        </div>
+      )}
     </form>
   );
 }
@@ -623,7 +629,7 @@ export default function ProformasPanel() {
                 >
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-mono text-[13px] font-bold text-white">{q.code}</span>
-                    <Pill tone={st.tone}>{st.label}</Pill>
+                    <Pill tone={st.tone}>{q.acceptedAt ? 'Aceptada por el cliente' : st.label}</Pill>
                     <span className="flex items-center gap-1.5 ml-auto text-jb-muted">
                       {q.emailedAt && <Mail size={14} aria-label="Enviada por correo" className="text-jb-mint" />}
                       {q.whatsappAt && <MessageCircle size={14} aria-label="Enviada por WhatsApp" className="text-jb-mint" />}
@@ -666,18 +672,30 @@ export default function ProformasPanel() {
               <div className="flex flex-wrap items-center gap-2">
                 <Pill tone={statusOf(current.status).tone}>{statusOf(current.status).label}</Pill>
                 <span className="ml-auto" />
-                {current.status !== 'ACCEPTED' && (
+                {!current.acceptedAt && current.status !== 'ACCEPTED' && (
                   <button type="button" onClick={() => setStatus(current, 'ACCEPTED')} className={btn.subtle}>
                     <BadgeCheck size={15} /> Aceptada
                   </button>
                 )}
-                {current.status !== 'REJECTED' && (
+                {!current.acceptedAt && current.status !== 'REJECTED' && (
                   <button type="button" onClick={() => setStatus(current, 'REJECTED')} className={btn.subtle}>
                     <Ban size={15} /> Rechazada
                   </button>
                 )}
                 <ConfirmDelete onConfirm={() => del(current)} />
               </div>
+              {current.acceptedAt && (
+                <div className="flex flex-col gap-1 p-4 rounded-xl border border-[rgba(52,209,122,.35)] bg-[rgba(52,209,122,.08)] text-[13px]">
+                  <span className="inline-flex items-center gap-2 text-[13.5px] font-semibold text-white">
+                    <BadgeCheck size={15} className="text-jb-accent" /> Aceptada por el cliente
+                  </span>
+                  <span className="text-jb-soft">
+                    <strong className="text-white">{current.acceptedName}</strong> firmó y aceptó los términos el {formatDate(current.acceptedAt)}
+                    {current.acceptedIp && <span className="font-mono text-[11.5px] text-jb-muted"> · IP {current.acceptedIp}</span>}
+                  </span>
+                  <span className="text-[12px] text-jb-muted">Ya no se puede editar. Si hay cambios, crea una proforma nueva.</span>
+                </div>
+              )}
               <SendBox key={current.id} quote={current} onSaved={upsert} />
             </div>
           </div>

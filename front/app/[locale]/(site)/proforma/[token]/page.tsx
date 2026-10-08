@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { fetchPublic, whatsappUrl, type ContactInfo } from '@/app/component';
 import PrintButton from './PrintButton';
+import AcceptForm from './AcceptForm';
 
 interface PublicQuote {
   code: string;
@@ -20,11 +21,18 @@ interface PublicQuote {
   /** Past validUntil (computed by the API) */
   expired: boolean;
   status: 'DRAFT' | 'SENT' | 'ACCEPTED' | 'REJECTED';
+  /** Set when the client accepted on this page */
+  acceptedAt?: string | null;
+  acceptedName?: string | null;
+  /** Version on screen; accepting a different one is refused */
+  version: string;
   createdAt: string;
   contact: ContactInfo;
 }
 
 const money = (cents: number) => (cents / 100).toLocaleString('es-EC', { style: 'currency', currency: 'USD' });
+const dateTime = (iso: string) =>
+  new Date(iso).toLocaleString('es-EC', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'America/Guayaquil' });
 const day = (iso: string) => new Date(iso).toLocaleDateString('es-EC', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 
 // Reached only through the secret link sent to the client: never indexed
@@ -44,6 +52,7 @@ export default async function ProformaPage({ params }: { params: Promise<{ token
   if (!q) notFound();
 
   const { expired } = q;
+  const canAccept = !q.acceptedAt && !expired && q.status !== 'REJECTED';
 
   return (
     <div className="px-4 py-10 sm:py-14">
@@ -56,7 +65,11 @@ export default async function ProformaPage({ params }: { params: Promise<{ token
 
       <div className="flex flex-wrap items-center justify-between gap-3 max-w-[820px] mx-auto mb-5 print:hidden">
         <p className="m-0 text-[14px] text-jb-soft">
-          {expired ? 'Esta proforma ya venció. Escríbenos para actualizarla.' : 'Puedes descargarla en PDF o imprimirla.'}
+          {q.acceptedAt
+            ? `Aceptada el ${dateTime(q.acceptedAt)}. ¡Gracias! Te contactaremos para coordinar.`
+            : expired
+              ? 'Esta proforma ya venció. Escríbenos para actualizarla.'
+              : 'Revísala y acéptala al final de la página. También puedes descargarla en PDF.'}
         </p>
         <div className="flex flex-wrap gap-2">
           <a
@@ -153,6 +166,17 @@ export default async function ProformaPage({ params }: { params: Promise<{ token
             <p className="mt-1.5 mb-0 text-[13.5px] leading-relaxed text-[#333] whitespace-pre-wrap">{q.notes}</p>
           </section>
         )}
+
+        {q.acceptedAt && (
+          <section className="mt-8 p-4 rounded-xl border-2 border-[#16a34a] break-inside-avoid">
+            <div className="font-mono text-[11px] font-semibold tracking-[.14em] uppercase text-[#16a34a]">Aceptada por el cliente</div>
+            <p className="mt-1.5 mb-0 text-[14px] text-[#222]">
+              <strong>{q.acceptedName}</strong> aceptó esta proforma, sus condiciones y los Términos y condiciones el {dateTime(q.acceptedAt)}.
+            </p>
+          </section>
+        )}
+
+        {canAccept && <AcceptForm token={token} total={money(q.totalCents)} version={q.version} />}
 
         <p className="mt-10 mb-0 text-[12px] text-[#777]">
           Documento informativo, no es una factura. Precios en dólares de EE. UU.

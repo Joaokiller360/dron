@@ -3,6 +3,9 @@
 /** Person names: letters, spaces, apostrophe, dot, hyphen */
 export const NAME_PATTERN = /^[\p{L}\p{M}' .-]+$/u;
 
+/** Only letters (accents/ñ included), words separated by single spaces: signatures */
+export const LETTERS_PATTERN = /^[\p{L}\p{M}]+(?: [\p{L}\p{M}]+)*$/u;
+
 /** Phone numbers: digits, spaces, parentheses, hyphen, optional leading + */
 export const PHONE_PATTERN = /^\+?[0-9 ()-]+$/;
 

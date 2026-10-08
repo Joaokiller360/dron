@@ -7,14 +7,18 @@ import {
   Param,
   Patch,
   Post,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
+import type { Request } from 'express';
+import { clientIp } from '../common/client-ip';
 import { QuotesService } from './quotes.service';
 import { CreateQuoteDto } from './dto/create-quote.dto';
 import { UpdateQuoteDto } from './dto/update-quote.dto';
 import { SendQuoteEmailDto } from './dto/send-quote-email.dto';
+import { AcceptQuoteDto } from './dto/accept-quote.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('quotes')
@@ -27,6 +31,14 @@ export class QuotesController {
   @ApiOperation({ summary: 'Public: a proforma by its secret link token' })
   findPublic(@Param('token') token: string) {
     return this.quotes.findPublic(token);
+  }
+
+  @Post('public/:token/accept')
+  @HttpCode(200)
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  @ApiOperation({ summary: 'Public: the client accepts the proforma and its terms' })
+  accept(@Param('token') token: string, @Body() dto: AcceptQuoteDto, @Req() req: Request) {
+    return this.quotes.accept(token, dto, clientIp(req));
   }
 
   @Get()
