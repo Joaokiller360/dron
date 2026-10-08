@@ -9,8 +9,10 @@ export default function TestimonialCard({ testimonial: q }: { testimonial: Publi
     .slice(0, 2)
     .map((w) => w[0]!.toUpperCase())
     .join('');
+  // A client quoting itself has the same name as author and company: show it once
+  const org = q.org && q.org.trim().toLowerCase() !== q.author.trim().toLowerCase() ? q.org : null;
   return (
-    <figure className="flex flex-col gap-5 p-[26px] m-0 rounded-2xl bg-jb-card border border-white/[.08]">
+    <figure className="flex flex-col w-full gap-5 p-[26px] m-0 rounded-2xl bg-jb-card border border-white/[.08]">
       <blockquote className="m-0 text-[16.5px] leading-[1.6] text-jb-text text-pretty">“{q.quote}”</blockquote>
       <figcaption className="flex items-center gap-3 mt-auto">
         {q.photoUrl ? (
@@ -22,7 +24,7 @@ export default function TestimonialCard({ testimonial: q }: { testimonial: Publi
         )}
         <span className="flex flex-col gap-[3px] min-w-0">
           <span className="text-[14.5px] font-bold text-white">{q.author}</span>
-          {q.org && <span className="font-mono text-[11.5px] text-jb-muted">{q.org}</span>}
+          {org && <span className="font-mono text-[11.5px] text-jb-muted">{org}</span>}
         </span>
       </figcaption>
     </figure>

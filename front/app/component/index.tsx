@@ -25,6 +25,7 @@ import { videoSource, videoThumbnail, projectVideoUrl, projectCover } from './si
 import type { VideoSource } from './site/video';
 import ProjectShot from './site/ProjectShot';
 import TestimonialCard from './site/TestimonialCard';
+import TestimonialMarquee from './site/TestimonialMarquee';
 
 export {
   Footer,
@@ -64,6 +65,7 @@ export {
   projectCover,
   ProjectShot,
   TestimonialCard,
+  TestimonialMarquee,
 };
 
 export type { VideoSource, ContactInfo, PublicService, PublicProject, PublicClient, PublicPromotions, PublicTestimonial, PublicProduct, PublicStore, ShippingCity, PublicDiscount };

@@ -16,7 +16,7 @@ import {
   btnGhost,
   useContactInfo,
   ProjectShot,
-  TestimonialCard,
+  TestimonialMarquee,
   storeHeader,
   bestDeal,
   dealBadge,
@@ -381,11 +381,7 @@ export default function HomeClient({
                 {t('testimonialsAll')}
               </Link>
             </div>
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(min(290px,100%),1fr))] gap-4">
-              {testimonials.map((q) => (
-                <TestimonialCard key={q.id} testimonial={q} />
-              ))}
-            </div>
+            <TestimonialMarquee testimonials={testimonials} />
           </div>
         </section>
       )}

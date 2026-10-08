@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { getLocale, getMessages, getTranslations } from 'next-intl/server';
-import { PageHero, Shot, TestimonialCard, fetchPublic, btnPrimary, type PublicClient, type PublicTestimonial } from '@/app/component';
+import { PageHero, Shot, TestimonialMarquee, fetchPublic, btnPrimary, type PublicClient, type PublicTestimonial } from '@/app/component';
 
 export async function generateMetadata() {
   const messages = await getMessages();
@@ -89,11 +89,7 @@ export default async function Clients() {
             <h2 className="m-0 mb-8 font-mono text-[clamp(26px,3.4vw,36px)] font-bold tracking-[-.02em] text-white">
               {t('says')}
             </h2>
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(min(290px,100%),1fr))] gap-4">
-              {testimonials.map((q) => (
-                <TestimonialCard key={q.id} testimonial={q} />
-              ))}
-            </div>
+            <TestimonialMarquee testimonials={testimonials} />
           </div>
         )}
         <div className="max-w-[1180px] mx-auto flex flex-wrap items-center justify-between gap-[18px] px-7 py-[26px] rounded-2xl border border-[rgba(52,209,122,.25)]">
