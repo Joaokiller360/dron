@@ -56,7 +56,6 @@ export function SiteHeader({ storeEnabled = false }: { storeEnabled?: boolean })
     { key: 'portfolio', href: '/portfolio' },
     { key: 'clients', href: '/clients' },
     ...(storeEnabled ? [{ key: 'store', href: '/store' }] : []),
-    { key: 'contact', href: '/contact' },
   ];
 
   return (
