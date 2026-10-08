@@ -348,6 +348,43 @@ export interface Order {
   createdAt: string;
 }
 
+export type QuoteStatus = 'DRAFT' | 'SENT' | 'ACCEPTED' | 'REJECTED';
+
+export interface QuoteItem {
+  description: string;
+  /** Up to 2 decimals (e.g. 1.5 hours) */
+  quantity: number;
+  unitCents: number;
+}
+
+/** Proforma; totals are computed by the API */
+export interface Quote {
+  id: string;
+  /** "PF-0001" */
+  code: string;
+  number: number;
+  /** Key of the public page /proforma/<token> */
+  token: string;
+  clientName: string;
+  clientCompany?: string | null;
+  clientTaxId?: string | null;
+  clientEmail?: string | null;
+  clientPhone?: string | null;
+  items: QuoteItem[];
+  discountCents: number;
+  taxPercent: number;
+  subtotalCents: number;
+  taxCents: number;
+  totalCents: number;
+  notes?: string | null;
+  validUntil?: string | null;
+  status: QuoteStatus;
+  emailedAt?: string | null;
+  whatsappAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 /** PayPal setup as seen by the API (no secrets) */
 export interface PaymentStatus {
   configured: boolean;

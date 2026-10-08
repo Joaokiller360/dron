@@ -7,6 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { redactUrl } from '../redact-url';
 
 /** Nest/Express default texts (status reasons and built-in exceptions) in Spanish */
 const SPANISH: Record<string, string> = {
@@ -58,14 +59,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
         : 'Error interno del servidor';
 
     this.logger.error(
-      `${request.method} ${request.url} -> ${status}`,
+      `${request.method} ${redactUrl(request.url)} -> ${status}`,
       exception instanceof Error ? exception.stack : undefined,
     );
 
     response.status(status).json({
       statusCode: status,
       timestamp: new Date().toISOString(),
-      path: request.url,
+      path: redactUrl(request.url),
       message,
     });
   }

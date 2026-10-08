@@ -23,6 +23,7 @@ import {
   Receipt,
   Settings2,
   KeyRound,
+  FileText,
 } from 'lucide-react';
 import LoginForm from './LoginForm';
 import OverviewPanel from './OverviewPanel';
@@ -42,6 +43,7 @@ import StorePanel from './StorePanel';
 import StoreSettingsPanel from './StoreSettingsPanel';
 import AccountPanel from './AccountPanel';
 import OrdersPanel from './OrdersPanel';
+import ProformasPanel from './ProformasPanel';
 import {
   apiFetch,
   LEGACY_TOKEN_KEY,
@@ -56,6 +58,7 @@ import { Toaster, useToast } from './ui';
 export type Tab =
   | 'resumen'
   | 'mensajes'
+  | 'proformas'
   | 'contacto'
   | 'servicios'
   | 'proyectos'
@@ -84,6 +87,7 @@ const NAV: { group: string; items: NavItem[] }[] = [
     items: [
       { id: 'resumen', label: 'Resumen', icon: <LayoutDashboard size={17} /> },
       { id: 'mensajes', label: 'Mensajes', icon: <Mail size={17} /> },
+      { id: 'proformas', label: 'Proformas', icon: <FileText size={17} /> },
       { id: 'contacto', label: 'Contacto', icon: <Phone size={17} /> },
     ],
   },
@@ -314,6 +318,7 @@ function Shell({ email, onLogout }: { email: string; onLogout: () => void }) {
         <main className="w-full px-4 py-8 sm:px-8">
           {tab === 'resumen' && <OverviewPanel onNavigate={setTab} />}
           {tab === 'mensajes' && <MessagesPanel />}
+          {tab === 'proformas' && <ProformasPanel />}
           {tab === 'contacto' && <ContactPanel />}
           {tab === 'servicios' && <ServicesPanel />}
           {tab === 'proyectos' && <ProjectsPanel />}

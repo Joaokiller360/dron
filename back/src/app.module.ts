@@ -26,6 +26,7 @@ import { VenuesModule } from './venues/venues.module';
 import { SettingsModule } from './settings/settings.module';
 import { UploadsModule } from './uploads/uploads.module';
 import { StoreModule } from './store/store.module';
+import { QuotesModule } from './quotes/quotes.module';
 import { SafeInputMiddleware } from './common/middleware/safe-input.middleware';
 import { ClientIpThrottlerGuard } from './common/guards/client-ip-throttler.guard';
 
@@ -61,6 +62,7 @@ import { ClientIpThrottlerGuard } from './common/guards/client-ip-throttler.guar
     SettingsModule,
     UploadsModule,
     StoreModule,
+    QuotesModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ClientIpThrottlerGuard },
