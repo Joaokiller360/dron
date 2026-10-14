@@ -59,7 +59,7 @@ export function SiteHeader({ storeEnabled = false }: { storeEnabled?: boolean })
   ];
 
   return (
-    <header className="sticky top-0 z-50 border-b backdrop-blur-[14px] bg-[rgba(10,28,18,.88)] border-white/[.07]">
+    <header className="sticky top-0 z-50 border-b backdrop-blur-[14px] bg-[rgba(10,28,18,.88)] border-white/[.07] [view-transition-name:site-header]">
       <nav className="max-w-[1180px] mx-auto px-6 py-3.5 flex items-center gap-6">
         <Brand href={prefix || '/'} />
 
