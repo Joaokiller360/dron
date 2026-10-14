@@ -11,7 +11,7 @@ export function Logo({ href = '', name = '', style = '', imgName = '' }: logo) {
   return (
     <>
       <a href={href} className="flex items-center">
-        <img src={`https://res.cloudinary.com/dzlavqhid/image/upload/${imgName}.png`} className={style} alt={name} />
+        <img src={`https://res.cloudinary.com/dzlavqhid/image/upload/f_webp,q_auto:eco/${imgName}.png`} className={style} alt={name} />
         <span className="self-center text-2xl font-semibold uppercase text-heading whitespace-nowrap">{name}</span>
       </a>
     </>

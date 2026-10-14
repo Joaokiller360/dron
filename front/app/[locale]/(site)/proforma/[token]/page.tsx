@@ -111,7 +111,7 @@ export default async function ProformaPage({ params }: { params: Promise<{ token
       <article className="max-w-[820px] mx-auto px-6 py-8 sm:px-12 sm:py-12 rounded-2xl bg-white text-[#111] shadow-[0_30px_80px_rgba(0,0,0,.45)] print:shadow-none print:p-0 print:rounded-none">
         <div className="flex flex-wrap items-start justify-between gap-6 pb-6 border-b-2 border-[#111]">
           <div className="flex items-center gap-3">
-            <img src="/img/logo-p.png" alt="" className="w-12 h-12 rounded-full" />
+            <img src="/img/logo-p.webp" alt="" className="w-12 h-12 rounded-full" />
             <div>
               <div className="font-mono text-[18px] font-bold tracking-[-.01em]">JB.SKYLENS</div>
               <div className="text-[12.5px] text-[#555]">Producción audiovisual y tomas con dron</div>

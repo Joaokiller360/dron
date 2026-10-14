@@ -52,7 +52,7 @@ const CLOUDINARY = 'https://res.cloudinary.com/dzlavqhid';
 const videoUrl = (name: string) => (/^https?:/.test(name) ? name : `${CLOUDINARY}/video/upload/${name}.mp4`);
 // First frame of a Cloudinary video as its poster (only for bare Cloudinary ids)
 const posterUrl = (name: string) => (/^https?:/.test(name) ? undefined : `${CLOUDINARY}/video/upload/so_0/${name}.jpg`);
-const imageUrl = (name: string) => (/^https?:/.test(name) ? name : `${CLOUDINARY}/image/upload/${name}.jpg`);
+const imageUrl = (name: string) => (/^https?:/.test(name) ? name : `${CLOUDINARY}/image/upload/f_webp,q_auto:eco/${name}.jpg`);
 
 const arr = <T,>(v: T[] | undefined | null): T[] => (Array.isArray(v) ? v : []);
 

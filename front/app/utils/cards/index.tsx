@@ -61,7 +61,7 @@ export function CardVideo({ index = 0, title = '', organizacion = '', nameButton
                 loading="lazy"
                 src={coverUrl}
                 onError={(e) => {
-                  e.currentTarget.src = "/img/palmas-atardecer.jpg";
+                  e.currentTarget.src = "/img/palmas-atardecer.webp";
                 }}
                 alt={title || "imagen"}
                 className="object-cover w-full h-64 transition-transform duration-500 group-hover:scale-105"
@@ -72,11 +72,11 @@ export function CardVideo({ index = 0, title = '', organizacion = '', nameButton
                   loading="lazy"
                   src={
                     imgName
-                      ? `https://res.cloudinary.com/dzlavqhid/image/upload/${imgName}.jpg`
-                      : '/img/palmas-atardecer.jpg'
+                      ? `https://res.cloudinary.com/dzlavqhid/image/upload/f_webp,q_auto:eco/${imgName}.jpg`
+                      : '/img/palmas-atardecer.webp'
                   }
                   onError={(e) => {
-                    e.currentTarget.src = "/img/palmas-atardecer.jpg";
+                    e.currentTarget.src = "/img/palmas-atardecer.webp";
                   }}
                   alt={imgName || "imagen"}
                   className="object-cover w-full h-64 transition-transform duration-500 group-hover:scale-105"
@@ -210,11 +210,11 @@ export function CardClient({ index = 0, buttons = [], content = [], clients = []
                         media?.coverUrl
                           ? media.coverUrl
                           : media?.imgName
-                            ? `https://res.cloudinary.com/dzlavqhid/image/upload/${media.imgName}.jpg`
-                            : '/img/palmas-atardecer.jpg'
+                            ? `https://res.cloudinary.com/dzlavqhid/image/upload/f_webp,q_auto:eco/${media.imgName}.jpg`
+                            : '/img/palmas-atardecer.webp'
                       }
                       onError={(e) => {
-                        e.currentTarget.src = "/img/palmas-atardecer.jpg";
+                        e.currentTarget.src = "/img/palmas-atardecer.webp";
                       }}
                       alt={d?.cliente?.client || "imagen"}
                       className="object-cover w-full h-auto mb-5 transition-transform duration-500 group-hover:scale-105 rounded-2xl"
@@ -276,11 +276,11 @@ export function CardClient({ index = 0, buttons = [], content = [], clients = []
                           media?.coverUrl
                             ? media.coverUrl
                             : media?.imgName
-                              ? `https://res.cloudinary.com/dzlavqhid/image/upload/${media?.imgName}.jpg`
-                              : '/img/palmas-atardecer.jpg'
+                              ? `https://res.cloudinary.com/dzlavqhid/image/upload/f_webp,q_auto:eco/${media?.imgName}.jpg`
+                              : '/img/palmas-atardecer.webp'
                         }
                         onError={(e) => {
-                          e.currentTarget.src = "/img/palmas-atardecer.jpg";
+                          e.currentTarget.src = "/img/palmas-atardecer.webp";
                         }}
                         alt={d?.cliente?.client || "imagen"}
                         className="w-auto h-56 mb-6 bg-white rounded-2xl"
@@ -486,11 +486,11 @@ export function PageServices({
           loading="lazy"
           src={
             banner?.imagen
-              ? `https://res.cloudinary.com/dzlavqhid/image/upload/${banner.imagen}.jpg`
-              : '/img/palmas-atardecer.jpg'
+              ? `https://res.cloudinary.com/dzlavqhid/image/upload/f_webp,q_auto:eco/${banner.imagen}.jpg`
+              : '/img/palmas-atardecer.webp'
           }
           onError={(e) => {
-            e.currentTarget.src = "/img/palmas-atardecer.jpg";
+            e.currentTarget.src = "/img/palmas-atardecer.webp";
           }}
           alt={banner?.title || "imagen"}
           className="absolute inset-0 object-cover object-center w-full h-full -z-10"
@@ -875,11 +875,11 @@ export function PageServices({
                                     loading="lazy"
                                     src={
                                       g?.urlImg
-                                        ? `https://res.cloudinary.com/dzlavqhid/image/upload/${g?.urlImg}.jpg`
-                                        : '/img/palmas-atardecer.jpg'
+                                        ? `https://res.cloudinary.com/dzlavqhid/image/upload/f_webp,q_auto:eco/${g?.urlImg}.jpg`
+                                        : '/img/palmas-atardecer.webp'
                                     }
                                     onError={(e) => {
-                                      e.currentTarget.src = "/img/palmas-atardecer.jpg";
+                                      e.currentTarget.src = "/img/palmas-atardecer.webp";
                                     }}
                                     alt={g?.label || "imagen"}
                                     className="object-cover w-full h-auto mb-5 transition-transform duration-500 group-hover:scale-105 rounded-2xl"

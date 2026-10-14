@@ -245,7 +245,7 @@ function Shell({ email, onLogout }: { email: string; onLogout: () => void }) {
 
   const brand = (
     <div className="flex items-center gap-2.5 px-3">
-      <img src="/img/logo-p.png" alt="" className="bg-white rounded-full w-7 h-7" />
+      <img src="/img/logo-p.webp" alt="" className="bg-white rounded-full w-7 h-7" />
       <div className="leading-tight">
         <div className="font-mono text-[14px] font-bold text-white">JB.SKYLENS</div>
         <div className="font-mono text-[10px] tracking-[.14em] uppercase text-jb-mint">Dashboard</div>

@@ -20,6 +20,7 @@ import { slugify } from '../common/slugify';
 import { CompleteUploadDto, PresignUploadDto, UPLOAD_FOLDERS } from './dto/presign-upload.dto';
 import { SHARP_FORMAT, UPLOAD_TYPES, UploadType } from './upload-types';
 import { MalwareScannerService } from './malware-scanner.service';
+import { toWebp, webpKey } from './webp';
 
 const MB = 1024 * 1024;
 const MAX_BYTES = { image: 20 * MB, video: 1024 * MB };
@@ -109,9 +110,10 @@ export class UploadsService {
 
   /**
    * Checks an upload's real content and publishes it. Every file is scanned by
-   * ClamAV first; images are then decoded and re-encoded (drops anything
-   * appended or hidden in the file, plus EXIF/GPS metadata); videos must have a
-   * valid container header. Whatever happens, the incoming copy is deleted.
+   * ClamAV first; images are then decoded and re-encoded as WebP (drops
+   * anything appended or hidden in the file, plus EXIF/GPS metadata, and is
+   * lighter to serve); videos must have a valid container header. Whatever
+   * happens, the incoming copy is deleted.
    */
   async complete(dto: CompleteUploadDto) {
     const client = this.requireClient();
@@ -120,7 +122,7 @@ export class UploadsService {
     if (!KEY_PATTERN.test(source)) {
       throw new BadRequestException('Clave de subida no válida');
     }
-    const target = source.slice(INCOMING.length);
+    const published = source.slice(INCOMING.length);
 
     try {
       const head = await client
@@ -137,6 +139,8 @@ export class UploadsService {
         throw new BadRequestException('El archivo supera el tamaño máximo');
       }
 
+      // Every image is published as WebP, whatever format was uploaded
+      const target = type.kind === 'image' ? webpKey(published) : published;
       if (type.kind === 'image') {
         await this.publishImage(client, bucket, source, target, contentType, type);
       } else {
@@ -179,14 +183,7 @@ export class UploadsService {
       if (meta.format !== SHARP_FORMAT[contentType]) {
         throw new Error(`format ${meta.format}`);
       }
-      // Bake the EXIF orientation in before metadata is dropped (stills only)
-      const oriented = (meta.pages ?? 1) > 1 ? image : image.rotate();
-      output =
-        type.ext === 'jpg'
-          ? await oriented.jpeg({ quality: 86, mozjpeg: true }).toBuffer()
-          : type.ext === 'png'
-            ? await oriented.png({ compressionLevel: 9 }).toBuffer()
-            : await oriented.webp({ quality: 86 }).toBuffer();
+      output = await toWebp(image, meta);
     } catch (err) {
       this.logger.warn(`Rejected image ${source}: ${(err as Error).message}`);
       throw new BadRequestException('La imagen está dañada o no es válida');
@@ -197,7 +194,7 @@ export class UploadsService {
         Bucket: bucket,
         Key: target,
         Body: output,
-        ContentType: contentType,
+        ContentType: 'image/webp',
         CacheControl: CACHE_CONTROL,
       }),
     );

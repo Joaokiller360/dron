@@ -28,7 +28,7 @@ function Brand({ href, size = 22 }: { href: string; size?: number }) {
   return (
     <Link href={href} className="flex items-center gap-2.5 text-white hover:text-white">
       <img
-        src="/img/logo-p.png"
+        src="/img/logo-p.webp"
         alt=""
         width={size}
         height={size}
