@@ -1,13 +1,13 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, ViewTransition } from 'react';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { ArrowLeft, ArrowRight, BadgePercent, ChevronLeft, ChevronRight, PauseCircle, ShoppingBag } from 'lucide-react';
 import { Shot, localized, dealBadge, btnPrimary, btnGhost, usePrefix, type PublicProduct, type PublicStore } from '@/app/component';
 import { Stepper, unitPrice, useCart, useMoney, type ChosenOption } from '../cart';
 import CartDrawer from '../CartDrawer';
-import ProductCard from '../ProductCard';
+import ProductCard, { productPhotoName } from '../ProductCard';
 
 const RELATED_COUNT = 4;
 // Words too common to make two products related
@@ -88,39 +88,42 @@ export default function ProductClient({
   return (
     <section className="px-6 pt-10 pb-24">
       <div className="max-w-[1180px] mx-auto">
-        <Link href={`${prefix}/store`} className="inline-flex items-center gap-1.5 text-[13.5px] text-jb-soft hover:text-white">
+        <Link href={`${prefix}/store`} prefetch className="inline-flex items-center gap-1.5 text-[13.5px] text-jb-soft hover:text-white">
           <ArrowLeft size={15} /> {t('backToStore')}
         </Link>
 
         <div className="grid gap-10 mt-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] items-start">
           {/* Gallery */}
           <div className="flex flex-col gap-3">
-            <div className="relative overflow-hidden rounded-2xl border border-white/[.08] bg-jb-band">
-              <Shot key={current} src={current} alt={name} label={name} labelPosition="center" fit="contain" className={`aspect-square ${soldOut ? 'opacity-60' : ''}`} />
-              {photos.length > 1 && (
-                <>
-                  <button
-                    type="button"
-                    aria-label={t('prevPhoto')}
-                    onClick={() => go(-1)}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center w-10 h-10 rounded-full bg-black/55 text-white hover:bg-black/75 backdrop-blur"
-                  >
-                    <ChevronLeft size={20} />
-                  </button>
-                  <button
-                    type="button"
-                    aria-label={t('nextPhoto')}
-                    onClick={() => go(1)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center w-10 h-10 rounded-full bg-black/55 text-white hover:bg-black/75 backdrop-blur"
-                  >
-                    <ChevronRight size={20} />
-                  </button>
-                  <span className="absolute bottom-3 right-3 px-2.5 py-1 rounded-full bg-black/60 font-mono text-[11.5px] text-white">
-                    {Math.min(index, photos.length - 1) + 1}/{photos.length}
-                  </span>
-                </>
-              )}
-            </div>
+            {/* The card photo the visitor clicked zooms into this frame */}
+            <ViewTransition name={productPhotoName(p.id)} share="product-zoom" default="none">
+              <div className="relative overflow-hidden rounded-2xl border border-white/[.08] bg-jb-band">
+                <Shot key={current} src={current} alt={name} label={name} labelPosition="center" fit="contain" loading="eager" className={`aspect-square ${soldOut ? 'opacity-60' : ''}`} />
+                {photos.length > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      aria-label={t('prevPhoto')}
+                      onClick={() => go(-1)}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center w-10 h-10 rounded-full bg-black/55 text-white hover:bg-black/75 backdrop-blur"
+                    >
+                      <ChevronLeft size={20} />
+                    </button>
+                    <button
+                      type="button"
+                      aria-label={t('nextPhoto')}
+                      onClick={() => go(1)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center w-10 h-10 rounded-full bg-black/55 text-white hover:bg-black/75 backdrop-blur"
+                    >
+                      <ChevronRight size={20} />
+                    </button>
+                    <span className="absolute bottom-3 right-3 px-2.5 py-1 rounded-full bg-black/60 font-mono text-[11.5px] text-white">
+                      {Math.min(index, photos.length - 1) + 1}/{photos.length}
+                    </span>
+                  </>
+                )}
+              </div>
+            </ViewTransition>
             {photos.length > 1 && (
               <div className="grid grid-cols-[repeat(auto-fill,minmax(72px,1fr))] gap-2">
                 {photos.map((src, i) => (
@@ -249,13 +252,13 @@ export default function ProductClient({
               <h2 id="related-title" className="m-0 font-mono text-[clamp(22px,2.6vw,28px)] font-bold tracking-[-.01em] text-white">
                 {t('relatedTitle')}
               </h2>
-              <Link href={`${prefix}/store`} className="inline-flex items-center gap-1.5 text-[14px] text-jb-soft hover:text-white">
+              <Link href={`${prefix}/store`} prefetch className="inline-flex items-center gap-1.5 text-[14px] text-jb-soft hover:text-white">
                 {t('seeAll')} <ArrowRight size={15} />
               </Link>
             </div>
             <div className="grid grid-cols-[repeat(auto-fill,minmax(min(260px,100%),1fr))] gap-4">
               {related.map((o) => (
-                <ProductCard key={o.id} product={o} cart={cart} selling={settings.sales} heading="h3" />
+                <ProductCard key={o.id} product={o} cart={cart} selling={settings.sales} heading="h3" zoom={false} />
               ))}
             </div>
           </section>

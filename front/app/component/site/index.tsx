@@ -249,6 +249,7 @@ export function Shot({
   imgClassName = '',
   labelPosition = 'bottom',
   fit = 'cover',
+  loading = 'lazy',
 }: {
   src?: string | null;
   alt?: string;
@@ -257,14 +258,15 @@ export function Shot({
   imgClassName?: string;
   labelPosition?: 'bottom' | 'center';
   fit?: 'cover' | 'contain';
+  loading?: 'lazy' | 'eager';
 }) {
   const [failed, setFailed] = useState(false);
   if (src && !failed && fit === 'contain') {
     return (
       <div className={`jb-stripes overflow-hidden ${className}`}>
         <div className="relative w-full h-full overflow-hidden">
-          <img src={src} alt="" aria-hidden loading="lazy" className="absolute inset-0 object-cover w-full h-full scale-125 blur-2xl opacity-35" />
-          <img src={src} alt={alt} loading="lazy" className={`relative object-contain w-full h-full ${imgClassName}`} onError={() => setFailed(true)} />
+          <img src={src} alt="" aria-hidden loading={loading} className="absolute inset-0 object-cover w-full h-full scale-125 blur-2xl opacity-35" />
+          <img src={src} alt={alt} loading={loading} className={`relative object-contain w-full h-full ${imgClassName}`} onError={() => setFailed(true)} />
         </div>
       </div>
     );
@@ -272,7 +274,7 @@ export function Shot({
   if (src && !failed) {
     return (
       <div className={`jb-stripes overflow-hidden ${className}`}>
-        <img src={src} alt={alt} loading="lazy" className={`object-cover w-full h-full ${imgClassName}`} onError={() => setFailed(true)} />
+        <img src={src} alt={alt} loading={loading} className={`object-cover w-full h-full ${imgClassName}`} onError={() => setFailed(true)} />
       </div>
     );
   }
