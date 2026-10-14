@@ -110,6 +110,8 @@
     "nextPhoto": "Next photo",
     "from": "From",
     "chooseOptions": "Choose options",
+    "relatedTitle": "You may also like",
+    "seeAll": "See the whole store",
     "errorGeneric": "The order could not be sent. Please try again.",
     "errorInvalid": "Check your details: valid name, email and phone."
   },

@@ -3,10 +3,46 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
-import { ArrowLeft, BadgePercent, ChevronLeft, ChevronRight, PauseCircle, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, ArrowRight, BadgePercent, ChevronLeft, ChevronRight, PauseCircle, ShoppingBag } from 'lucide-react';
 import { Shot, localized, dealBadge, btnPrimary, btnGhost, usePrefix, type PublicProduct, type PublicStore } from '@/app/component';
 import { Stepper, unitPrice, useCart, useMoney, type ChosenOption } from '../cart';
 import CartDrawer from '../CartDrawer';
+import ProductCard from '../ProductCard';
+
+const RELATED_COUNT = 4;
+// Words too common to make two products related
+const STOPWORDS = new Set(['desde', 'para', 'with', 'from', 'the', 'and', 'con', 'del', 'los', 'las', 'una', 'por']);
+
+const wordsOf = (p: PublicProduct) =>
+  new Set(
+    [p.nameEs, p.nameEn, ...(p.specs ?? []).map((s) => s.value)]
+      .join(' ')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .filter((w) => w.length >= 3 && !STOPWORDS.has(w)),
+  );
+
+/**
+ * Products to show under this one: those sharing the most words in their
+ * name and details first, then the rest of the catalog in store order, with
+ * sold-out ones last.
+ */
+function relatedTo(product: PublicProduct, products: PublicProduct[]) {
+  const own = wordsOf(product);
+  return products
+    .filter((o) => o.id !== product.id)
+    .map((o, order) => ({
+      o,
+      order,
+      soldOut: o.stock !== null && o.stock <= 0,
+      score: [...wordsOf(o)].filter((w) => own.has(w)).length,
+    }))
+    .sort((a, b) => Number(a.soldOut) - Number(b.soldOut) || b.score - a.score || a.order - b.order)
+    .slice(0, RELATED_COUNT)
+    .map(({ o }) => o);
+}
 
 export default function ProductClient({
   product: p,
@@ -23,7 +59,8 @@ export default function ProductClient({
   const locale = useLocale();
   const prefix = usePrefix();
   const money = useMoney();
-  const { lines, add, setLineQty, maxFor, keyOf, unitsOf } = useCart(products, settings.showPrices);
+  const cart = useCart(products, settings.showPrices);
+  const { lines, add, setLineQty, maxFor, keyOf, unitsOf } = cart;
   const [cartOpen, setCartOpen] = useState(false);
   const [index, setIndex] = useState(0);
   // One value per option; starts on the first value of each
@@ -46,6 +83,7 @@ export default function ProductClient({
   // Below zero = oversold: also unavailable
   const soldOut = p.stock !== null && p.stock <= 0;
   const go = (step: number) => setIndex((i) => (i + step + photos.length) % photos.length);
+  const related = relatedTo(p, products);
 
   return (
     <section className="px-6 pt-10 pb-24">
@@ -204,6 +242,24 @@ export default function ProductClient({
             )}
           </div>
         </div>
+
+        {related.length > 0 && (
+          <section aria-labelledby="related-title" className="mt-20">
+            <div className="flex flex-wrap items-end justify-between gap-3 mb-6">
+              <h2 id="related-title" className="m-0 font-mono text-[clamp(22px,2.6vw,28px)] font-bold tracking-[-.01em] text-white">
+                {t('relatedTitle')}
+              </h2>
+              <Link href={`${prefix}/store`} className="inline-flex items-center gap-1.5 text-[14px] text-jb-soft hover:text-white">
+                {t('seeAll')} <ArrowRight size={15} />
+              </Link>
+            </div>
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(min(260px,100%),1fr))] gap-4">
+              {related.map((o) => (
+                <ProductCard key={o.id} product={o} cart={cart} selling={settings.sales} heading="h3" />
+              ))}
+            </div>
+          </section>
+        )}
       </div>
 
       <CartDrawer products={products} settings={settings} payments={payments} open={cartOpen} onOpenChange={setCartOpen} />

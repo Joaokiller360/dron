@@ -110,6 +110,8 @@
     "nextPhoto": "Foto siguiente",
     "from": "Desde",
     "chooseOptions": "Elegir opciones",
+    "relatedTitle": "También te puede gustar",
+    "seeAll": "Ver toda la tienda",
     "errorGeneric": "No se pudo enviar el pedido. Inténtalo de nuevo.",
     "errorInvalid": "Revisa tus datos: nombre, correo y teléfono válidos."
   },
