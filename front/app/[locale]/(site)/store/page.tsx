@@ -1,14 +1,19 @@
+import { createMetadata } from '@/app/utils';
 import { notFound } from 'next/navigation';
 import { getLocale, getMessages, getTranslations } from 'next-intl/server';
 import { PageHero, fetchPublic, storeHeader, type PublicStore } from '@/app/component';
 import StoreClient from './StoreClient';
 
 export async function generateMetadata() {
-  const messages = await getMessages();
-  return {
-    title: messages.store?.metadeta?.TitleMeta || 'Tienda | JB.SKYLENS',
-    description: messages.store?.metadeta?.DescriptionMeta,
-  };
+  const [messages, locale] = await Promise.all([getMessages(), getLocale()]);
+  const meta = messages.store?.metadeta;
+  return createMetadata({
+    title: meta?.TitleMeta || 'Tienda',
+    description: meta?.DescriptionMeta || 'Compra productos de JB.SKYLENS: fotografía aérea impresa, packs y más, con entrega en Ecuador.',
+    keywords: meta?.keywords,
+    path: '/store',
+    locale,
+  });
 }
 
 export default async function Store() {

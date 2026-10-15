@@ -1,3 +1,4 @@
+import { createMetadata } from '@/app/utils';
 import Link from 'next/link';
 import { getLocale, getMessages, getTranslations } from 'next-intl/server';
 import { ArrowUpRight, Users, LifeBuoy, ShieldCheck, Palette } from 'lucide-react';
@@ -14,16 +15,15 @@ import {
 } from '@/app/component';
 
 export async function generateMetadata() {
-  const messages = await getMessages();
-  return {
-    title: messages.services?.metadeta?.TitleMeta || 'Servicios con drones | JB.SKYLENS',
-    description:
-      messages.services?.metadeta?.DescriptionMeta || 'Explora el portafolio de JB.SKYLENS con proyectos reales de fotografía aérea, video con drones, eventos e inspecciones en Ecuador.',
-    keywords: [
-      messages.services?.metadeta?.keywords
-    ],
-    canonical: 'https://dron.joaobarres.dev/services',
-  };
+  const [messages, locale] = await Promise.all([getMessages(), getLocale()]);
+  const meta = messages.services?.metadeta;
+  return createMetadata({
+    title: meta?.TitleMeta || 'Servicios con drones',
+    description: meta?.DescriptionMeta || 'Servicios con drones en Ecuador: inspecciones técnicas, fotografía aérea, video profesional, eventos y soluciones industriales.',
+    keywords: meta?.keywords,
+    path: '/services',
+    locale,
+  });
 }
 
 const includedIcons = [Users, LifeBuoy, ShieldCheck, Palette];

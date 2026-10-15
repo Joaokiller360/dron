@@ -1,5 +1,7 @@
 import { notFound } from 'next/navigation';
-import { fetchPublic, type PublicService } from '@/app/component';
+import { getLocale } from 'next-intl/server';
+import { createMetadata } from '@/app/utils';
+import { fetchPublic, localized, type PublicService } from '@/app/component';
 import ServiceDetail, { type DetailService } from './ServiceDetail';
 
 interface DbService extends DetailService {
@@ -29,25 +31,23 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const service = await getService(slug);
-  if (!service) return {};
+  const [service, locale] = await Promise.all([getService(slug), getLocale()]);
+  if (!service || !service.isPage) return {};
 
-  const title = service.metaTitle || `${service.titleEs} | JB.SKYLENS`;
-  return {
+  const name = localized(locale, service.titleEs, service.titleEn);
+  // The dashboard's SEO texts are written in Spanish; English pages use the English copy
+  const title = (locale === 'es' && service.metaTitle) || name;
+  const description =
+    (locale === 'es' && service.metaDescription) || localized(locale, service.descriptionEs ?? '', service.descriptionEn).slice(0, 160) || undefined;
+  return createMetadata({
     title,
-    description: service.metaDescription || undefined,
-    keywords: service.keywords?.length ? service.keywords : undefined,
-    alternates: { canonical: `https://dron.joaobarres.dev/services/${service.slug}` },
-    robots: { index: service.published, follow: service.published },
-    openGraph: {
-      title,
-      description: service.metaDescription || undefined,
-      url: `https://dron.joaobarres.dev/services/${service.slug}`,
-      siteName: 'JB Skylens',
-      images: service.coverUrl ? [{ url: service.coverUrl }] : [],
-      type: 'website',
-    },
-  };
+    description,
+    keywords: service.keywords,
+    path: `/services/${service.slug}`,
+    locale,
+    index: service.published,
+    image: service.coverUrl && /^https?:/.test(service.coverUrl) ? service.coverUrl : undefined,
+  });
 }
 
 export default async function DynamicServicePage({

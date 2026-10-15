@@ -1,6 +1,9 @@
 import { Banner, CardClient, SectionCard } from "@/app/utils";
 import { PhoneCall, Instagram } from 'lucide-react'
 
+// Test page: kept out of search results
+export const metadata = { robots: { index: false, follow: false } }
+
 export default function Prueba() {
   return (
     <>

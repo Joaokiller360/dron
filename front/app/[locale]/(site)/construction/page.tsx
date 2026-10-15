@@ -7,7 +7,7 @@ export const metadata = createMetadata({
   title: 'Página en construcción',
   description:
     'Esta sección de JB.SKYLENS se encuentra actualmente en construcción. Pronto tendremos nuevas soluciones con drones.',
-  canonical: 'https://dron.joaobarres.dev/construction',
+  path: '/construction',
   index: false, // 👈 importante para SEO
 })
 

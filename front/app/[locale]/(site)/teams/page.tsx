@@ -1,17 +1,16 @@
 import { createMetadata } from '@/app/utils'
-import { getMessages } from 'next-intl/server';
+import { getLocale, getMessages } from 'next-intl/server';
 import TeamsClient, { DbTeamMember } from './TeamsClient';
 
 export async function generateMetadata() {
-  const messages = await getMessages();
+  const [messages, locale] = await Promise.all([getMessages(), getLocale()]);
+  const meta = messages.teams?.metadeta;
   return createMetadata({
-    title: messages.teams?.metadeta?.TitleMeta || 'Equipo',
-    description:
-      messages.teams?.metadeta?.DescriptionMeta,
-    keywords: [
-      messages.teams?.metadeta?.keywords,
-    ],
-    canonical: 'https://dron.joaobarres.dev/teams',
+    title: meta?.TitleMeta || 'Nuestro equipo',
+    description: meta?.DescriptionMeta || 'Conoce al equipo de JB.SKYLENS, especialistas en operación de drones, inspecciones técnicas y producción audiovisual aérea.',
+    keywords: meta?.keywords,
+    path: '/teams',
+    locale,
   });
 }
 

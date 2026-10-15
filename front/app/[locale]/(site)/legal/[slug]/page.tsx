@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
-import { highlightText } from '@/app/utils';
+import { createMetadata, highlightText } from '@/app/utils';
 import { Eyebrow } from '@/app/component';
 
 interface LegalSection {
@@ -42,17 +42,17 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const page = await getLegalPage(slug);
+  const [page, locale] = await Promise.all([getLegalPage(slug), getLocale()]);
   if (!page) return {};
 
-  const title = page.metaTitle || `${page.titleEs} | JB.SKYLENS`;
-  return {
-    title,
+  return createMetadata({
+    title: (locale === 'es' && page.metaTitle) || (locale === 'en' && page.titleEn) || page.titleEs,
     description: page.metaDescription || undefined,
-    keywords: page.keywords?.length ? page.keywords : undefined,
-    alternates: { canonical: `https://dron.joaobarres.dev/legal/${page.slug}` },
-    robots: { index: page.published, follow: page.published },
-  };
+    keywords: page.keywords,
+    path: `/legal/${page.slug}`,
+    locale,
+    index: page.published,
+  });
 }
 
 export default async function DynamicLegalPage({

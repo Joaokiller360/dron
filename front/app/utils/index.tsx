@@ -7,7 +7,7 @@ import { ToastSuccess } from './toast'
 import { SeparatorUp, SeparatorBelow } from './separador'
 import Maps from './maps'
 import { SectionCard, CardVideo, CardClient, PageServices } from './cards'
-import { createMetadata } from './metadata'
+import { createMetadata, localeAlternates, localeUrl, SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE } from './metadata'
 import Banner from './banner'
 import { Favicon, Logo } from './logo'
 import LegalPage from './legalProps'
@@ -32,6 +32,11 @@ export {
   Maps,
   SectionCard,
   createMetadata,
+  localeAlternates,
+  localeUrl,
+  SITE_URL,
+  SITE_NAME,
+  DEFAULT_OG_IMAGE,
   Banner,
   CardVideo,
   CardClient,

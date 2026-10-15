@@ -1,18 +1,18 @@
+import { createMetadata } from '@/app/utils';
 import Link from 'next/link';
 import { getLocale, getMessages, getTranslations } from 'next-intl/server';
 import { PageHero, Shot, TestimonialMarquee, fetchPublic, btnPrimary, type PublicClient, type PublicTestimonial } from '@/app/component';
 
 export async function generateMetadata() {
-  const messages = await getMessages();
-  return {
-    title: messages.clients?.metadeta?.TitleMeta || 'Cliente | JB.SKYLENS',
-    description:
-      messages.clients?.metadeta?.DescriptionMeta || 'Conoce a los clientes de JB.SKYLENS, empresas y marcas que han confiado en nuestros servicios profesionales con drones en Ecuador.',
-    keywords: [
-      messages.clients?.metadeta?.keywords
-    ],
-    canonical: messages.clients?.metadeta?.canonical,
-  };
+  const [messages, locale] = await Promise.all([getMessages(), getLocale()]);
+  const meta = messages.clients?.metadeta;
+  return createMetadata({
+    title: meta?.TitleMeta || 'Clientes',
+    description: meta?.DescriptionMeta || 'Conoce a los clientes de JB.SKYLENS, empresas y marcas que han confiado en nuestros servicios profesionales con drones en Ecuador.',
+    keywords: meta?.keywords,
+    path: '/clients',
+    locale,
+  });
 }
 
 export default async function Clients() {
