@@ -4,14 +4,14 @@ import { useState, FormEvent, ReactNode } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
-import { ArrowLeft, CheckCircle2, Clock, CreditCard, Landmark, MapPin, Pencil, Trash2, Truck } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Clock, CreditCard, Landmark, MapPin, Pencil, Ticket, Trash2, Truck, X } from 'lucide-react';
 import { Shot, localized, shippingFor, btnPrimary, btnGhost, inputClass, usePrefix, type PublicProduct, type PublicStore } from '@/app/component';
 import { EMAIL_PATTERN, NAME_PATTERN, PLACE_PATTERN, TEXT_PATTERN } from '@/app/utils/formRules';
 import PhoneInput, { formatPhone, isValidPhone, type PhoneCountry } from '@/app/component/site/PhoneInput';
 import PaypalButtons, { type PaymentOutcome } from '../PaypalButtons';
 import TransferPayment from '../TransferPayment';
 import FreeOrder from '../FreeOrder';
-import { Stepper, optionsText, useCart, useMoney, type CartLine } from '../cart';
+import { Stepper, optionsText, useCart, useMoney, withCoupon, type CartLine, type Coupon } from '../cart';
 
 const emptyBuyer = { name: '', email: '', phoneCountry: 'EC' as PhoneCountry, phone: '', address: '', city: '', note: '' };
 type Buyer = typeof emptyBuyer;
@@ -73,7 +73,13 @@ export default function CheckoutClient({
   // units, which can drop live stock to 0 and would otherwise empty this very
   // cart; the order being paid must not change under the buyer.
   const [frozen, setFrozen] = useState<CartLine[] | null>(null);
-  const lines = step === 'pay' && frozen ? frozen : cart.lines;
+  // Coupon checked with the API; the order sends its code and the API prices it again
+  const [coupon, setCoupon] = useState<Coupon | null>(null);
+  const [couponInput, setCouponInput] = useState('');
+  const [couponError, setCouponError] = useState('');
+  const [couponBusy, setCouponBusy] = useState(false);
+  const lines = withCoupon(step === 'pay' && frozen ? frozen : cart.lines, coupon);
+  const couponUsed = !!coupon && lines.some((l) => l.discount === coupon);
   const units = lines.reduce((n, l) => n + l.quantity, 0);
   const showPrices = settings.showPrices && lines.every((l) => l.unitCents !== null);
   const itemsCents = lines.reduce((sum, l) => sum + (l.unitCents ?? 0) * l.quantity, 0);
@@ -131,7 +137,36 @@ export default function CheckoutClient({
     city: buyer.city,
     note: buyer.note || undefined,
     locale,
+    couponCode: coupon?.code,
     items: lines.map((l) => ({ productId: l.product.id, quantity: l.quantity, ...(l.options.length ? { options: l.options } : {}) })),
+  };
+
+  const applyCoupon = async (e: FormEvent) => {
+    e.preventDefault();
+    const code = couponInput.trim().toUpperCase();
+    if (!/^[A-Z0-9_-]{4,30}$/.test(code)) {
+      setCouponError(t('couponInvalid'));
+      return;
+    }
+    setCouponBusy(true);
+    setCouponError('');
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/store/coupon`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code }),
+      });
+      if (!res.ok) {
+        setCouponError(t(res.status === 429 ? 'couponTooMany' : 'couponInvalid'));
+        return;
+      }
+      setCoupon((await res.json()) as Coupon);
+      setCouponInput('');
+    } catch {
+      setCouponError(t('couponFailed'));
+    } finally {
+      setCouponBusy(false);
+    }
   };
 
   const finish = (outcome: { status: Done['status']; code: string }) => {
@@ -204,6 +239,41 @@ export default function CheckoutClient({
           );
         })}
       </ul>
+      {/* Coupon: typed while editing the order; locked once paying */}
+      <div className="flex flex-col gap-2 pt-4 border-t border-white/[.08]">
+        {coupon ? (
+          <div className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg border border-jb-accent/30 bg-jb-accent/[.06]">
+            <span className="inline-flex items-center min-w-0 gap-2 text-[13.5px] text-white">
+              <Ticket size={15} className="flex-none text-jb-accent" />
+              <span className="min-w-0 truncate">
+                <span className="font-mono font-bold">{coupon.code}</span> <span className="text-jb-soft">· {coupon.title}</span>
+              </span>
+            </span>
+            {step === 'details' && (
+              <button type="button" aria-label={t('couponRemove')} title={t('couponRemove')} onClick={() => setCoupon(null)} className="flex-none p-1 text-jb-muted hover:text-white">
+                <X size={15} />
+              </button>
+            )}
+          </div>
+        ) : step === 'details' ? (
+          <form onSubmit={applyCoupon} className="flex gap-2">
+            <input
+              value={couponInput}
+              onChange={(e) => setCouponInput(e.target.value)}
+              maxLength={30}
+              autoCapitalize="characters"
+              aria-label={t('couponLabel')}
+              placeholder={t('couponPlaceholder')}
+              className={`${inputClass} flex-1 min-w-0 font-mono uppercase`}
+            />
+            <button type="submit" disabled={couponBusy || !couponInput.trim()} className={`${btnGhost} flex-none px-4 text-[13.5px]`}>
+              {couponBusy ? '…' : t('couponApply')}
+            </button>
+          </form>
+        ) : null}
+        {couponError && <p role="alert" className="m-0 text-[12.5px] text-red-300">{couponError}</p>}
+        {coupon && !couponUsed && showPrices && <p className="m-0 text-[12.5px] text-amber-300">{t('couponNotApplicable')}</p>}
+      </div>
       {showPrices && (
         <div className="flex flex-col gap-2 pt-4 border-t border-white/[.08]">
           {cities.length > 0 && (

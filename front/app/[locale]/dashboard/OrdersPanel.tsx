@@ -298,6 +298,15 @@ export default function OrdersPanel() {
                             <td className="py-2 font-mono text-right text-jb-soft whitespace-nowrap">{o.shippingCents ? formatMoney(o.shippingCents) : 'Gratis'}</td>
                           </tr>
                         )}
+                        {o.couponCode && (
+                          <tr className="border-b border-white/[.06]">
+                            <td />
+                            <td className="py-2 text-jb-soft">
+                              Cupón <span className="font-mono text-jb-muted">· {o.couponCode}</span>
+                            </td>
+                            <td />
+                          </tr>
+                        )}
                         <tr>
                           <td />
                           <td className="pt-2.5 font-semibold text-white">Total</td>

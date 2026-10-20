@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   ArrayMaxSize,
   IsArray,
@@ -9,12 +10,18 @@ import {
   IsOptional,
   IsString,
   IsUUID,
+  Matches,
   Max,
   MaxLength,
   Min,
   ValidateIf,
 } from 'class-validator';
-import { DISCOUNT_TYPES, type DiscountType } from '../store-discounts';
+import {
+  COUPON_PATTERN,
+  DISCOUNT_TYPES,
+  normalizeCoupon,
+  type DiscountType,
+} from '../store-discounts';
 
 export class CreatePromotionDto {
   @ApiProperty({ example: 'Pack Boda Completa' })
@@ -79,6 +86,19 @@ export class CreatePromotionDto {
   @Min(1)
   @Max(10000000)
   discountValue?: number | null;
+
+  @ApiPropertyOptional({
+    example: 'BODA2026',
+    nullable: true,
+    description: 'Coupon code: the discount then only applies when typed at checkout',
+  })
+  @IsOptional()
+  @Transform(({ value }) => normalizeCoupon(value) || null)
+  @ValidateIf((o: CreatePromotionDto) => o.couponCode != null)
+  @Matches(COUPON_PATTERN, {
+    message: 'El cupón debe tener de 4 a 30 letras, números, guiones o guiones bajos',
+  })
+  couponCode?: string | null;
 
   @ApiPropertyOptional({ type: [String], description: 'Discounted products; empty = all' })
   @IsOptional()

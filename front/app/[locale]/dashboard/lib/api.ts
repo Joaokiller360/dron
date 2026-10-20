@@ -218,6 +218,8 @@ export interface Promotion {
   discountValue?: number | null;
   /** Discounted products; empty = whole store */
   productIds: string[];
+  /** With a code the discount only applies when typed at checkout */
+  couponCode?: string | null;
   endsAt?: string | null;
   active: boolean;
   sortOrder: number;
@@ -329,6 +331,8 @@ export interface Order {
   /** City whose shipping rate was charged; null on orders from a store without cities */
   shippingCity?: string | null;
   shippingCents: number;
+  /** Coupon the buyer typed at checkout */
+  couponCode?: string | null;
   /** Items + shipping */
   totalCents: number;
   status: OrderStatus;

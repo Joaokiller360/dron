@@ -197,6 +197,12 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
   ) {
     const city = this.shippingCity(dto, settings);
     const discounts = await this.promotions.activeStoreDiscounts();
+    // A typed coupon competes with the running promotions; the best price wins per line
+    if (dto.couponCode) {
+      const coupon = await this.promotions.couponDiscount(dto.couponCode);
+      if (!coupon) throw new BadRequestException('El cupón no es válido o ya venció');
+      discounts.push(coupon);
+    }
     const order = await this.prisma.$transaction(async (tx) => {
       const ids = [...new Set(dto.items.map((l) => l.productId))];
       const products = await tx.product.findMany({ where: { id: { in: ids }, published: true } });
@@ -249,6 +255,7 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
           city: city?.name ?? dto.city,
           note: dto.note || null,
           locale: dto.locale ?? 'es',
+          couponCode: dto.couponCode ?? null,
           items: lines as unknown as Prisma.InputJsonValue,
           shippingCity: city?.name ?? null,
           shippingCents,

@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   ArrayMaxSize,
   ArrayMinSize,
@@ -23,6 +23,7 @@ import {
   PLACE_PATTERN,
   TEXT_PATTERN,
 } from '../../common/text-patterns';
+import { COUPON_PATTERN, normalizeCoupon } from '../../promotions/store-discounts';
 
 export class OrderLineOptionDto {
   @ApiProperty({ example: 'Medida' })
@@ -111,4 +112,18 @@ export class CreateOrderDto {
   @IsOptional()
   @IsIn(['es', 'en'])
   locale?: string;
+
+  @ApiPropertyOptional({ example: 'BODA2026', description: 'Coupon typed at checkout' })
+  @IsOptional()
+  @Transform(({ value }) => normalizeCoupon(value) || undefined)
+  @Matches(COUPON_PATTERN, { message: 'El cupón no es válido o ya venció' })
+  couponCode?: string;
+}
+
+export class CouponDto {
+  @ApiProperty({ example: 'BODA2026' })
+  @Transform(({ value }) => normalizeCoupon(value))
+  @IsString()
+  @Matches(COUPON_PATTERN, { message: 'El cupón no es válido o ya venció' })
+  code: string;
 }

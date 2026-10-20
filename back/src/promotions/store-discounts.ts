@@ -1,6 +1,11 @@
 import { Promotion } from '@prisma/client';
 
 export type DiscountType = 'PERCENT' | 'FIXED';
+
+/** Coupon codes: 4–30 letters, digits, "-" or "_", compared uppercase */
+export const COUPON_PATTERN = /^[A-Z0-9_-]{4,30}$/;
+export const normalizeCoupon = (value: unknown) =>
+  typeof value === 'string' ? value.trim().toUpperCase() : value;
 export const DISCOUNT_TYPES: DiscountType[] = ['PERCENT', 'FIXED'];
 
 /** A running promotion that lowers store prices */

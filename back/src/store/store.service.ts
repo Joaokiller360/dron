@@ -163,6 +163,14 @@ export class StoreService {
     };
   }
 
+  /** A coupon typed at checkout: its discount and the products it covers (empty = all) */
+  async coupon(code: string) {
+    const settings = await this.getSettings();
+    const discount = settings.enabled ? await this.promotions.couponDiscount(code) : null;
+    if (!discount) throw new NotFoundException('El cupón no es válido o ya venció');
+    return { code, ...publicDiscount(discount), productIds: discount.productIds };
+  }
+
   private publicProduct(p: Product, showPrices: boolean) {
     if (showPrices) return p;
     // Hidden prices: option extras would give them away too

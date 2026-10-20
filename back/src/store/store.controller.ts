@@ -1,7 +1,9 @@
-import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { StoreService } from './store.service';
 import { StoreSettingsDto } from './dto/store-settings.dto';
+import { CouponDto } from './dto/create-order.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('store')
@@ -20,6 +22,15 @@ export class StoreController {
   async status() {
     const { enabled, sales } = await this.store.getSettings();
     return { enabled, sales };
+  }
+
+  @Post('coupon')
+  @HttpCode(200)
+  // Slow enough that codes can't be guessed by trying them
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
+  @ApiOperation({ summary: 'Public: check a coupon typed at checkout and get its discount' })
+  coupon(@Body() dto: CouponDto) {
+    return this.store.coupon(dto.code);
   }
 
   @Get('payments')

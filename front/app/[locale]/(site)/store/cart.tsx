@@ -84,6 +84,25 @@ export function unitPrice(p: PublicProduct, options: ChosenOption[]) {
   return { unitCents: deal?.unitCents ?? list, listCents: list, discount: deal?.discount ?? null };
 }
 
+/** A coupon the API accepted: its discount and the products it covers (empty = all) */
+export interface Coupon extends PublicDiscount {
+  code: string;
+  productIds: string[];
+}
+
+/**
+ * Lines priced with the coupon too: it competes with the running promotions
+ * and the best price wins per line, never stacking (the API prices it the same way)
+ */
+export function withCoupon(lines: CartLine[], coupon: Coupon | null): CartLine[] {
+  if (!coupon) return lines;
+  return lines.map((l) => {
+    if (l.listCents === null || (coupon.productIds.length && !coupon.productIds.includes(l.product.id))) return l;
+    const deal = bestDeal(l.listCents, [...(l.product.discounts ?? []), coupon]);
+    return deal ? { ...l, unitCents: deal.unitCents, discount: deal.discount } : l;
+  });
+}
+
 /** True when `options` answers every option of the product with a value that still exists */
 const validChoice = (p: PublicProduct, options: ChosenOption[]) =>
   (p.options ?? []).every((o) => options.some((c) => c.name === o.name && o.values.some((v) => v.label === c.value))) &&

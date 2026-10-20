@@ -42,6 +42,8 @@ const emptyForm = {
   discountValue: '',
   allProducts: true,
   productIds: [] as string[],
+  // '' = applies to everyone; with a code only when typed at checkout
+  couponCode: '',
 };
 type Form = typeof emptyForm;
 
@@ -53,7 +55,7 @@ const discountText = (p: Promotion) =>
   p.discountType && p.discountValue
     ? `Tienda: ${p.discountType === 'PERCENT' ? `-${p.discountValue}%` : `-${formatMoney(p.discountValue)}`} · ${
         p.productIds?.length ? `${p.productIds.length} producto${p.productIds.length === 1 ? '' : 's'}` : 'toda la tienda'
-      }`
+      }${p.couponCode ? ` · cupón ${p.couponCode}` : ''}`
     : null;
 
 export default function PromotionsPanel() {
@@ -113,6 +115,7 @@ export default function PromotionsPanel() {
       discountValue: !p.discountValue ? '' : p.discountType === 'FIXED' ? (p.discountValue / 100).toFixed(2) : String(p.discountValue),
       allProducts: !p.productIds?.length,
       productIds: p.productIds ?? [],
+      couponCode: p.couponCode ?? '',
     });
     setFormError('');
     setEditing(p);
@@ -127,6 +130,11 @@ export default function PromotionsPanel() {
       setFormError(form.discountType === 'PERCENT' ? 'El porcentaje debe estar entre 1 y 100.' : 'Indica cuánto se descuenta por unidad.');
       return;
     }
+    const couponCode = form.discountType ? form.couponCode.trim().toUpperCase() : '';
+    if (couponCode && !/^[A-Z0-9_-]{4,30}$/.test(couponCode)) {
+      setFormError('El cupón debe tener de 4 a 30 letras, números, guiones o guiones bajos.');
+      return;
+    }
     if (form.discountType && !form.allProducts && !form.productIds.length) {
       setFormError('Elige al menos un producto o aplica el descuento a toda la tienda.');
       return;
@@ -137,6 +145,7 @@ export default function PromotionsPanel() {
       discountType: form.discountType || null,
       discountValue,
       productIds: form.discountType && !form.allProducts ? form.productIds : [],
+      couponCode: couponCode || null,
       title: form.title.trim(),
       detail: orNull(form.detail),
       badge: orNull(form.badge),
@@ -352,6 +361,17 @@ export default function PromotionsPanel() {
                   </div>
                 )}
               </div>
+            )}
+            {form.discountType && (
+              <Field label="Código de cupón" hint="Opcional. Con código, el descuento solo se aplica si el cliente lo escribe al pagar; sin código, se aplica a todos.">
+                <input
+                  value={form.couponCode}
+                  onChange={(e) => set('couponCode', e.target.value.toUpperCase())}
+                  maxLength={30}
+                  placeholder="BODA2026"
+                  className={`${inputCls} font-mono uppercase`}
+                />
+              </Field>
             )}
             <p className="m-0 text-[12.5px] text-jb-muted">
               Se aplica mientras la promoción esté activa y sin vencer, con «Descuentos en la tienda» encendido. Si un producto tiene varias, gana la de mejor precio.

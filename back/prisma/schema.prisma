@@ -219,6 +219,9 @@ model Promotion {
   discountType  String?   @map("discount_type")
   discountValue Int?      @map("discount_value")
   productIds    String[]  @default([]) @map("product_ids")
+  // Coupon: with a code the discount only applies when the buyer types it at
+  // checkout (stored uppercase); without one it applies to everyone
+  couponCode    String?   @unique @map("coupon_code")
   // Hidden automatically once this date passes
   endsAt        DateTime? @map("ends_at")
   active        Boolean   @default(true)
@@ -345,6 +348,8 @@ model Order {
   // cities) and what it charged; totalCents = items + shippingCents
   shippingCity  String?       @map("shipping_city")
   shippingCents Int           @default(0) @map("shipping_cents")
+  // Coupon the buyer typed at checkout (valid at the time)
+  couponCode    String?       @map("coupon_code")
   totalCents    Int           @map("total_cents")
   status        OrderStatus   @default(PENDING_PAYMENT)
   paymentMethod PaymentMethod @default(PAYPAL) @map("payment_method")
