@@ -159,6 +159,22 @@ export class PromotionsService {
     }
   }
 
+  /**
+   * Pauses the coupon's promotion once its last use is taken. Call it in the
+   * order transaction, after creating the order and with the lock from
+   * assertCouponAvailable. It stays paused even if a use comes back later:
+   * the owner reactivates it (raising the limit if needed).
+   */
+  async pauseIfSoldOut(coupon: Coupon, tx: Prisma.TransactionClient) {
+    if (coupon.maxUses === null) return false;
+    if ((await tx.order.count({ where: usesOf(coupon.code) })) < coupon.maxUses) return false;
+    await tx.promotion.update({
+      where: { id: coupon.discount.promotionId },
+      data: { active: false },
+    });
+    return true;
+  }
+
   /** All offers, with how many orders hold a use of each coupon */
   async findAllForAdmin() {
     const [items, uses] = await Promise.all([

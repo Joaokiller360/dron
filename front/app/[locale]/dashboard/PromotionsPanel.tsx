@@ -53,9 +53,16 @@ type Form = typeof emptyForm;
 const orNull = (v: string) => (v.trim() ? v.trim() : null);
 const isExpired = (p: Promotion) => !!p.endsAt && new Date(p.endsAt).getTime() < Date.now();
 
-/** " (3/50 usos)" next to a coupon in the list */
-const couponUsesText = (p: Promotion) =>
-  p.couponUses === undefined ? '' : ` (${p.couponUses}${p.couponMaxUses ? `/${p.couponMaxUses}` : ''} uso${p.couponUses === 1 && !p.couponMaxUses ? '' : 's'})`;
+/** Uses left of a limited coupon; null without a limit or before the admin list loads them */
+const couponLeft = (p: Promotion) =>
+  p.couponMaxUses && p.couponUses !== undefined ? Math.max(0, p.couponMaxUses - p.couponUses) : null;
+
+/** " · quedan 47 de 50" (limited) or " · 3 usos" next to a coupon in the list */
+const couponUsesText = (p: Promotion) => {
+  if (p.couponUses === undefined) return '';
+  const left = couponLeft(p);
+  return left !== null ? ` · quedan ${left} de ${p.couponMaxUses}` : ` · ${p.couponUses} uso${p.couponUses === 1 ? '' : 's'}`;
+};
 
 /** "-20% · 3 productos" for the list; null for display-only promotions */
 const discountText = (p: Promotion) =>
@@ -264,6 +271,7 @@ export default function PromotionsPanel() {
               pills={
                 <>
                   {isExpired(p) && <Pill tone="warn">Vencida</Pill>}
+                  {couponLeft(p) === 0 && <Pill tone="warn">Cupón agotado</Pill>}
                   <StatusPill published={p.active} labels={['Activa', 'Pausada']} />
                 </>
               }
@@ -394,13 +402,20 @@ export default function PromotionsPanel() {
             )}
             {form.discountType && form.couponCode.trim() && (
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Usos máximos" hint="Pedidos en total. Vacío = sin límite.">
+                <Field
+                  label="Usos máximos"
+                  hint={
+                    editing && editing !== 'new' && editing.couponCode && editing.couponUses !== undefined
+                      ? `Usados: ${editing.couponUses}${editing.couponMaxUses ? ` · quedan ${Math.max(0, editing.couponMaxUses - editing.couponUses)}` : ''}. Al agotarse, la promoción se pausa sola.`
+                      : 'Pedidos en total. Vacío = sin límite. Al agotarse, la promoción se pausa sola.'
+                  }
+                >
                   <input inputMode="numeric" value={form.couponMaxUses} onChange={(e) => set('couponMaxUses', e.target.value.replace(/\D/g, ''))} placeholder="50" className={`${inputCls} font-mono`} />
                 </Field>
                 <Field label="Usos por cliente" hint="Mismo correo o teléfono. Vacío = sin límite.">
                   <input inputMode="numeric" value={form.couponMaxPerCustomer} onChange={(e) => set('couponMaxPerCustomer', e.target.value.replace(/\D/g, ''))} placeholder="1" className={`${inputCls} font-mono`} />
                 </Field>
-                <p className="m-0 text-[12.5px] text-jb-muted sm:col-span-2">Los pedidos cancelados o reembolsados devuelven su uso.</p>
+                <p className="m-0 text-[12.5px] text-jb-muted sm:col-span-2">Los pedidos cancelados o reembolsados devuelven su uso; si el cupón ya se pausó por agotarse, vuelve a activarlo tú.</p>
               </div>
             )}
             <p className="m-0 text-[12.5px] text-jb-muted">

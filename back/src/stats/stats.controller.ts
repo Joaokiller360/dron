@@ -1,7 +1,8 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { BadRequestException, Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { SALES_RANGES, SalesRange, salesSeries } from './sales-series';
 
 @ApiTags('stats')
 @Controller('stats')
@@ -59,5 +60,22 @@ export class StatsController {
       products,
       orders: { total: orders, toShip: ordersToShip, toVerify: transfersToVerify },
     };
+  }
+
+  @Get('sales')
+  @ApiQuery({ name: 'days', enum: [...SALES_RANGES], required: false })
+  @ApiOperation({ summary: 'Admin: store sales and shipments per day for the overview chart' })
+  async sales(@Query('days') raw?: string) {
+    const days = Number(raw ?? 30) as SalesRange;
+    if (!SALES_RANGES.includes(days)) {
+      throw new BadRequestException(`days debe ser ${SALES_RANGES.join(', ')}`);
+    }
+    // A day of margin: the first chart day starts at midnight in the shop's time zone
+    const since = new Date(Date.now() - (days + 1) * 86_400_000);
+    const orders = await this.prisma.order.findMany({
+      where: { OR: [{ paidAt: { gte: since } }, { shippedAt: { gte: since } }] },
+      select: { paidAt: true, shippedAt: true, totalCents: true, status: true },
+    });
+    return salesSeries(orders, days);
   }
 }

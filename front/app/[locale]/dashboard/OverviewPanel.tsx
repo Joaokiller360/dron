@@ -6,6 +6,7 @@ import { apiFetch, ContactMessage, Stats } from './lib/api';
 import { useLive } from './lib/live';
 import { Card, PanelHeader, Pill, btn } from './ui';
 import type { Tab } from './DashboardClient';
+import SalesChart from './SalesChart';
 
 function StatCard({
   icon,
@@ -95,6 +96,8 @@ export default function OverviewPanel({ onNavigate }: { onNavigate: (tab: Tab) =
         />
         <StatCard icon={<ShoppingBag size={19} />} label="Productos" value={stats?.products?.total ?? '–'} detail={pub(stats?.products)} onClick={() => onNavigate('tienda')} />
       </div>
+
+      <SalesChart />
 
       <Card className="overflow-hidden">
         <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-white/[.07]">

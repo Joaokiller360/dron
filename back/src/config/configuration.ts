@@ -72,6 +72,12 @@ export default () => ({
     useTemplates: process.env.WHATSAPP_USE_TEMPLATES === 'true',
     templatePaid: process.env.WHATSAPP_TEMPLATE_PAID || 'pedido_pagado',
     templateShipped: process.env.WHATSAPP_TEMPLATE_SHIPPED || 'pedido_enviado',
+    // Shop heads-ups (paid sale, transfer to verify) go to these numbers,
+    // comma-separated; not the API's own number, which can't message itself
+    shopNotifyTo: process.env.WHATSAPP_SHOP_NOTIFY_TO,
+    templateShopSale: process.env.WHATSAPP_TEMPLATE_SHOP_SALE || 'venta_nueva',
+    templateShopTransfer:
+      process.env.WHATSAPP_TEMPLATE_SHOP_TRANSFER || 'transferencia_por_verificar',
     // Language codes the templates were approved in
     langEs: process.env.WHATSAPP_TEMPLATE_LANG_ES ?? 'es',
     langEn: process.env.WHATSAPP_TEMPLATE_LANG_EN ?? 'en',

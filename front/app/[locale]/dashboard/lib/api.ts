@@ -428,6 +428,12 @@ export interface PaymentCheck extends PaymentStatus {
 export const formatMoney = (cents: number) =>
   (cents / 100).toLocaleString('es-EC', { style: 'currency', currency: 'USD' });
 
+/** Store sales and shipments per day (shop time zone), oldest first */
+export interface SalesSeries {
+  days: { date: string; salesCents: number; orders: number; shipped: number }[];
+  totals: { salesCents: number; orders: number; shipped: number };
+}
+
 export interface Stats {
   messages: { total: number; new: number };
   projects: { total: number; published: number };

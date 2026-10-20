@@ -154,6 +154,9 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
     this.mail
       .transferReceived(order)
       .catch((err) => this.logger.error(`Transfer email ${order.code}: ${err}`));
+    this.whatsapp
+      .shopTransfer(order)
+      .catch((err) => this.logger.error(`Transfer WhatsApp ${order.code}: ${err}`));
     return { code: order.code, status: 'VERIFYING' as const };
   }
 
@@ -244,7 +247,7 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
       }
       await this.reserve(tx, lines);
 
-      return tx.order.create({
+      const created = await tx.order.create({
         data: {
           code: newOrderCode(),
           name: dto.name,
@@ -263,8 +266,13 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
           ...extra,
         },
       });
+      if (coupon && (await this.promotions.pauseIfSoldOut(coupon, tx))) {
+        this.logger.log(`Coupon ${coupon.code} used up by ${created.code}: promotion paused`);
+      }
+      return created;
     });
     this.events.emit('products', 'update'); // stock changed
+    if (coupon) this.events.emit('promotions', 'update'); // uses left changed
     return order;
   }
 
@@ -671,6 +679,10 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
       );
       this.announce();
       this.kick('notices', () => this.sendPendingNotices());
+      // Heads-up for the shop with the order as it is now (paid)
+      this.ensure(order.id)
+        .then((paidOrder) => this.whatsapp.shopSale(paidOrder))
+        .catch((err) => this.logger.error(`Sale WhatsApp ${order.code}: ${err}`));
     }
   }
 
@@ -694,7 +706,7 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
       return tx.order.findUniqueOrThrow({ where: { id: order.id } });
     });
     if (!updated) return this.ensure(order.id); // already refunded by the other path
-    this.announce();
+    this.announce(updated.couponCode);
     if (notify) {
       this.mail
         .orderRefunded(updated)
@@ -714,12 +726,12 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
         },
         data: { status: CANCELLED },
       });
-      if (count === 0) return false;
+      if (count === 0) return null;
       const order = await tx.order.findUniqueOrThrow({ where: { id } });
       await this.release(tx, order.items as unknown as OrderLine[]);
-      return true;
+      return order;
     });
-    if (cancelled) this.announce();
+    if (cancelled) this.announce(cancelled.couponCode);
   }
 
   // ── Stock ─────────────────────────────────────────────────────────────────
@@ -771,9 +783,11 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
   }
 
   /** Tells the dashboard and the public store (stock) that orders changed */
-  private announce() {
+  private announce(couponCode?: string | null) {
     this.events.emit('orders', 'update');
     this.events.emit('products', 'update');
+    // A cancelled or refunded order gives its coupon use back
+    if (couponCode) this.events.emit('promotions', 'update');
   }
 
   private async ensure(id: string) {

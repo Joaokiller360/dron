@@ -119,6 +119,50 @@ describe('StoreWhatsappService', () => {
     );
   });
 
+  it('sends the shop a sale notice to every configured number, in Spanish', async () => {
+    const shop = {
+      get: (key: string) =>
+        key === 'whatsapp.useTemplates'
+          ? false
+          : key === 'whatsapp.shopNotifyTo'
+            ? '+593 99 111 2222, 0993334444'
+            : env[key],
+    } as unknown as ConfigService;
+    fetchMock
+      .mockResolvedValueOnce({ ok: false, status: 400, json: async () => ({ error: {} }) })
+      .mockResolvedValueOnce({ ok: true });
+    await new StoreWhatsappService(shop).shopSale({
+      ...order,
+      locale: 'en',
+      email: 'ana@mail.com',
+      paymentMethod: 'FREE',
+      couponCode: 'BODA2026',
+    } as Order);
+    // The first number failing doesn't stop the second
+    expect(fetchMock.mock.calls.map((c) => JSON.parse(c[1].body).to)).toEqual([
+      '593991112222',
+      '593993334444',
+    ]);
+    const body = JSON.parse(fetchMock.mock.calls[1][1].body);
+    expect(body.text.body).toBe(
+      [
+        '🛒 Nueva venta JB-ABC123 por $545.00',
+        '',
+        'Cliente: Ana · 0987654321 · ana@mail.com',
+        'Productos: 1 × Dron, 2 × Batería (Larga)',
+        'Entrega: Av. Libertad, casa 12, Quito · Quito · $5.00',
+        'Pago: Gratis · cupón BODA2026',
+        '',
+        'Gestiónala en el dashboard (Pedidos).',
+      ].join('\n'),
+    );
+  });
+
+  it('sends nothing to the shop without WHATSAPP_SHOP_NOTIFY_TO', async () => {
+    await new StoreWhatsappService(config).shopTransfer(order);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it('throws on API errors so the notice is retried', async () => {
     fetchMock.mockResolvedValue({
       ok: false,

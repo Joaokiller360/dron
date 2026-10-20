@@ -30,6 +30,30 @@ function fakeDb(orders: { email: string; phone: string }[]) {
   return db;
 }
 
+describe('pauseIfSoldOut', () => {
+  const tx = (uses: number) => ({
+    order: { count: jest.fn(async () => uses) },
+    promotion: { update: jest.fn(async () => ({})) },
+  });
+  const service = new PromotionsService({} as PrismaService);
+
+  it('pauses the promotion when the last use is taken', async () => {
+    const db = tx(2);
+    await expect(service.pauseIfSoldOut(coupon({ maxUses: 2 }), db as never)).resolves.toBe(true);
+    expect(db.promotion.update).toHaveBeenCalledWith({
+      where: { id: 'p1' },
+      data: { active: false },
+    });
+  });
+
+  it('leaves it running while uses remain, or without a limit', async () => {
+    const db = tx(1);
+    await expect(service.pauseIfSoldOut(coupon({ maxUses: 2 }), db as never)).resolves.toBe(false);
+    await expect(service.pauseIfSoldOut(coupon({}), db as never)).resolves.toBe(false);
+    expect(db.promotion.update).not.toHaveBeenCalled();
+  });
+});
+
 describe('assertCouponAvailable', () => {
   const buyer = { email: 'Ana@Mail.com', phone: '0987654321' };
 
