@@ -44,18 +44,25 @@ const emptyForm = {
   productIds: [] as string[],
   // '' = applies to everyone; with a code only when typed at checkout
   couponCode: '',
+  // Coupon limits; '' = unlimited
+  couponMaxUses: '',
+  couponMaxPerCustomer: '',
 };
 type Form = typeof emptyForm;
 
 const orNull = (v: string) => (v.trim() ? v.trim() : null);
 const isExpired = (p: Promotion) => !!p.endsAt && new Date(p.endsAt).getTime() < Date.now();
 
+/** " (3/50 usos)" next to a coupon in the list */
+const couponUsesText = (p: Promotion) =>
+  p.couponUses === undefined ? '' : ` (${p.couponUses}${p.couponMaxUses ? `/${p.couponMaxUses}` : ''} uso${p.couponUses === 1 && !p.couponMaxUses ? '' : 's'})`;
+
 /** "-20% · 3 productos" for the list; null for display-only promotions */
 const discountText = (p: Promotion) =>
   p.discountType && p.discountValue
     ? `Tienda: ${p.discountType === 'PERCENT' ? `-${p.discountValue}%` : `-${formatMoney(p.discountValue)}`} · ${
         p.productIds?.length ? `${p.productIds.length} producto${p.productIds.length === 1 ? '' : 's'}` : 'toda la tienda'
-      }${p.couponCode ? ` · cupón ${p.couponCode}` : ''}`
+      }${p.couponCode ? ` · cupón ${p.couponCode}${couponUsesText(p)}` : ''}`
     : null;
 
 export default function PromotionsPanel() {
@@ -116,6 +123,8 @@ export default function PromotionsPanel() {
       allProducts: !p.productIds?.length,
       productIds: p.productIds ?? [],
       couponCode: p.couponCode ?? '',
+      couponMaxUses: p.couponMaxUses ? String(p.couponMaxUses) : '',
+      couponMaxPerCustomer: p.couponMaxPerCustomer ? String(p.couponMaxPerCustomer) : '',
     });
     setFormError('');
     setEditing(p);
@@ -135,6 +144,14 @@ export default function PromotionsPanel() {
       setFormError('El cupón debe tener de 4 a 30 letras, números, guiones o guiones bajos.');
       return;
     }
+    // Whole numbers ≥ 1, or empty for unlimited
+    const limit = (v: string) => (couponCode && v.trim() ? Number(v) : null);
+    const couponMaxUses = limit(form.couponMaxUses);
+    const couponMaxPerCustomer = limit(form.couponMaxPerCustomer);
+    if ([couponMaxUses, couponMaxPerCustomer].some((n) => n !== null && (!Number.isInteger(n) || n < 1))) {
+      setFormError('Los límites del cupón deben ser números enteros desde 1, o quedar vacíos (sin límite).');
+      return;
+    }
     if (form.discountType && !form.allProducts && !form.productIds.length) {
       setFormError('Elige al menos un producto o aplica el descuento a toda la tienda.');
       return;
@@ -146,6 +163,8 @@ export default function PromotionsPanel() {
       discountValue,
       productIds: form.discountType && !form.allProducts ? form.productIds : [],
       couponCode: couponCode || null,
+      couponMaxUses,
+      couponMaxPerCustomer,
       title: form.title.trim(),
       detail: orNull(form.detail),
       badge: orNull(form.badge),
@@ -372,6 +391,17 @@ export default function PromotionsPanel() {
                   className={`${inputCls} font-mono uppercase`}
                 />
               </Field>
+            )}
+            {form.discountType && form.couponCode.trim() && (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="Usos máximos" hint="Pedidos en total. Vacío = sin límite.">
+                  <input inputMode="numeric" value={form.couponMaxUses} onChange={(e) => set('couponMaxUses', e.target.value.replace(/\D/g, ''))} placeholder="50" className={`${inputCls} font-mono`} />
+                </Field>
+                <Field label="Usos por cliente" hint="Mismo correo o teléfono. Vacío = sin límite.">
+                  <input inputMode="numeric" value={form.couponMaxPerCustomer} onChange={(e) => set('couponMaxPerCustomer', e.target.value.replace(/\D/g, ''))} placeholder="1" className={`${inputCls} font-mono`} />
+                </Field>
+                <p className="m-0 text-[12.5px] text-jb-muted sm:col-span-2">Los pedidos cancelados o reembolsados devuelven su uso.</p>
+              </div>
             )}
             <p className="m-0 text-[12.5px] text-jb-muted">
               Se aplica mientras la promoción esté activa y sin vencer, con «Descuentos en la tienda» encendido. Si un producto tiene varias, gana la de mejor precio.

@@ -198,12 +198,12 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
     const city = this.shippingCity(dto, settings);
     const discounts = await this.promotions.activeStoreDiscounts();
     // A typed coupon competes with the running promotions; the best price wins per line
-    if (dto.couponCode) {
-      const coupon = await this.promotions.couponDiscount(dto.couponCode);
-      if (!coupon) throw new BadRequestException('El cupón no es válido o ya venció');
-      discounts.push(coupon);
-    }
+    const coupon = dto.couponCode ? await this.promotions.findCoupon(dto.couponCode) : null;
+    if (dto.couponCode && !coupon) throw new ConflictException('El cupón no es válido o ya venció');
+    if (coupon) discounts.push(coupon.discount);
     const order = await this.prisma.$transaction(async (tx) => {
+      // Uses are counted under a lock on the coupon and the order is created in this transaction
+      if (coupon) await this.promotions.assertCouponAvailable(coupon, dto, tx);
       const ids = [...new Set(dto.items.map((l) => l.productId))];
       const products = await tx.product.findMany({ where: { id: { in: ids }, published: true } });
       if (products.length !== ids.length) {

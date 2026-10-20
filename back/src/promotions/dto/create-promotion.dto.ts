@@ -100,6 +100,28 @@ export class CreatePromotionDto {
   })
   couponCode?: string | null;
 
+  @ApiPropertyOptional({
+    example: 50,
+    nullable: true,
+    description: 'Orders that may use the coupon; null = unlimited',
+  })
+  @ValidateIf((o: CreatePromotionDto) => o.couponMaxUses != null)
+  @IsInt()
+  @Min(1)
+  @Max(1000000)
+  couponMaxUses?: number | null;
+
+  @ApiPropertyOptional({
+    example: 1,
+    nullable: true,
+    description: 'Uses per buyer (email or phone); null = unlimited',
+  })
+  @ValidateIf((o: CreatePromotionDto) => o.couponMaxPerCustomer != null)
+  @IsInt()
+  @Min(1)
+  @Max(1000)
+  couponMaxPerCustomer?: number | null;
+
   @ApiPropertyOptional({ type: [String], description: 'Discounted products; empty = all' })
   @IsOptional()
   @IsArray()

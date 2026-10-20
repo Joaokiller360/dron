@@ -166,8 +166,11 @@ export class StoreService {
   /** A coupon typed at checkout: its discount and the products it covers (empty = all) */
   async coupon(code: string) {
     const settings = await this.getSettings();
-    const discount = settings.enabled ? await this.promotions.couponDiscount(code) : null;
-    if (!discount) throw new NotFoundException('El cupón no es válido o ya venció');
+    const coupon = settings.enabled ? await this.promotions.findCoupon(code) : null;
+    if (!coupon) throw new NotFoundException('El cupón no es válido o ya venció');
+    // Uses left for this buyer are checked at checkout, once their email and phone are known
+    await this.promotions.assertCouponAvailable(coupon);
+    const { discount } = coupon;
     return { code, ...publicDiscount(discount), productIds: discount.productIds };
   }
 

@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { OrderStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePromotionDto } from './dto/create-promotion.dto';
 import { StoreDiscount, toStoreDiscount } from './store-discounts';
@@ -16,6 +16,23 @@ import {
 } from './dto/promotion-settings.dto';
 
 const SETTINGS_KEY = 'promotions';
+
+/** A running coupon and its limits (null = unlimited) */
+export interface Coupon {
+  code: string;
+  discount: StoreDiscount;
+  maxUses: number | null;
+  maxPerCustomer: number | null;
+}
+
+/** Orders holding a use of a coupon: any not cancelled or refunded */
+const usesOf = (code: string): Prisma.OrderWhereInput => ({
+  couponCode: code,
+  status: { notIn: [OrderStatus.CANCELLED, OrderStatus.REFUNDED] },
+});
+
+/** Phones typed differently ("+593 98…" / "098…") still match on their last 9 digits */
+const phoneKey = (phone: string) => phone.replace(/\D/g, '').slice(-9);
 
 @Injectable()
 export class PromotionsService {
@@ -70,8 +87,8 @@ export class PromotionsService {
     return items.map(toStoreDiscount).filter((d): d is StoreDiscount => d !== null);
   }
 
-  /** The store discount behind a coupon code, while it runs under the same rules; null otherwise */
-  async couponDiscount(code: string): Promise<StoreDiscount | null> {
+  /** The coupon behind a code, while it runs under the same rules as other discounts; null otherwise */
+  async findCoupon(code: string): Promise<Coupon | null> {
     const settings = await this.getSettings();
     if (!settings.enabled || !settings.store) return null;
     const promotion = await this.prisma.promotion.findFirst({
@@ -82,11 +99,85 @@ export class PromotionsService {
         OR: [{ endsAt: null }, { endsAt: { gt: new Date() } }],
       },
     });
-    return promotion ? toStoreDiscount(promotion) : null;
+    const discount = promotion && toStoreDiscount(promotion);
+    return discount
+      ? {
+          code,
+          discount,
+          maxUses: promotion.couponMaxUses,
+          maxPerCustomer: promotion.couponMaxPerCustomer,
+        }
+      : null;
   }
 
-  findAllForAdmin() {
-    return this.prisma.promotion.findMany({ orderBy: { sortOrder: 'asc' } });
+  /**
+   * Throws when the coupon has no uses left, in total or for this buyer (same
+   * email, or same phone on its last 9 digits). Inside an order transaction it
+   * first locks the promotion, so concurrent checkouts can't both take the
+   * last use; the order must be created in that same transaction.
+   */
+  async assertCouponAvailable(
+    coupon: Coupon,
+    buyer?: { email: string; phone: string },
+    tx?: Prisma.TransactionClient,
+  ) {
+    if (coupon.maxUses === null && (coupon.maxPerCustomer === null || !buyer)) return;
+    const db = tx ?? this.prisma;
+    if (tx) {
+      await tx.$queryRaw`SELECT 1 FROM "promotions" WHERE "id" = ${coupon.discount.promotionId} FOR UPDATE`;
+    }
+    if (
+      coupon.maxUses !== null &&
+      (await db.order.count({ where: usesOf(coupon.code) })) >= coupon.maxUses
+    ) {
+      throw new ConflictException('Este cupón ya alcanzó su límite de usos');
+    }
+    if (coupon.maxPerCustomer === null || !buyer) return;
+    const email = buyer.email.trim();
+    const phone = phoneKey(buyer.phone);
+    const candidates = await db.order.findMany({
+      where: {
+        ...usesOf(coupon.code),
+        OR: [
+          { email: { equals: email, mode: 'insensitive' } },
+          ...(phone.length >= 7 ? [{ phone: { endsWith: phone.slice(-4) } }] : []),
+        ],
+      },
+      select: { email: true, phone: true },
+    });
+    const used = candidates.filter(
+      (o) =>
+        o.email.trim().toLowerCase() === email.toLowerCase() ||
+        (phone.length >= 7 && phoneKey(o.phone) === phone),
+    ).length;
+    if (used >= coupon.maxPerCustomer) {
+      throw new ConflictException(
+        coupon.maxPerCustomer === 1
+          ? 'Ya usaste este cupón'
+          : `Ya usaste este cupón ${coupon.maxPerCustomer} veces, el máximo permitido`,
+      );
+    }
+  }
+
+  /** All offers, with how many orders hold a use of each coupon */
+  async findAllForAdmin() {
+    const [items, uses] = await Promise.all([
+      this.prisma.promotion.findMany({ orderBy: { sortOrder: 'asc' } }),
+      this.prisma.order.groupBy({
+        by: ['couponCode'],
+        where: {
+          couponCode: { not: null },
+          status: { notIn: [OrderStatus.CANCELLED, OrderStatus.REFUNDED] },
+        },
+        _count: { _all: true },
+      }),
+    ]);
+    return items.map((p) => ({
+      ...p,
+      couponUses: p.couponCode
+        ? (uses.find((u) => u.couponCode === p.couponCode)?._count._all ?? 0)
+        : 0,
+    }));
   }
 
   create(dto: CreatePromotionDto) {
@@ -118,16 +209,24 @@ export class PromotionsService {
    */
   private withDiscount<T extends UpdatePromotionDto>(
     dto: T,
-    current?: { discountType: string | null; discountValue: number | null },
+    current?: {
+      discountType: string | null;
+      discountValue: number | null;
+      couponCode: string | null;
+    },
   ): T {
     const type = dto.discountType !== undefined ? dto.discountType : current?.discountType;
     const value = dto.discountValue !== undefined ? dto.discountValue : current?.discountValue;
+    const noCoupon = { couponCode: null, couponMaxUses: null, couponMaxPerCustomer: null };
     if (!type) {
       if (dto.couponCode) {
         throw new BadRequestException('Un cupón necesita un descuento en la tienda');
       }
-      return { ...dto, discountType: null, discountValue: null, couponCode: null };
+      return { ...dto, discountType: null, discountValue: null, ...noCoupon };
     }
+    // Limits only mean something on a coupon
+    const code = dto.couponCode !== undefined ? dto.couponCode : current?.couponCode;
+    if (!code) dto = { ...dto, ...noCoupon };
     if (!value) throw new BadRequestException('Indica el valor del descuento');
     if (type === 'PERCENT' && value > 100) {
       throw new BadRequestException('El descuento en porcentaje admite hasta 100%');

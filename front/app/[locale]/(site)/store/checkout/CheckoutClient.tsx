@@ -156,11 +156,14 @@ export default function CheckoutClient({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code }),
       });
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setCouponError(t(res.status === 429 ? 'couponTooMany' : 'couponInvalid'));
+        // A coupon with no uses left explains itself; anything else reads as invalid
+        const m = data?.message?.message ?? data?.message;
+        setCouponError(res.status === 429 ? t('couponTooMany') : res.status === 409 && typeof m === 'string' ? m : t('couponInvalid'));
         return;
       }
-      setCoupon((await res.json()) as Coupon);
+      setCoupon(data as Coupon);
       setCouponInput('');
     } catch {
       setCouponError(t('couponFailed'));

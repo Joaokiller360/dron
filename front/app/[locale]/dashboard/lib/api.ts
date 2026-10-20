@@ -220,6 +220,11 @@ export interface Promotion {
   productIds: string[];
   /** With a code the discount only applies when typed at checkout */
   couponCode?: string | null;
+  /** Coupon limits: orders in total and per buyer (email or phone); null = unlimited */
+  couponMaxUses?: number | null;
+  couponMaxPerCustomer?: number | null;
+  /** Orders holding a use of the coupon (admin list only) */
+  couponUses?: number;
   endsAt?: string | null;
   active: boolean;
   sortOrder: number;
