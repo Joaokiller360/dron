@@ -214,7 +214,7 @@ model Promotion {
   oldPrice      String?   @map("old_price")
   // Service whose card gets the badge (Service.slug), optional
   serviceSlug   String?   @map("service_slug")
-  // Real discount on store products: PERCENT (1–90) or FIXED (cents off each
+  // Real discount on store products: PERCENT (1–100) or FIXED (cents off each
   // unit); null = display-only promotion. productIds empty = whole store
   discountType  String?   @map("discount_type")
   discountValue Int?      @map("discount_value")
@@ -311,6 +311,8 @@ model Product {
 enum PaymentMethod {
   PAYPAL
   TRANSFER
+  // Nothing to pay (100% promotion and free shipping): paid on checkout
+  FREE
 }
 
 // PENDING_PAYMENT → PAID (PayPal capture verified) → SHIPPED (carrier + tracking)
@@ -365,8 +367,11 @@ model Order {
   shippedAt      DateTime? @map("shipped_at")
 
   // Buyer emails are sent by a background task; null = still to send (retried)
-  paidEmailAt    DateTime? @map("paid_email_at")
-  shippedEmailAt DateTime? @map("shipped_email_at")
+  paidEmailAt       DateTime? @map("paid_email_at")
+  shippedEmailAt    DateTime? @map("shipped_email_at")
+  // Same for the WhatsApp notices
+  paidWhatsappAt    DateTime? @map("paid_whatsapp_at")
+  shippedWhatsappAt DateTime? @map("shipped_whatsapp_at")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")

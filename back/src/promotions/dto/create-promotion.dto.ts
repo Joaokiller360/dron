@@ -72,7 +72,7 @@ export class CreatePromotionDto {
   @IsIn(DISCOUNT_TYPES)
   discountType?: DiscountType | null;
 
-  @ApiPropertyOptional({ example: 20, description: 'Percent (1–90) or cents off each unit' })
+  @ApiPropertyOptional({ example: 20, description: 'Percent (1–100) or cents off each unit' })
   // Checked whenever sent (updates may change only the value); cleared with the type
   @ValidateIf((o: CreatePromotionDto) => o.discountValue != null)
   @IsInt()

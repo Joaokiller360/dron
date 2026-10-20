@@ -70,7 +70,7 @@ export class PromotionsService {
     return this.prisma.promotion.update({ where: { id }, data: this.withDiscount(dto, current) });
   }
 
-  /** Keeps type and value consistent: no type = no value; a percent tops out at 90 */
+  /** Keeps type and value consistent: no type = no value; a percent tops out at 100 */
   private withDiscount<T extends UpdatePromotionDto>(
     dto: T,
     current?: { discountType: string | null; discountValue: number | null },
@@ -79,8 +79,8 @@ export class PromotionsService {
     const value = dto.discountValue !== undefined ? dto.discountValue : current?.discountValue;
     if (!type) return { ...dto, discountType: null, discountValue: null };
     if (!value) throw new BadRequestException('Indica el valor del descuento');
-    if (type === 'PERCENT' && value > 90) {
-      throw new BadRequestException('El descuento en porcentaje admite hasta 90%');
+    if (type === 'PERCENT' && value > 100) {
+      throw new BadRequestException('El descuento en porcentaje admite hasta 100%');
     }
     return dto;
   }

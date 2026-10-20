@@ -5,7 +5,7 @@ import { SettingsService } from '../settings/settings.service';
 import type { OrderLine } from './store.service';
 import { lineTitle } from './product-options';
 
-const money = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+export const money = (cents: number) => `$${(cents / 100).toFixed(2)}`;
 const esc = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
@@ -14,6 +14,8 @@ const COPY = {
     paidSubject: (code: string) => `Confirmamos tu compra ${code}`,
     paidIntro: (name: string) =>
       `Hola ${name}, recibimos tu pago. Estamos preparando tu pedido y te avisaremos por correo cuando salga, con la empresa de envío y el número de guía.`,
+    freeIntro: (name: string) =>
+      `Hola ${name}, confirmamos tu pedido sin costo. Lo estamos preparando y te avisaremos por correo cuando salga, con la empresa de envío y el número de guía.`,
     shippedSubject: (code: string) => `Tu pedido ${code} está en camino`,
     shippedIntro: (name: string) => `Hola ${name}, tu pedido ya fue enviado.`,
     refundedSubject: (code: string) => `Reembolso de tu pedido ${code}`,
@@ -42,6 +44,8 @@ const COPY = {
     paidSubject: (code: string) => `Your purchase ${code} is confirmed`,
     paidIntro: (name: string) =>
       `Hi ${name}, we received your payment. We're preparing your order and will email you when it ships, with the carrier and tracking number.`,
+    freeIntro: (name: string) =>
+      `Hi ${name}, your free order is confirmed. We're preparing it and will email you when it ships, with the carrier and tracking number.`,
     shippedSubject: (code: string) => `Your order ${code} is on its way`,
     shippedIntro: (name: string) => `Hi ${name}, your order has shipped.`,
     refundedSubject: (code: string) => `Refund for your order ${code}`,
@@ -84,7 +88,11 @@ export class StoreMailService {
     await this.send(
       order.email,
       c.paidSubject(order.code),
-      [`<p>${esc(c.paidIntro(order.name))}</p>`, this.summary(order), this.address(order)],
+      [
+        `<p>${esc((order.paymentMethod === 'FREE' ? c.freeIntro : c.paidIntro)(order.name))}</p>`,
+        this.summary(order),
+        this.address(order),
+      ],
       { buyer: c },
     );
     const { email: shop } = await this.settings.getContact();

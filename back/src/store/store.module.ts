@@ -8,10 +8,11 @@ import { StoreService } from './store.service';
 import { OrdersService } from './orders.service';
 import { PaypalService } from './paypal.service';
 import { StoreMailService } from './store-mail.service';
+import { StoreWhatsappService } from './store-whatsapp.service';
 
 @Module({
   imports: [SettingsModule, PromotionsModule],
   controllers: [StoreController, ProductsController, OrdersController],
-  providers: [StoreService, OrdersService, PaypalService, StoreMailService],
+  providers: [StoreService, OrdersService, PaypalService, StoreMailService, StoreWhatsappService],
 })
 export class StoreModule {}

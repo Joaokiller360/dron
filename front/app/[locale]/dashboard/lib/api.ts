@@ -332,7 +332,7 @@ export interface Order {
   /** Items + shipping */
   totalCents: number;
   status: OrderStatus;
-  paymentMethod: 'PAYPAL' | 'TRANSFER';
+  paymentMethod: 'PAYPAL' | 'TRANSFER' | 'FREE';
   transferBank?: string | null;
   transferReference?: string | null;
   paypalOrderId?: string | null;

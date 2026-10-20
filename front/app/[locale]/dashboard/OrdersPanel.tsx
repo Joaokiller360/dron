@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState, FormEvent } from 'react';
-import { Receipt, ChevronRight, Mail, Phone, MapPin, Truck, CreditCard, CheckCheck, Undo2, Ban, Check, Clock, Landmark, BadgeCheck } from 'lucide-react';
+import { Receipt, ChevronRight, Mail, Phone, MapPin, Truck, CreditCard, CheckCheck, Undo2, Ban, Check, Clock, Landmark, BadgeCheck, Gift } from 'lucide-react';
 import { apiFetch, errorMessage, formatMoney, Order, OrderStatus } from './lib/api';
 import { useCollection } from './lib/useCollection';
 import Modal from './Modal';
@@ -148,7 +148,7 @@ export default function OrdersPanel() {
       o,
       'refund',
       () => apiFetch<Order>(`/orders/${o.id}/refund`, { method: 'POST' }),
-      o.paymentMethod === 'TRANSFER' ? 'Pedido marcado como reembolsado' : `Reembolso de ${formatMoney(o.totalCents)} enviado por PayPal`,
+      o.paymentMethod === 'FREE' ? 'Pedido gratis anulado' : o.paymentMethod === 'TRANSFER' ? 'Pedido marcado como reembolsado' : `Reembolso de ${formatMoney(o.totalCents)} enviado por PayPal`,
       'No se pudo reembolsar.',
     );
   const confirmTransfer = (o: Order) =>
@@ -323,8 +323,8 @@ export default function OrdersPanel() {
                   <div className="flex flex-col gap-3">
                     <div className="flex flex-col gap-1.5 p-4 rounded-xl border border-white/[.08] bg-white/[.02] text-[13px]">
                       <span className="inline-flex items-center gap-2 text-[13.5px] font-semibold text-white">
-                        {o.paymentMethod === 'TRANSFER' ? <Landmark size={15} className="text-jb-accent" /> : <CreditCard size={15} className="text-jb-accent" />}
-                        {o.paymentMethod === 'TRANSFER' ? 'Transferencia bancaria' : 'Pago PayPal'}
+                        {o.paymentMethod === 'FREE' ? <Gift size={15} className="text-jb-accent" /> : o.paymentMethod === 'TRANSFER' ? <Landmark size={15} className="text-jb-accent" /> : <CreditCard size={15} className="text-jb-accent" />}
+                        {o.paymentMethod === 'FREE' ? 'Gratis (promoción 100%)' : o.paymentMethod === 'TRANSFER' ? 'Transferencia bancaria' : 'Pago PayPal'}
                       </span>
                       {o.paymentMethod === 'TRANSFER' && (
                         <span className="text-jb-soft">
@@ -373,11 +373,12 @@ export default function OrdersPanel() {
                           <CheckCheck size={15} /> Marcar entregado
                         </button>
                       )}
-                      {paid && (o.paypalCaptureId || o.paymentMethod === 'TRANSFER') && (
+                      {paid && (o.paypalCaptureId || o.paymentMethod !== 'PAYPAL') && (
                         <RefundButton
                           busy={isBusy('refund')}
                           amount={formatMoney(o.totalCents)}
                           manual={o.paymentMethod === 'TRANSFER'}
+                          free={o.paymentMethod === 'FREE'}
                           onConfirm={() => refund(o)}
                         />
                       )}
@@ -399,7 +400,7 @@ export default function OrdersPanel() {
 }
 
 /** Two-step refund: the second click (within 4s) sends it to PayPal */
-function RefundButton({ amount, busy, manual, onConfirm }: { amount: string; busy: boolean; manual: boolean; onConfirm: () => void }) {
+function RefundButton({ amount, busy, manual, free, onConfirm }: { amount: string; busy: boolean; manual: boolean; free: boolean; onConfirm: () => void }) {
   const [armed, setArmed] = useState(false);
   useEffect(() => {
     if (!armed) return;
@@ -415,11 +416,11 @@ function RefundButton({ amount, busy, manual, onConfirm }: { amount: string; bus
       }}
       className={btn.danger}
     >
-      <Undo2 size={15} /> {manual ? `¿Ya devolviste ${amount}?` : `¿Reembolsar ${amount}?`}
+      <Undo2 size={15} /> {free ? '¿Anular pedido gratis?' : manual ? `¿Ya devolviste ${amount}?` : `¿Reembolsar ${amount}?`}
     </button>
   ) : (
     <button type="button" disabled={busy} onClick={() => setArmed(true)} className={btn.ghost}>
-      <Undo2 size={15} /> {busy ? 'Reembolsando…' : manual ? 'Marcar reembolsado' : 'Reembolsar'}
+      <Undo2 size={15} /> {busy ? (free ? 'Anulando…' : 'Reembolsando…') : free ? 'Anular pedido' : manual ? 'Marcar reembolsado' : 'Reembolsar'}
     </button>
   );
 }

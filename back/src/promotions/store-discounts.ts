@@ -9,7 +9,7 @@ export interface StoreDiscount {
   title: string;
   badge: string | null;
   type: DiscountType;
-  /** Percent (1–90) or cents off each unit */
+  /** Percent (1–100) or cents off each unit */
   value: number;
   /** Empty = every product */
   productIds: string[];

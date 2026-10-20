@@ -56,6 +56,22 @@ export default () => ({
     // only trusted after PayPal confirms their signature against it
     webhookId: process.env.PAYPAL_WEBHOOK_ID,
   },
+  // WhatsApp Cloud API (Meta) for buyer notices. Business-initiated messages
+  // must use templates approved in WhatsApp Manager; only their variables are sent
+  whatsapp: {
+    // Permanent System User token with whatsapp_business_messaging permission
+    token: process.env.WHATSAPP_TOKEN,
+    // Id of the sending number (WhatsApp Manager → API Setup), not the number itself
+    phoneNumberId: process.env.WHATSAPP_PHONE_NUMBER_ID,
+    apiVersion: process.env.WHATSAPP_API_VERSION ?? 'v23.0',
+    // Prefix for local numbers typed at checkout (0987654321 → 593987654321)
+    countryCode: process.env.WHATSAPP_COUNTRY_CODE ?? '593',
+    templatePaid: process.env.WHATSAPP_TEMPLATE_PAID ?? 'pedido_pagado',
+    templateShipped: process.env.WHATSAPP_TEMPLATE_SHIPPED ?? 'pedido_enviado',
+    // Language codes the templates were approved in
+    langEs: process.env.WHATSAPP_TEMPLATE_LANG_ES ?? 'es',
+    langEn: process.env.WHATSAPP_TEMPLATE_LANG_EN ?? 'en',
+  },
   // ClamAV daemon that scans every upload before it is published. Required in
   // production: without it uploads are refused.
   clamav: {

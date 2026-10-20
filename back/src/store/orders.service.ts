@@ -25,6 +25,7 @@ import { PaypalError, PaypalOrder, PaypalService } from './paypal.service';
 import { PromotionsService } from '../promotions/promotions.service';
 import { bestPrice, discountsFor } from '../promotions/store-discounts';
 import { StoreMailService } from './store-mail.service';
+import { StoreWhatsappService } from './store-whatsapp.service';
 
 type Tx = Prisma.TransactionClient;
 
@@ -42,8 +43,8 @@ const CHECKOUT_TTL_MS = 30 * 60_000;
 const TRANSFER_TTL_MS = 72 * 60 * 60_000;
 /** How often the background tasks run */
 const TASK_INTERVAL_MS = 2 * 60_000;
-/** Emails that keep failing stop being retried after this long */
-const EMAIL_RETRY_WINDOW_MS = 3 * 24 * 60 * 60_000;
+/** Notices that keep failing stop being retried after this long */
+const NOTICE_RETRY_WINDOW_MS = 3 * 24 * 60 * 60_000;
 
 const CODE_ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ'; // no 0/O, 1/I/L
 const newOrderCode = () =>
@@ -64,7 +65,8 @@ export type PaymentResult = 'PAID' | 'PENDING' | 'DECLINED';
  *
  * Background tasks, every couple of minutes:
  * - reconcile / expire unpaid checkouts (capture approved ones, release the rest)
- * - send pending buyer emails (purchase confirmation, shipping), retrying failures
+ * - send pending buyer notices by email and WhatsApp (purchase confirmation,
+ *   shipping), retrying failures
  */
 @Injectable()
 export class OrdersService implements OnModuleInit, OnModuleDestroy {
@@ -77,6 +79,7 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
     private readonly store: StoreService,
     private readonly paypal: PaypalService,
     private readonly mail: StoreMailService,
+    private readonly whatsapp: StoreWhatsappService,
     private readonly events: EventsService,
     private readonly promotions: PromotionsService,
   ) {}
@@ -154,6 +157,18 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
     return { code: order.code, status: 'VERIFYING' as const };
   }
 
+  /**
+   * Nothing to pay (100% promotion and free shipping): the server prices the
+   * cart itself, so this only goes through when its total really is $0. The
+   * order is paid right away and the buyer gets the usual confirmation.
+   */
+  async checkoutFree(dto: CreateOrderDto): Promise<{ code: string; status: PaymentResult }> {
+    const settings = await this.ensureSelling();
+    const order = await this.createReserved(dto, settings, { paymentMethod: PaymentMethod.FREE });
+    await this.markPaid(order, null);
+    return { code: order.code, status: 'PAID' };
+  }
+
   private async ensureSelling() {
     const settings = await this.store.getSettings();
     if (!settings.enabled || !settings.sales) {
@@ -211,8 +226,16 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
       }
       const lines = [...byKey.values()];
       const itemsCents = lines.reduce((sum, l) => sum + l.unitCents * l.quantity, 0);
-      if (itemsCents <= 0) throw new BadRequestException('El total del pedido debe ser mayor a 0');
       const shippingCents = city ? shippingFor(city, itemsCents) : 0;
+      // A $0 order has nothing for PayPal or a transfer to pay; only the free checkout takes it
+      const free = itemsCents + shippingCents === 0;
+      if (free !== (extra.paymentMethod === PaymentMethod.FREE)) {
+        throw new BadRequestException(
+          free
+            ? 'Este pedido no tiene costo: confírmalo sin pagar'
+            : 'Este pedido tiene un costo: elige cómo pagarlo',
+        );
+      }
       await this.reserve(tx, lines);
 
       return tx.order.create({
@@ -338,7 +361,7 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
-  /** Sets carrier + tracking and emails them to the buyer (again if they change) */
+  /** Sets carrier + tracking and sends them to the buyer (again if they change) */
   async ship(id: string, dto: ShipOrderDto) {
     const order = await this.ensure(id);
     if (order.status !== PAID && order.status !== SHIPPED) {
@@ -353,9 +376,10 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
         trackingUrl: dto.trackingUrl || null,
         shippedAt: order.shippedAt ?? new Date(),
         shippedEmailAt: null,
+        shippedWhatsappAt: null,
       },
     });
-    this.kick('emails', () => this.sendPendingEmails());
+    this.kick('notices', () => this.sendPendingNotices());
     return updated;
   }
 
@@ -400,6 +424,8 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
     }
     // Transfers are returned by the owner from the bank; here it's only recorded
     if (order.paymentMethod === PaymentMethod.TRANSFER) return this.markRefunded(order, true);
+    // Free orders had no payment: only cancelled (units back), the buyer isn't told of a refund
+    if (order.paymentMethod === PaymentMethod.FREE) return this.markRefunded(order, false);
     if (!order.paypalCaptureId) {
       throw new BadRequestException('Este pedido no tiene un pago para reembolsar');
     }
@@ -432,7 +458,7 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
   runTasks() {
     this.kick('checkouts', () => this.reconcileCheckouts());
     this.kick('transfers', () => this.expireTransfers());
-    this.kick('emails', () => this.sendPendingEmails());
+    this.kick('notices', () => this.sendPendingNotices());
   }
 
   /** Runs a task unless the same one is still going; errors are logged, never thrown */
@@ -496,13 +522,13 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
   }
 
   /**
-   * Purchase confirmations and shipping notices not yet delivered. Each email
-   * is claimed before sending (so it can't go out twice) and released again if
+   * Purchase confirmations and shipping notices (email and WhatsApp) not yet
+   * delivered. Each notice is claimed before sending (so it can't go out twice) and released again if
    * sending fails, to be retried on the next run. One failing address never
    * blocks the rest of the queue.
    */
-  private async sendPendingEmails() {
-    const since = new Date(Date.now() - EMAIL_RETRY_WINDOW_MS);
+  private async sendPendingNotices() {
+    const since = new Date(Date.now() - NOTICE_RETRY_WINDOW_MS);
     const paid = await this.prisma.order.findMany({
       where: { paidEmailAt: null, paidAt: { gt: since }, status: { in: PAID_STATES } },
       orderBy: { paidAt: 'asc' },
@@ -523,11 +549,31 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
     for (const order of shipped) {
       await this.sendOnce(order, 'shippedEmailAt', () => this.mail.orderShipped(order));
     }
+    const paidWa = await this.prisma.order.findMany({
+      where: { paidWhatsappAt: null, paidAt: { gt: since }, status: { in: PAID_STATES } },
+      orderBy: { paidAt: 'asc' },
+      take: 20,
+    });
+    for (const order of paidWa) {
+      await this.sendOnce(order, 'paidWhatsappAt', () => this.whatsapp.orderPaid(order));
+    }
+    const shippedWa = await this.prisma.order.findMany({
+      where: {
+        shippedWhatsappAt: null,
+        shippedAt: { gt: since },
+        status: { in: [SHIPPED, COMPLETED] },
+      },
+      orderBy: { shippedAt: 'asc' },
+      take: 20,
+    });
+    for (const order of shippedWa) {
+      await this.sendOnce(order, 'shippedWhatsappAt', () => this.whatsapp.orderShipped(order));
+    }
   }
 
   private async sendOnce(
     order: Order,
-    field: 'paidEmailAt' | 'shippedEmailAt',
+    field: 'paidEmailAt' | 'shippedEmailAt' | 'paidWhatsappAt' | 'shippedWhatsappAt',
     send: () => Promise<void>,
   ) {
     const claimedAt = new Date();
@@ -539,7 +585,7 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
     try {
       await send();
     } catch (err) {
-      this.logger.warn(`Email ${field} for ${order.code} failed, will retry: ${err}`);
+      this.logger.warn(`Notice ${field} for ${order.code} failed, will retry: ${err}`);
       await this.prisma.order.updateMany({
         where: { id: order.id, [field]: claimedAt },
         data: { [field]: null },
@@ -614,10 +660,10 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
     });
     if (paid) {
       this.logger.log(
-        `Order ${order.code} paid (${captureId ? `capture ${captureId}` : 'transfer confirmed'})`,
+        `Order ${order.code} paid (${captureId ? `capture ${captureId}` : order.paymentMethod === PaymentMethod.FREE ? 'free order' : 'transfer confirmed'})`,
       );
       this.announce();
-      this.kick('emails', () => this.sendPendingEmails());
+      this.kick('notices', () => this.sendPendingNotices());
     }
   }
 

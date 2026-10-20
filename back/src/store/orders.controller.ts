@@ -44,6 +44,15 @@ export class OrdersController {
     return this.orders.checkoutTransfer(dto);
   }
 
+  @Post('free')
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  @ApiOperation({
+    summary: 'Public: order whose total is $0 (100% promotion), confirmed without payment',
+  })
+  checkoutFree(@Body() dto: CreateOrderDto) {
+    return this.orders.checkoutFree(dto);
+  }
+
   @Post('paypal/capture')
   @HttpCode(200)
   @Throttle({ default: { limit: 20, ttl: 60_000 } })

@@ -123,8 +123,8 @@ export default function PromotionsPanel() {
     // Percent as typed; a fixed amount goes to the API in cents
     const raw = parseFloat(form.discountValue.replace(',', '.'));
     const discountValue = !form.discountType ? null : form.discountType === 'PERCENT' ? Math.round(raw) : Math.round(raw * 100);
-    if (form.discountType && (!Number.isFinite(raw) || !discountValue || discountValue < 1 || (form.discountType === 'PERCENT' && discountValue > 90))) {
-      setFormError(form.discountType === 'PERCENT' ? 'El porcentaje debe estar entre 1 y 90.' : 'Indica cuánto se descuenta por unidad.');
+    if (form.discountType && (!Number.isFinite(raw) || !discountValue || discountValue < 1 || (form.discountType === 'PERCENT' && discountValue > 100))) {
+      setFormError(form.discountType === 'PERCENT' ? 'El porcentaje debe estar entre 1 y 100.' : 'Indica cuánto se descuenta por unidad.');
       return;
     }
     if (form.discountType && !form.allProducts && !form.productIds.length) {
@@ -319,7 +319,7 @@ export default function PromotionsPanel() {
                 </select>
               </Field>
               {form.discountType && (
-                <Field label={form.discountType === 'PERCENT' ? 'Porcentaje' : 'Descuento (USD)'} hint={form.discountType === 'PERCENT' ? 'Entre 1 y 90.' : 'Se resta a cada unidad.'}>
+                <Field label={form.discountType === 'PERCENT' ? 'Porcentaje' : 'Descuento (USD)'} hint={form.discountType === 'PERCENT' ? 'Entre 1 y 100.' : 'Se resta a cada unidad.'}>
                   <input
                     required
                     inputMode="decimal"

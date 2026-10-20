@@ -10,11 +10,12 @@ import { EMAIL_PATTERN, NAME_PATTERN, PLACE_PATTERN, TEXT_PATTERN } from '@/app/
 import PhoneInput, { formatPhone, isValidPhone, type PhoneCountry } from '@/app/component/site/PhoneInput';
 import PaypalButtons, { type PaymentOutcome } from '../PaypalButtons';
 import TransferPayment from '../TransferPayment';
+import FreeOrder from '../FreeOrder';
 import { Stepper, optionsText, useCart, useMoney, type CartLine } from '../cart';
 
 const emptyBuyer = { name: '', email: '', phoneCountry: 'EC' as PhoneCountry, phone: '', address: '', city: '', note: '' };
 type Buyer = typeof emptyBuyer;
-type Done = { status: PaymentOutcome['status'] | 'VERIFYING'; code: string; email: string };
+type Done = { status: PaymentOutcome['status'] | 'VERIFYING' | 'FREE'; code: string; email: string };
 
 function Field({ label, optional, className = '', children }: { label: string; optional?: string; className?: string; children: ReactNode }) {
   return (
@@ -82,6 +83,8 @@ export default function CheckoutClient({
   const shipCity = cities.find((c) => c.name === buyer.city) ?? null;
   const shippingCents = shipCity ? shippingFor(shipCity, itemsCents) : 0;
   const totalCents = itemsCents + shippingCents;
+  // 100% promotion and free shipping: nothing to pay, the buyer only confirms
+  const free = showPrices && totalCents === 0;
   const shippingText = (cents: number) => (cents === 0 ? t('shippingFree') : money(cents));
 
   const hasPaypal = !!payments?.paypalClientId;
@@ -149,13 +152,13 @@ export default function CheckoutClient({
     return (
       <section className="px-6 pt-20 pb-24 jb-glow">
         <div className="max-w-[560px] mx-auto flex flex-col items-center gap-5 text-center">
-          {done.status === 'PAID' ? <CheckCircle2 size={56} className="text-jb-accent" /> : <Clock size={56} className="text-amber-300" />}
+          {done.status === 'PAID' || done.status === 'FREE' ? <CheckCircle2 size={56} className="text-jb-accent" /> : <Clock size={56} className="text-amber-300" />}
           <h1 className="m-0 font-mono text-[clamp(28px,4vw,40px)] font-bold tracking-[-.02em] text-white">
-            {t(done.status === 'PAID' ? 'successTitle' : done.status === 'VERIFYING' ? 'verifyingTitle' : 'pendingTitle')}
+            {t(done.status === 'PAID' || done.status === 'FREE' ? 'successTitle' : done.status === 'VERIFYING' ? 'verifyingTitle' : 'pendingTitle')}
           </h1>
           <span className="px-4 py-2 rounded-xl border border-white/[.12] font-mono text-[22px] font-bold tracking-[.06em] text-white">{done.code}</span>
           <p className="m-0 text-[16px] leading-[1.65] text-jb-soft">
-            {t(done.status === 'PAID' ? 'successText' : done.status === 'VERIFYING' ? 'verifyingText' : 'pendingText', { code: done.code, email: done.email })}
+            {t(done.status === 'PAID' ? 'successText' : done.status === 'FREE' ? 'freeSuccessText' : done.status === 'VERIFYING' ? 'verifyingText' : 'pendingText', { code: done.code, email: done.email })}
           </p>
           <Link href={`${prefix}/store`} className={`${btnGhost} mt-2 text-sm px-5 py-3`}>
             {t('keepShopping')}
@@ -362,6 +365,8 @@ export default function CheckoutClient({
               <StepCard n={2} title={t('stepPayment')} active={step === 'pay'}>
                 {step === 'details' ? (
                   <p className="m-0 text-[14px] text-jb-muted">{t('paymentLocked')}</p>
+                ) : free ? (
+                  <FreeOrder order={orderBody} onDone={(code) => finish({ status: 'FREE', code })} onStockChanged={() => router.refresh()} />
                 ) : (
                   <div className="flex flex-col gap-4">
                     <p className="m-0 text-[14px] leading-[1.55] text-jb-soft">{t('payText')}</p>
