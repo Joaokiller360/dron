@@ -136,14 +136,16 @@ export class StoreWhatsappService {
 
   /**
    * Sends the notice as its approved template ({{1}}, {{2}}… filled in order)
-   * or, while that template isn't configured, as a plain text message. Meta
+   * or, until templates are turned on, as a plain text message. Meta
    * only delivers plain text to buyers who wrote to the shop's number in the
    * last 24 hours, so templates are needed to reach everyone.
    */
   private async send(order: Order, notice: Notice, values: string[]) {
-    const template = this.config.get<string>(
-      notice === 'paid' ? 'whatsapp.templatePaid' : 'whatsapp.templateShipped',
-    );
+    const template = this.config.get<boolean>('whatsapp.useTemplates')
+      ? this.config.get<string>(
+          notice === 'paid' ? 'whatsapp.templatePaid' : 'whatsapp.templateShipped',
+        )
+      : undefined;
     const label = template ?? `${notice} (text)`;
     const token = this.config.get<string>('whatsapp.token');
     const phoneNumberId = this.config.get<string>('whatsapp.phoneNumberId');

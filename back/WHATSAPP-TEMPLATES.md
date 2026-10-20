@@ -9,8 +9,9 @@ El backend avisa al comprador por WhatsApp en dos momentos:
 
 ## Mientras no haya plantillas aprobadas
 
-Deja `WHATSAPP_TEMPLATE_PAID` y `WHATSAPP_TEMPLATE_SHIPPED` **vacías**. El aviso sale
-como mensaje de texto normal, con el mismo contenido de abajo.
+No hace falta tocar nada: mientras `WHATSAPP_USE_TEMPLATES` no sea `true`, el aviso
+sale como mensaje de texto normal, con el mismo contenido de abajo (aunque
+`WHATSAPP_TEMPLATE_PAID` / `WHATSAPP_TEMPLATE_SHIPPED` tengan valor).
 
 > **Limitación de Meta:** un mensaje de texto libre solo se entrega si el comprador
 > le escribió a tu número de WhatsApp en las **últimas 24 horas**. Si no, la API
@@ -28,8 +29,9 @@ como mensaje de texto normal, con el mismo contenido de abajo.
    variables deben ir en ese orden porque el backend las llena así (`pedido_pagado`
    tiene 6, `pedido_enviado` tiene 5).
 6. Meta pide un ejemplo por variable: usa los de cada tabla.
-7. Cuando Meta las apruebe (minutos u horas), pon los nombres en el entorno del servidor:
+7. Cuando Meta las apruebe (minutos u horas), actívalas en el entorno del servidor:
    ```env
+   WHATSAPP_USE_TEMPLATES=true
    WHATSAPP_TEMPLATE_PAID=pedido_pagado
    WHATSAPP_TEMPLATE_SHIPPED=pedido_enviado
    ```
@@ -113,7 +115,7 @@ Thank you for shopping at JB.SKYLENS.
 
 | Error | Causa |
 | --- | --- |
-| `(#132001) Template name does not exist in the translation` | La plantilla no existe, no está aprobada o no existe en ese idioma. Revisa el nombre y el código de idioma, o deja la variable vacía para enviar texto. |
+| `(#132001) Template name does not exist in the translation` | La plantilla no existe, no está aprobada o no existe en ese idioma. Revisa el nombre y el código de idioma, o quita `WHATSAPP_USE_TEMPLATES=true` para enviar texto. |
 | `(#132000) Number of parameters does not match` | La plantilla aprobada no tiene el número de variables esperado (6 en `pedido_pagado`, 5 en `pedido_enviado`). |
 | `131047` (en el webhook) | Mensaje de texto sin plantilla a alguien que no te escribió en 24 h. |
 | `(#131030) Recipient phone number not in allowed list` | Con el número de prueba de Meta solo puedes enviar a números verificados en API Setup. |

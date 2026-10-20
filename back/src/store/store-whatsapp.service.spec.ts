@@ -33,7 +33,8 @@ describe('param', () => {
 });
 
 describe('StoreWhatsappService', () => {
-  const env: Record<string, string> = {
+  const env: Record<string, string | boolean> = {
+    'whatsapp.useTemplates': true,
     'whatsapp.token': 'tkn',
     'whatsapp.phoneNumberId': '111',
     'whatsapp.apiVersion': 'v23.0',
@@ -91,9 +92,9 @@ describe('StoreWhatsappService', () => {
     ]);
   });
 
-  it('sends plain text while no template is configured', async () => {
+  it('sends plain text until templates are turned on', async () => {
     const noTemplates = {
-      get: (key: string) => (key.startsWith('whatsapp.template') ? undefined : env[key]),
+      get: (key: string) => (key === 'whatsapp.useTemplates' ? false : env[key]),
     } as unknown as ConfigService;
     await new StoreWhatsappService(noTemplates).orderShipped({
       ...order,
