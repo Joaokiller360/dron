@@ -91,6 +91,33 @@ describe('StoreWhatsappService', () => {
     ]);
   });
 
+  it('sends plain text while no template is configured', async () => {
+    const noTemplates = {
+      get: (key: string) => (key.startsWith('whatsapp.template') ? undefined : env[key]),
+    } as unknown as ConfigService;
+    await new StoreWhatsappService(noTemplates).orderShipped({
+      ...order,
+      carrier: 'Servientrega',
+      trackingNumber: '123456',
+      trackingUrl: null,
+    } as Order);
+    const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+    expect(body.type).toBe('text');
+    expect(body.template).toBeUndefined();
+    expect(body.text.body).toBe(
+      [
+        'Hola Ana, tu pedido JB-ABC123 ya fue enviado.',
+        '',
+        'Empresa de envío: Servientrega',
+        'Número de guía: 123456',
+        'Rastreo: —',
+        'Entrega en: Av. Libertad, casa 12, Quito',
+        '',
+        'Gracias por comprar en JB.SKYLENS.',
+      ].join('\n'),
+    );
+  });
+
   it('throws on API errors so the notice is retried', async () => {
     fetchMock.mockResolvedValue({
       ok: false,

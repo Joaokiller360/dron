@@ -66,8 +66,10 @@ export default () => ({
     apiVersion: process.env.WHATSAPP_API_VERSION ?? 'v23.0',
     // Prefix for local numbers typed at checkout (0987654321 → 593987654321)
     countryCode: process.env.WHATSAPP_COUNTRY_CODE ?? '593',
-    templatePaid: process.env.WHATSAPP_TEMPLATE_PAID ?? 'pedido_pagado',
-    templateShipped: process.env.WHATSAPP_TEMPLATE_SHIPPED ?? 'pedido_enviado',
+    // Approved template names (WHATSAPP-TEMPLATES.md); empty = plain text, which
+    // Meta only delivers to buyers who wrote to the shop in the last 24 h
+    templatePaid: process.env.WHATSAPP_TEMPLATE_PAID || undefined,
+    templateShipped: process.env.WHATSAPP_TEMPLATE_SHIPPED || undefined,
     // Language codes the templates were approved in
     langEs: process.env.WHATSAPP_TEMPLATE_LANG_ES ?? 'es',
     langEn: process.env.WHATSAPP_TEMPLATE_LANG_EN ?? 'en',

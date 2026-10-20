@@ -5,10 +5,68 @@ import type { OrderLine } from './store.service';
 import { lineTitle } from './product-options';
 import { money } from './store-mail.service';
 
+type Notice = 'paid' | 'shipped';
+
+/**
+ * Wording of each notice; {{n}} are its values in order. Templates approved in
+ * WhatsApp Manager must keep this text and variable order (see
+ * WHATSAPP-TEMPLATES.md); the same text goes out as a plain message while no
+ * template is configured.
+ */
 const COPY = {
-  es: { freeShipping: 'Gratis', none: '—' },
-  en: { freeShipping: 'Free', none: '—' },
+  es: {
+    freeShipping: 'Gratis',
+    none: '—',
+    paid: [
+      'Hola {{1}}, confirmamos tu pedido {{2}} en JB.SKYLENS.',
+      '',
+      'Productos: {{3}}',
+      'Envío: {{4}}',
+      'Total: {{5}}',
+      'Entrega en: {{6}}',
+      '',
+      'Te avisaremos por aquí cuando salga, con la empresa de envío y el número de guía.',
+    ],
+    shipped: [
+      'Hola {{1}}, tu pedido {{2}} ya fue enviado.',
+      '',
+      'Empresa de envío: {{3}}',
+      'Número de guía: {{4}}',
+      'Rastreo: {{5}}',
+      'Entrega en: {{6}}',
+      '',
+      'Gracias por comprar en JB.SKYLENS.',
+    ],
+  },
+  en: {
+    freeShipping: 'Free',
+    none: '—',
+    paid: [
+      'Hi {{1}}, your order {{2}} at JB.SKYLENS is confirmed.',
+      '',
+      'Products: {{3}}',
+      'Shipping: {{4}}',
+      'Total: {{5}}',
+      'Delivery to: {{6}}',
+      '',
+      "We'll message you here when it ships, with the carrier and tracking number.",
+    ],
+    shipped: [
+      'Hi {{1}}, your order {{2}} has shipped.',
+      '',
+      'Carrier: {{3}}',
+      'Tracking number: {{4}}',
+      'Track it: {{5}}',
+      'Delivery to: {{6}}',
+      '',
+      'Thank you for shopping at JB.SKYLENS.',
+    ],
+  },
 };
+
+/** Fills {{1}}, {{2}}… of a notice with its values */
+export const fill = (lines: string[], values: string[]) =>
+  lines.join('\n').replace(/\{\{(\d+)\}\}/g, (_, n: string) => param(values[Number(n) - 1] ?? ''));
 
 /**
  * Phone typed at checkout → WhatsApp id (country code + number, digits only).
@@ -47,7 +105,7 @@ export class StoreWhatsappService {
     const shipping = order.shippingCity
       ? `${order.shippingCity} · ${order.shippingCents ? money(order.shippingCents) : c.freeShipping}`
       : c.none;
-    await this.send(order, this.config.get<string>('whatsapp.templatePaid')!, [
+    await this.send(order, 'paid', [
       order.name,
       order.code,
       items,
@@ -59,7 +117,7 @@ export class StoreWhatsappService {
 
   async orderShipped(order: Order) {
     const c = this.copy(order);
-    await this.send(order, this.config.get<string>('whatsapp.templateShipped')!, [
+    await this.send(order, 'shipped', [
       order.name,
       order.code,
       order.carrier ?? c.none,
@@ -77,48 +135,58 @@ export class StoreWhatsappService {
     return `${order.address}, ${order.city}`;
   }
 
-  /** Sends an approved template; its body variables {{1}}, {{2}}… are filled in order */
-  private async send(order: Order, template: string, values: string[]) {
+  /**
+   * Sends the notice as its approved template ({{1}}, {{2}}… filled in order)
+   * or, while that template isn't configured, as a plain text message. Meta
+   * only delivers plain text to buyers who wrote to the shop's number in the
+   * last 24 hours, so templates are needed to reach everyone.
+   */
+  private async send(order: Order, notice: Notice, values: string[]) {
+    const template = this.config.get<string>(
+      notice === 'paid' ? 'whatsapp.templatePaid' : 'whatsapp.templateShipped',
+    );
+    const label = template ?? `${notice} (text)`;
     const token = this.config.get<string>('whatsapp.token');
     const phoneNumberId = this.config.get<string>('whatsapp.phoneNumberId');
     if (!token || !phoneNumberId) {
       this.logger.warn(
-        `WhatsApp "${template}" for ${order.code} not sent: WHATSAPP_TOKEN / WHATSAPP_PHONE_NUMBER_ID missing`,
+        `WhatsApp "${label}" for ${order.code} not sent: WHATSAPP_TOKEN / WHATSAPP_PHONE_NUMBER_ID missing`,
       );
       return;
     }
     const to = toWaNumber(order.phone, this.config.get<string>('whatsapp.countryCode')!);
     if (!to) {
       // Retrying won't fix a bad number; the email still goes out
-      this.logger.warn(`WhatsApp "${template}" for ${order.code} not sent: invalid phone`);
+      this.logger.warn(`WhatsApp "${label}" for ${order.code} not sent: invalid phone`);
       return;
     }
     const language = this.config.get<string>(
       order.locale === 'en' ? 'whatsapp.langEn' : 'whatsapp.langEs',
     );
+    const message = template
+      ? {
+          type: 'template',
+          template: {
+            name: template,
+            language: { code: language },
+            components: [
+              {
+                type: 'body',
+                parameters: values.map((v) => ({ type: 'text', text: param(v) })),
+              },
+            ],
+          },
+        }
+      : { type: 'text', text: { body: fill(this.copy(order)[notice], values) } };
     const version = this.config.get<string>('whatsapp.apiVersion');
     const res = await fetch(`https://graph.facebook.com/${version}/${phoneNumberId}/messages`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        messaging_product: 'whatsapp',
-        to,
-        type: 'template',
-        template: {
-          name: template,
-          language: { code: language },
-          components: [
-            {
-              type: 'body',
-              parameters: values.map((v) => ({ type: 'text', text: param(v) })),
-            },
-          ],
-        },
-      }),
+      body: JSON.stringify({ messaging_product: 'whatsapp', to, ...message }),
     });
     if (!res.ok) {
       const body = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
-      throw new Error(`WhatsApp ${res.status} for "${template}": ${body?.error?.message ?? '?'}`);
+      throw new Error(`WhatsApp ${res.status} for "${label}": ${body?.error?.message ?? '?'}`);
     }
   }
 }
