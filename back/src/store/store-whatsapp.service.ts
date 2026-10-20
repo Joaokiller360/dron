@@ -18,7 +18,7 @@ const COPY = {
     freeShipping: 'Gratis',
     none: '—',
     paid: [
-      'Hola {{1}}, confirmamos tu pedido {{2}} en JB.SKYLENS.',
+      'Hola {{1}}, confirmamos tu pedido {{2}} en JB.SKYLENS 🚁',
       '',
       'Productos: {{3}}',
       'Envío: {{4}}',
@@ -28,12 +28,12 @@ const COPY = {
       'Te avisaremos por aquí cuando salga, con la empresa de envío y el número de guía.',
     ],
     shipped: [
-      'Hola {{1}}, tu pedido {{2}} ya fue enviado.',
+      'Tu pedido {{1}} ya fue enviado.',
       '',
-      'Empresa de envío: {{3}}',
-      'Número de guía: {{4}}',
-      'Rastreo: {{5}}',
-      'Entrega en: {{6}}',
+      'Empresa de envío: {{2}}',
+      'Número de guía: {{3}}',
+      'Entrega en: {{4}}',
+      'Web de rastreo: {{5}}',
       '',
       'Gracias por comprar en JB.SKYLENS.',
     ],
@@ -42,7 +42,7 @@ const COPY = {
     freeShipping: 'Free',
     none: '—',
     paid: [
-      'Hi {{1}}, your order {{2}} at JB.SKYLENS is confirmed.',
+      'Hi {{1}}, your order {{2}} at JB.SKYLENS is confirmed 🚁',
       '',
       'Products: {{3}}',
       'Shipping: {{4}}',
@@ -52,12 +52,12 @@ const COPY = {
       "We'll message you here when it ships, with the carrier and tracking number.",
     ],
     shipped: [
-      'Hi {{1}}, your order {{2}} has shipped.',
+      'Your order {{1}} has shipped.',
       '',
-      'Carrier: {{3}}',
-      'Tracking number: {{4}}',
-      'Track it: {{5}}',
-      'Delivery to: {{6}}',
+      'Carrier: {{2}}',
+      'Tracking number: {{3}}',
+      'Delivery to: {{4}}',
+      'Tracking website: {{5}}',
       '',
       'Thank you for shopping at JB.SKYLENS.',
     ],
@@ -118,12 +118,11 @@ export class StoreWhatsappService {
   async orderShipped(order: Order) {
     const c = this.copy(order);
     await this.send(order, 'shipped', [
-      order.name,
       order.code,
       order.carrier ?? c.none,
       order.trackingNumber ?? c.none,
-      order.trackingUrl ?? c.none,
       this.address(order),
+      order.trackingUrl ?? c.none,
     ]);
   }
 

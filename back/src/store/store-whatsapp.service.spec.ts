@@ -106,12 +106,12 @@ describe('StoreWhatsappService', () => {
     expect(body.template).toBeUndefined();
     expect(body.text.body).toBe(
       [
-        'Hola Ana, tu pedido JB-ABC123 ya fue enviado.',
+        'Tu pedido JB-ABC123 ya fue enviado.',
         '',
         'Empresa de envío: Servientrega',
         'Número de guía: 123456',
-        'Rastreo: —',
         'Entrega en: Av. Libertad, casa 12, Quito',
+        'Web de rastreo: —',
         '',
         'Gracias por comprar en JB.SKYLENS.',
       ].join('\n'),
