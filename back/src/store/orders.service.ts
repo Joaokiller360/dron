@@ -266,9 +266,6 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
           ...extra,
         },
       });
-      if (coupon && (await this.promotions.pauseIfSoldOut(coupon, tx))) {
-        this.logger.log(`Coupon ${coupon.code} used up by ${created.code}: promotion paused`);
-      }
       return created;
     });
     this.events.emit('products', 'update'); // stock changed
@@ -671,13 +668,20 @@ export class OrdersService implements OnModuleInit, OnModuleDestroy {
           );
         }
       }
+      // Paying the coupon's last use pauses its promotion
+      const coupon = current.couponCode
+        ? await this.promotions.findCoupon(current.couponCode)
+        : null;
+      if (coupon && (await this.promotions.pauseIfSoldOut(coupon, tx))) {
+        this.logger.log(`Coupon ${coupon.code} used up by ${order.code}: promotion paused`);
+      }
       return true;
     });
     if (paid) {
       this.logger.log(
         `Order ${order.code} paid (${captureId ? `capture ${captureId}` : order.paymentMethod === PaymentMethod.FREE ? 'free order' : 'transfer confirmed'})`,
       );
-      this.announce();
+      this.announce(order.couponCode);
       this.kick('notices', () => this.sendPendingNotices());
       // Heads-up for the shop with the order as it is now (paid)
       this.ensure(order.id)

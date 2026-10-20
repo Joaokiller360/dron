@@ -37,9 +37,13 @@ describe('pauseIfSoldOut', () => {
   });
   const service = new PromotionsService({} as PrismaService);
 
-  it('pauses the promotion when the last use is taken', async () => {
+  it('pauses the promotion when paid orders took the last use', async () => {
     const db = tx(2);
     await expect(service.pauseIfSoldOut(coupon({ maxUses: 2 }), db as never)).resolves.toBe(true);
+    // Unpaid checkouts don't count towards selling it out
+    expect(db.order.count).toHaveBeenCalledWith({
+      where: { couponCode: 'BODA2026', status: { in: ['PAID', 'SHIPPED', 'COMPLETED'] } },
+    });
     expect(db.promotion.update).toHaveBeenCalledWith({
       where: { id: 'p1' },
       data: { active: false },
@@ -89,5 +93,26 @@ describe('assertCouponAvailable', () => {
     await expect(
       service([{ email: 'otro@mail.com', phone: '0991234321' }]).assertCouponAvailable(once, buyer),
     ).resolves.toBeUndefined();
+  });
+});
+
+describe('findPublic', () => {
+  it('never sends coupon codes or limits to the public site', async () => {
+    const db = {
+      siteSetting: { findUnique: jest.fn(async () => null) },
+      promotion: {
+        findMany: jest.fn(async () => [
+          {
+            id: 'p1',
+            title: 'Boda',
+            couponCode: 'BODA2026',
+            couponMaxUses: 5,
+            couponMaxPerCustomer: 1,
+          },
+        ]),
+      },
+    };
+    const { items } = await new PromotionsService(db as unknown as PrismaService).findPublic();
+    expect(items).toEqual([{ id: 'p1', title: 'Boda' }]);
   });
 });

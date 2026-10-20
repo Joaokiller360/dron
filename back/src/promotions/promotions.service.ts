@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { OrderStatus, Prisma } from '@prisma/client';
+import { OrderStatus, Prisma, Promotion } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePromotionDto } from './dto/create-promotion.dto';
 import { StoreDiscount, toStoreDiscount } from './store-discounts';
@@ -29,6 +29,21 @@ export interface Coupon {
 const usesOf = (code: string): Prisma.OrderWhereInput => ({
   couponCode: code,
   status: { notIn: [OrderStatus.CANCELLED, OrderStatus.REFUNDED] },
+});
+
+/** A promotion as the public site gets it: coupon code and limits stay with the shop */
+const withoutCoupon = (p: Promotion) => {
+  const item: Partial<Promotion> = { ...p };
+  delete item.couponCode;
+  delete item.couponMaxUses;
+  delete item.couponMaxPerCustomer;
+  return item;
+};
+
+/** Paid orders using a coupon: only these can sell it out */
+const paidUsesOf = (code: string): Prisma.OrderWhereInput => ({
+  couponCode: code,
+  status: { in: [OrderStatus.PAID, OrderStatus.SHIPPED, OrderStatus.COMPLETED] },
 });
 
 /** Phones typed differently ("+593 98…" / "098…") still match on their last 9 digits */
@@ -64,8 +79,7 @@ export class PromotionsService {
       where: { active: true, OR: [{ endsAt: null }, { endsAt: { gt: new Date() } }] },
       orderBy: { sortOrder: 'asc' },
     });
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    return { settings, items: items.map(({ couponCode, ...item }) => item) };
+    return { settings, items: items.map(withoutCoupon) };
   }
 
   /**
@@ -160,14 +174,15 @@ export class PromotionsService {
   }
 
   /**
-   * Pauses the coupon's promotion once its last use is taken. Call it in the
-   * order transaction, after creating the order and with the lock from
-   * assertCouponAvailable. It stays paused even if a use comes back later:
-   * the owner reactivates it (raising the limit if needed).
+   * Pauses the coupon's promotion once paid orders have taken all its uses.
+   * Call it when an order is marked paid. Only paid orders count: checkouts
+   * that are never paid (anyone knowing the code can open them) hold a use
+   * for a while but can't switch the promotion off. It stays paused even if a
+   * use comes back later; the owner reactivates it (raising the limit if needed).
    */
   async pauseIfSoldOut(coupon: Coupon, tx: Prisma.TransactionClient) {
     if (coupon.maxUses === null) return false;
-    if ((await tx.order.count({ where: usesOf(coupon.code) })) < coupon.maxUses) return false;
+    if ((await tx.order.count({ where: paidUsesOf(coupon.code) })) < coupon.maxUses) return false;
     await tx.promotion.update({
       where: { id: coupon.discount.promotionId },
       data: { active: false },
